@@ -11,10 +11,8 @@ module Enumerable
   end
 end
 
-require_relative '../../bundler_setup'
-
+require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVimBroker'
-
 require 'benchmark'
 require 'util/miq-process'
 

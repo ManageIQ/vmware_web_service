@@ -1,6 +1,6 @@
 USE_BROKER = true
 
-require_relative '../../bundler_setup'
+require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVimBroker'
 require 'VMwareWebService/MiqVim'
 require 'util/extensions/miq-hash'

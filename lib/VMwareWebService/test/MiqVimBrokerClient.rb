@@ -1,4 +1,4 @@
-require_relative '../../bundler_setup'
+require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
 require 'VMwareWebService/MiqVimBroker'
 
