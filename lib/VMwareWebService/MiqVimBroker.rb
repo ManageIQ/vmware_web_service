@@ -517,7 +517,7 @@ class MiqVimBroker
     if @mode == :client
       begin
         return @broker.serverAlive?
-      rescue DRb::DRbConnError => err
+      rescue DRb::DRbConnError
         return false
       end
     end

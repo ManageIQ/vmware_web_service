@@ -2014,7 +2014,7 @@ class MiqVimInventory < MiqVimClientBase
 
     begin
       dsPath = dsName2path(ds)
-    rescue => err
+    rescue
       return nil
     end
 
@@ -2048,7 +2048,7 @@ class MiqVimInventory < MiqVimClientBase
           fVms.each do |vmMo|
             return o['name'] if vmMor == vmMo
           end
-        rescue => err
+        rescue
           # Ignore errors, keep going and return nil if not found.
         end
       end
