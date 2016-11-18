@@ -1290,9 +1290,9 @@ class VimService < Handsoap::Service
     if xsiType =~ /^ArrayOf(.*)$/
       nextType = $1
       obj = VimArray.new(xsiType)
-      node.children.each do |c|
-        next if c.blank?
-        obj << unmarshal_response(c, nextType)
+      node.children.each do |child|
+        next if child.blank?
+        obj << unmarshal_response(child, nextType)
       end
       return(obj)
     end
@@ -1300,9 +1300,9 @@ class VimService < Handsoap::Service
     aih = VimMappingRegistry.argInfoMap(xsiType)
     obj = VimHash.new(xsiType)
 
-    node.children.each do |c|
-      next if c.blank?
-      name = c.name.freeze
+    node.children.each do |child|
+      next if child.blank?
+      name = child.name.freeze
 
       ai = aih[name] if aih
 
@@ -1313,9 +1313,9 @@ class VimService < Handsoap::Service
       nextType = (ai ? ai[:type] : nil)
 
       if v.kind_of?(Array)
-        obj[name] << unmarshal_response(c, nextType)
+        obj[name] << unmarshal_response(child, nextType)
       else
-        obj[name] = unmarshal_response(c, nextType)
+        obj[name] = unmarshal_response(child, nextType)
       end
     end
     (obj)
