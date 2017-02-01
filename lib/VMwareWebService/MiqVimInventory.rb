@@ -49,6 +49,7 @@ class MiqVimInventory < MiqVimClientBase
       deleteProperty(:HostSystem, "capability.vmotionWithStorageVMotionSupported")
 
       deleteProperty(:Datastore, "summary.uncommitted")
+      deleteProperty(:Datastore, "summary.maintenanceMode")
 
       deleteProperty(:VirtualMachine, "config.cpuHotAddEnabled")
       deleteProperty(:VirtualMachine, "config.cpuHotRemoveEnabled")
@@ -66,11 +67,17 @@ class MiqVimInventory < MiqVimClientBase
         deleteProperty(:HostSystem, "config.dateTimeInfo")
       end
     else
-      if @v4 && cacheScope != :cache_scope_event_monitor
+      if @v4
         @propMap = dupProps(@propMap)
-        addProperty(:VirtualMachine, "runtime.memoryOverhead")
-        deleteProperty(:VirtualMachine, "config.hardware.numCoresPerSocket")
+
+        deleteProperty(:Datastore, "summary.maintenanceMode")
+
+        if cacheScope != :cache_scope_event_monitor
+          addProperty(:VirtualMachine, "runtime.memoryOverhead")
+          deleteProperty(:VirtualMachine, "config.hardware.numCoresPerSocket")
+        end
       end
+
       @propMap = @propMap.merge(PropMap4)
     end
 

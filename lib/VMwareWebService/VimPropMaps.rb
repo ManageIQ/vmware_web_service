@@ -344,6 +344,7 @@ module VimPropMaps
         "summary.capacity",
         "summary.datastore",
         "summary.freeSpace",
+        "summary.maintenanceMode",
         "summary.multipleHostAccess",
         "summary.name",
         "summary.type",
@@ -499,6 +500,7 @@ module VimPropMaps
         "summary.capacity",
         "summary.datastore",
         "summary.freeSpace",
+        "summary.maintenanceMode",
         "summary.uncommitted",
         "parent"
       ]
