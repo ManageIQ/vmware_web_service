@@ -46,6 +46,16 @@ class VimService < Handsoap::Service
     (parse_response(response, 'AcquireMksTicketResponse')['returnval'])
   end
 
+  def acquireTicket(mor, ticketType)
+    response = invoke("n1:AcquireTicket") do |message|
+      message.add "n1:_this", mor do |i|
+        i.set_attr "type", mor.vimType
+      end
+      message.add "n1:ticketType", ticketType
+    end
+    (parse_response(response, 'AcquireTicketResponse')['returnval'])
+  end
+
   def addHost_Task(clustMor, spec, asConnected, resourcePool = nil, license = nil)
     response = invoke("n1:AddHost_Task") do |message|
       message.add "n1:_this", clustMor do |i|
