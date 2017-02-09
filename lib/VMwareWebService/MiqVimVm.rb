@@ -1228,6 +1228,13 @@ class MiqVimVm
     (rv)
   end # def acquireMksTicket
 
+  def acquireTicket(ticketType)
+    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireTicket: calling acquireTicket" if $vim_log
+    rv = @invObj.acquireTicket(@vmMor, ticketType)
+    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireTicket: returned from acquireTicket" if $vim_log
+    (rv)
+  end # def acquireTicket
+
   def datacenterName
     @cacheLock.synchronize(:SH) do
       @datacenterName = @invObj.vmDatacenterName(@vmMor) unless @datacenterName
