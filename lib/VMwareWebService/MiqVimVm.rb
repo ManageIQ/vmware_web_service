@@ -609,6 +609,15 @@ class MiqVimVm
     waitForTask(taskMor)
   end
 
+  def getHardware
+    getProp("config.hardware").try(:fetch_path, "config", "hardware") || {}
+  end
+
+  def getScsiControllers(hardware = nil)
+    hardware ||= getHardware()
+    hardware["device"].to_a.select { |dev| VIRTUAL_SCSI_CONTROLLERS.include?(dev.xsiType) }
+  end
+
   def getMemory
     getProp("summary.config.memorySizeMB")["summary"]["config"]["memorySizeMB"].to_i
   end
