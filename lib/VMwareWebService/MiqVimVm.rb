@@ -6,8 +6,8 @@ require "ostruct"
 require 'util/extensions/miq-hash'
 require 'util/miq-exception'
 require 'VMwareWebService/MiqVimVdlMod'
-require 'vmware/esx_thumb_print'
-require 'vmware/vcenter_thumb_print'
+require 'VMwareWebService/esx_thumb_print'
+require 'VMwareWebService/vcenter_thumb_print'
 
 class MiqVimVm
   include MiqVimVdlVcConnectionMod
