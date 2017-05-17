@@ -1264,6 +1264,8 @@ class VimService < Handsoap::Service
   end
 
   def handle_memory_and_gc(response)
+    log_prefix = "#{self.class.name}##{__method__}:"
+
     xml_len = response.instance_variable_get(:@http_body).length
 
     # At this point we don't need the internal raw XML content since we
@@ -1276,9 +1278,14 @@ class VimService < Handsoap::Service
       if @xml_payload_len > @xml_payload_max
         @xml_payload_len = 0
 
+        $vim_log.debug("#{log_prefix} Running garbage collection")
+
         # Force a GC, because Ruby's GC is triggered on number of objects without
         #   regard to size.  The object we just freed may not be released right away.
-        GC.start
+        gc_time = Benchmark.realtime { GC.start }
+
+        gc_log_level = gc_time >= 5 ? :warn : :debug
+        $vim_log.send(gc_log_level, "#{log_prefix} Garbage collection took #{gc_time} seconds")
       end
     end
   end
