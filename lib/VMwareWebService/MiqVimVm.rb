@@ -5,6 +5,8 @@ require "ostruct"
 
 require 'util/extensions/miq-hash'
 require 'util/miq-exception'
+require 'active_support/core_ext/object/try'
+
 require 'VMwareWebService/MiqVimVdlMod'
 require 'VMwareWebService/esx_thumb_print'
 require 'VMwareWebService/vcenter_thumb_print'

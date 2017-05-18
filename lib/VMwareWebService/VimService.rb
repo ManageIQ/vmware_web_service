@@ -1,4 +1,5 @@
 require "handsoap"
+require 'active_support/core_ext/numeric/bytes'
 require 'VMwareWebService/VimTypes'
 
 class VimService < Handsoap::Service
