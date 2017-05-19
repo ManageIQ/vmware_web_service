@@ -28,7 +28,7 @@ module MiqVimVdlVcConnectionMod
   # The connection is specific to this VM, and should be closed by the caller when it
   # has finished accessing the VM's disk files.
   #
-  def vdlVcConnection(thumb_print)
+  def vdlVcConnection
     require 'VixDiskLib/VixDiskLib'
 
     VixDiskLib.init(->(s) { $vim_log.info  "VMware(VixDiskLib): #{s}" },
@@ -36,6 +36,12 @@ module MiqVimVdlVcConnectionMod
                     ->(s) { $vim_log.error "VMware(VixDiskLib): #{s}" })
 
     $log.info "MiqVimVdlVcConnectionMod.vdlVcConnection: server - #{invObj.server}"
+    thumb_print = if invObj.isVirtualCenter?
+                    VcenterThumbPrint.new(invObj.server)
+                  else
+                    ESXThumbPrint.new(invObj.server, invObj.username, invObj.password)
+                  end
+
     sha1 = thumb_print.to_sha1
     VixDiskLib.connect(:serverName => invObj.server,
                        :vmxSpec    => vixVmxSpec,
