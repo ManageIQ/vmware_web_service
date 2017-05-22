@@ -3,7 +3,6 @@ require 'sync'
 require 'fs/MiqFS/MiqFS'
 require 'fs/VimDatastoreFS/VimDatastoreFS'
 require 'util/miq-extensions'  # Required patch to open-uri for get_file_content
-require 'util/miq-encode'
 
 class MiqVimDataStore
   attr_reader :accessible, :multipleHostAccess, :name, :dsType, :url, :freeBytes, :capacityBytes, :uncommitted, :invObj
@@ -287,7 +286,7 @@ class MiqVimDataStore
     /(\d*)\.(\d*)/ =~ @invObj.about['version']
     raise "get_file_content not supported on [#{@invObj.about['fullName']}]" if $1.to_i < 3 || ($1.to_i == 3 && $2.to_i < 5)
 
-    fileUrl = "https://#{@invObj.server}/folder/#{MIQEncode.base64Encode(filepath)}?dsName=#{MIQEncode.base64Encode(@name)}"
+    fileUrl = encode_datastore_url(filepath, @name)
     options = {:http_basic_authentication => [@invObj.username, @invObj.password]}
     if block_given?
       open(fileUrl, options) { |ret| yield(ret) }
@@ -300,5 +299,22 @@ class MiqVimDataStore
 
   def dupObj(obj)
     obj
+  end
+
+  private
+
+  def encode_datastore_url(file_path, ds_name)
+    uri_parts = {
+      :scheme => "https",
+      :host   => @invObj.server,
+      :path   => "/folder/#{encode_path_url(file_path)}",
+      :query  => "dsName=#{encode_path_url(ds_name)}"
+    }
+
+    URI::Generic.build(uri_parts).to_s
+  end
+
+  def encode_path_url(path)
+    URI.encode(path, /[^#{URI::PATTERN::UNRESERVED}]/)
   end
 end # module MiqVimDataStore
