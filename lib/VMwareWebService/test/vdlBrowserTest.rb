@@ -2,7 +2,7 @@ require 'manageiq-gems-pending'
 require 'enumerator'
 
 require 'VMwareWebService/MiqVimBroker'
-require 'VixDiskLib/VixDiskLib'
+require 'VMwareWebService/VixDiskLib/VixDiskLib'
 
 $vim_log = Logger.new(STDOUT)
 $vim_log.level = Logger::WARN
