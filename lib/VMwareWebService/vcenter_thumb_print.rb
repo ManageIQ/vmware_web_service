@@ -1,4 +1,4 @@
-require 'util/thumb_print'
+require 'VMwareWebService/thumb_print'
 
 class VcenterThumbPrint < ThumbPrint
   def uri

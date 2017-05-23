@@ -1,4 +1,4 @@
-require 'util/thumb_print'
+require 'VMwareWebService/thumb_print'
 
 class ESXThumbPrint < ThumbPrint
   attr_reader :user, :password
