@@ -4,11 +4,10 @@ require 'ffi-vix_disk_lib/api_wrapper'
 require 'VMwareWebService/VimTypes'
 require 'log4r'
 require 'time'
-require 'util/vmdb-logger'
 
 LOG_FILE    = ENV["LOG_FILE"]
 
-$vim_log = VMDBLogger.new LOG_FILE
+$vim_log = Logger.new LOG_FILE
 
 VixDiskLibApi = FFI::VixDiskLib::ApiWrapper
 class VdlWrapper
