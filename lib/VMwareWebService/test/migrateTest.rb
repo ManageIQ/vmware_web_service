@@ -1,18 +1,8 @@
 require 'manageiq-gems-pending'
-require 'log4r'
 require 'VMwareWebService/MiqVim'
 
-#
-# Formatter to output log messages to the console.
-#
-class ConsoleFormatter < Log4r::Formatter
-  def format(event)
-    (event.data.kind_of?(String) ? event.data : event.data.inspect) + "\n"
-  end
-end
-$vim_log = Log4r::Logger.new 'toplog'
-Log4r::StderrOutputter.new('err_console', :level=>Log4r::INFO, :formatter=>ConsoleFormatter)
-$vim_log.add 'err_console'
+$vim_log = Logger.new(STDOUT)
+$vim_log.level = Logger::WARN
 
 TARGET_VM = "rpo-test2"
 vmMor = nil

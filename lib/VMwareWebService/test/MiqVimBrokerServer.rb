@@ -1,5 +1,4 @@
 require 'manageiq-gems-pending'
-require 'log4r'
 require 'VMwareWebService/MiqVimBroker'
 
 SelectionSpec = {
@@ -78,19 +77,10 @@ SelectionSpec = {
   ]
 }
 
-#
-# Formatter to output log messages to the console.
-#
 $stderr.sync = true
-class ConsoleFormatter < Log4r::Formatter
-  def format(event)
-    t = Time.now
-    "[%s] %02d:%02d:%02d <%s>: %s\n" % [Log4r::LNAMES[event.level], t.hour, t.min, t.sec, Thread.current.object_id, event.data.kind_of?(String) ? event.data : event.data.inspect]
-  end
-end
-$vim_log = Log4r::Logger.new 'toplog'
-Log4r::StderrOutputter.new('err_console', :level => Log4r::DEBUG, :formatter => ConsoleFormatter)
-$vim_log.add 'err_console'
+
+$vim_log = Logger.new(STDOUT)
+$vim_log.level = Logger::WARN
 
 broker = nil
 
