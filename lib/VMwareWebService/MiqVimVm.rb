@@ -4,9 +4,9 @@ require 'enumerator'
 require "ostruct"
 
 require 'util/extensions/miq-hash'
-require 'util/miq-exception'
 require 'active_support/core_ext/object/try'
 
+require 'VMwareWebService/exception'
 require 'VMwareWebService/MiqVimVdlMod'
 require 'VMwareWebService/esx_thumb_print'
 require 'VMwareWebService/vcenter_thumb_print'
@@ -343,11 +343,11 @@ class MiqVimVm
     hasNetApp = hasSnapshot?(NETAPP_SNAPSHOT_NAME, false)
 
     if hasEvm || hasCh || hasVcb
-      raise MiqException::MiqVmSnapshotError, "VM has EVM and consolidate helper snapshots" if hasEvm && hasCh
-      raise MiqException::MiqVmSnapshotError, "VM already has an EVM snapshot"              if hasEvm
-      raise MiqException::MiqVmSnapshotError, "VM already has an VCB snapshot"              if hasVcb
-      raise MiqException::MiqVmSnapshotError, "VM already has a NetApp snapshot"            if hasNetApp
-      raise MiqException::MiqVmSnapshotError, "VM has a consolidate helper snapshot"
+      raise MiqException::MiqVimVmSnapshotError, "VM has EVM and consolidate helper snapshots" if hasEvm && hasCh
+      raise MiqException::MiqVimVmSnapshotError, "VM already has an EVM snapshot"              if hasEvm
+      raise MiqException::MiqVimVmSnapshotError, "VM already has an VCB snapshot"              if hasVcb
+      raise MiqException::MiqVimVmSnapshotError, "VM already has a NetApp snapshot"            if hasNetApp
+      raise MiqException::MiqVimVmSnapshotError, "VM has a consolidate helper snapshot"
     end
     createSnapshot(EVM_SNAPSHOT_NAME, desc, false, quiesce, wait, free_space_percent)
   end
@@ -476,7 +476,7 @@ class MiqVimVm
     end
 
     if ds_free_space < required_snapshot_space
-      raise MiqException::MiqVmSnapshotError, "Snapshot #{action} aborted.  Datastore <#{ds_name}> does not have enough free space.  Space Free:<#{ds_free_space}>  Required:<#{required_snapshot_space}>  Disk Percentage Used:<#{free_space_percent}>"
+      raise MiqException::MiqVimVmSnapshotError, "Snapshot #{action} aborted.  Datastore <#{ds_name}> does not have enough free space.  Space Free:<#{ds_free_space}>  Required:<#{required_snapshot_space}>  Disk Percentage Used:<#{free_space_percent}>"
     else
       $log.info "Snapshot #{action} pre-check OK.  Datastore <#{ds_name}> has enough free space.  Space Free:<#{ds_free_space}>  Required:<#{required_snapshot_space}>  Disk Percentage Used:<#{free_space_percent}>" if $log
     end
