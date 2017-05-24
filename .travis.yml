@@ -5,3 +5,11 @@ rvm:
   - 2.3.4
   - 2.4.1
 before_install: gem install bundler -v 1.14.4
+after_script: bundle exec codeclimate-test-reporter
+notifications:
+  webhooks:
+    urls:
+    - https://webhooks.gitter.im/e/a15a36fcd1750318ad5f
+    on_success: change
+    on_failure: always
+    on_start: never
