@@ -2,6 +2,9 @@ require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
 require 'VMwareWebService/MiqVimBroker'
 
+require 'fs/MiqFS/MiqFS'
+require 'fs/VimDatastoreFS/VimDatastoreFS'
+
 $vim_log = Logger.new(STDOUT)
 $vim_log.level = Logger::WARN
 
@@ -16,6 +19,10 @@ filePattern = nil
 testPath  = nil
 pathOnly  = false
 recurse   = true
+
+def getFs(ds)
+  (MiqFS.new(VimDatastoreFS, ds))
+end
 
 begin
   vim = MiqVim.new(SERVER, USERNAME, PASSWORD)
@@ -111,7 +118,7 @@ begin
 
   puts "==============================="
   puts "Mounting file system..."
-  fs = vimDs.getFs
+  fs = getFs(vimDs)
   puts "done."
 
   puts "FS Type: #{fs.fsType}"
