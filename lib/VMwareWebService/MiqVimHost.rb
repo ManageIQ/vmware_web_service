@@ -3,7 +3,7 @@ require 'sync'
 require 'enumerator'
 require "ostruct"
 
-require 'util/extensions/miq-hash'
+require 'more_core_extensions/core_ext/hash'
 require 'VMwareWebService/MiqHostDatastoreSystem'
 require 'VMwareWebService/MiqHostStorageSystem'
 require 'VMwareWebService/MiqHostFirewallSystem'
