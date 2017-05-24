@@ -4,7 +4,6 @@ require 'enumerator'
 require "ostruct"
 
 require 'util/extensions/miq-hash'
-require 'util/miq-exception'
 require 'VMwareWebService/MiqHostDatastoreSystem'
 require 'VMwareWebService/MiqHostStorageSystem'
 require 'VMwareWebService/MiqHostFirewallSystem'

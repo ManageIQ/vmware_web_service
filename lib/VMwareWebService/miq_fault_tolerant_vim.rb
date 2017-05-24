@@ -1,5 +1,6 @@
 require 'VMwareWebService/MiqVim'
 require 'VMwareWebService/MiqVimBroker'
+require 'VMwareWebService/exception'
 
 class MiqFaultTolerantVim
   def initialize(*options)

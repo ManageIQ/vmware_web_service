@@ -84,7 +84,7 @@ describe MiqVimVm do
 
       it "check_disk_space - 100 percent, large disk" do
         max_disk_space_in_kb = 10000
-        expect { @vim_vm.check_disk_space('create', @ds_mor, max_disk_space_in_kb, 100) }.to raise_error(MiqException::MiqVmSnapshotError)
+        expect { @vim_vm.check_disk_space('create', @ds_mor, max_disk_space_in_kb, 100) }.to raise_error(MiqException::MiqVimVmSnapshotError)
       end
 
       it "check_disk_space - 0 percent" do
