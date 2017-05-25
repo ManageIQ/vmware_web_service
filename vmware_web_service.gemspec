@@ -18,7 +18,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "ffi",                  "~>1.9.3"
   spec.add_dependency "ffi-vix_disk_lib",     "~>1.0.3"  # used by VixDiskLib
   spec.add_dependency "handsoap",             "~>0.2.5"
-  spec.add_dependency "httpclient",           "~>2.7.1"
+  spec.add_dependency "httpclient",           "~>2.8.0"
   spec.add_dependency "more_core_extensions", "~>3.2"
   spec.add_dependency "rbvmomi",              "~>1.9.4"
 
