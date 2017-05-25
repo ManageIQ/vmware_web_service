@@ -1,7 +1,4 @@
 require 'sync'
-
-require 'fs/MiqFS/MiqFS'
-require 'fs/VimDatastoreFS/VimDatastoreFS'
 require 'util/miq-extensions'  # Required patch to open-uri for get_file_content
 
 class MiqVimDataStore
@@ -265,9 +262,6 @@ class MiqVimDataStore
     end
   end
 
-  def getFs
-    (MiqFS.new(VimDatastoreFS, self))
-  end
 
   def dumpProps
     props = @invObj.getMoProp_local(@dsMor, "browser")["browser"]
