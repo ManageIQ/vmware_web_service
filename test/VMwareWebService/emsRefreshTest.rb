@@ -3,7 +3,7 @@ USE_BROKER = true
 require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVimBroker'
 require 'VMwareWebService/MiqVim'
-require 'util/extensions/miq-hash'
+require 'more_core_extensions/core_ext/hash'
 require 'util/vmdb-logger'
 
 trap("INT") { exit }
