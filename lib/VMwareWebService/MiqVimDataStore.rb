@@ -281,7 +281,12 @@ class MiqVimDataStore
     raise "get_file_content not supported on [#{@invObj.about['fullName']}]" if $1.to_i < 3 || ($1.to_i == 3 && $2.to_i < 5)
 
     fileUrl = encode_datastore_url(filepath, @name)
-    options = {:http_basic_authentication => [@invObj.username, @invObj.password]}
+
+    options = {
+      :http_basic_authentication => [@invObj.username, @invObj.password],
+      :ssl_verify_mode           => OpenSSL::SSL::VERIFY_NONE
+    }
+
     if block_given?
       open(fileUrl, options) { |ret| yield(ret) }
     else
