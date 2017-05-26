@@ -5,7 +5,6 @@
 $LOAD_PATH << File.expand_path(File.join(__dir__, "../.."))
 
 require 'drb/drb'
-require 'log4r'
 require 'time'
 require 'VMwareWebService/VixDiskLib/vdl_wrapper'
 
