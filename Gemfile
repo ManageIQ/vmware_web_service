@@ -1,6 +1,6 @@
 source 'https://rubygems.org'
 
-# Specify your gem's dependencies in azure-armrest.gemspec
+# Specify your gem's dependencies in vmware_web_service.gemspec
 gemspec
 
 # Modified gems (forked on github)
