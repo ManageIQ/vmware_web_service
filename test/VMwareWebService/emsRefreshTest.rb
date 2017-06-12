@@ -4,7 +4,7 @@ require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVimBroker'
 require 'VMwareWebService/MiqVim'
 require 'more_core_extensions/core_ext/hash'
-require 'util/vmdb-logger'
+require 'logger'
 
 trap("INT") { exit }
 
@@ -19,7 +19,7 @@ VC_ACCESSORS = [
   [:resourcePoolsByMor, :rp],
 ]
 
-$vim_log = VMDBLogger.new("./ems_refresh_test.log") unless USE_BROKER
+$vim_log = Logger.new("./ems_refresh_test.log") unless USE_BROKER
 
 begin
   loop do
