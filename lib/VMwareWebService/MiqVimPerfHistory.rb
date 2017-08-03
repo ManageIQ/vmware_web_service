@@ -187,7 +187,7 @@ class MiqVimPerfHistory
     pqSpec = VimHash.new('PerfQuerySpec') do |pqs|
       pqs.entity      = ah[:entity]     if ah[:entity]
       pqs.intervalId  = ah[:intervalId]
-      pqs.format      = PerfFormat::Normal
+      pqs.format      = PerfFormat.const_get((ah[:format] || "normal").to_s.capitalize)
 
       pqs.endTime     = ah[:endTime].to_s   if ah[:endTime]
       pqs.startTime   = ah[:startTime].to_s if ah[:startTime]
