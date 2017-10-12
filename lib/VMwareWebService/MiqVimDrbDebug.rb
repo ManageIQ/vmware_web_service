@@ -24,6 +24,8 @@ module DRb
           Marshal::load(str)
         rescue NameError, ArgumentError
           DRbUnknown.new($!, str)
+        rescue TypeError => err
+          raise TypeError, "#{err}\n#{str.hex_dump}"
         ensure
           Thread.current[:drb_untaint].each do |x|
             x.untaint
