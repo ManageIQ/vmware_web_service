@@ -2,8 +2,8 @@ sudo: false
 cache: bundler
 language: ruby
 rvm:
-  - 2.3.4
-  - 2.4.1
+  - 2.3.1
+  - 2.4.2
 before_install: gem install bundler -v 1.14.4
 after_script: bundle exec codeclimate-test-reporter
 notifications:
