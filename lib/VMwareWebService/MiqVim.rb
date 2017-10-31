@@ -13,15 +13,18 @@ require 'VMwareWebService/MiqVimEventHistoryCollector'
 require 'VMwareWebService/MiqCustomFieldsManager'
 require 'VMwareWebService/MiqVimAlarmManager'
 require 'VMwareWebService/MiqVimCustomizationSpecManager'
+require 'VMwareWebService/MiqVapiService'
 
 class MiqVim < MiqVimInventory
   include MiqVimVdlConnectionMod
   include MiqPbmInventory
+  include MiqVapiService
 
   def initialize(server, username, password, cacheScope = nil)
     super
 
     pbm_initialize(self)
+    vapi_service_initialize(server, username, password)
   end
 
   def getVimVm(path)
