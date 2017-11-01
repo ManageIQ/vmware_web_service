@@ -43,9 +43,8 @@ module MiqVapiService
     tag_ids = @tag_svc.list
     tag_ids.each do |t_id|
       tag = tag_svc.get(t_id)
-      tags[t_id] = tag
-      # TODO: do we need category detail?
-      # category = category_svc.get(tag.category_id)
+      category = category_svc.get(tag.category_id)
+      tags[t_id] = [tag, category]
     end
     tags
   rescue => err
