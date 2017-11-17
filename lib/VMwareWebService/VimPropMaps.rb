@@ -308,6 +308,7 @@ module VimPropMaps
         "config.service.service",
         "datastore",
         "hardware.systemInfo.otherIdentifyingInfo",
+        "hardware.systemInfo.uuid",
         "name",
         "summary.host",
         "summary.config.name",
