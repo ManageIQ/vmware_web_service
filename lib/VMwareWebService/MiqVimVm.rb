@@ -925,6 +925,20 @@ class MiqVimVm
     ([nil, nil])
   end # def getDeviceKeysByBacking
 
+  def getDeviceKeysByNetwork(networkName)
+    devs = getProp("config.hardware")["config"]["hardware"]["device"]
+    devs.each do |dev|
+      next if !["VirtualVmxnet3","VirtualE1000e","VirtualPCNet32"].include? dev.xsiType
+      next if dev["deviceInfo"]["label"] != networkName
+      controller_key = dev["controllerKey"]
+      key = dev["key"]
+      unitNumber = dev["unitNumber"]
+      return controller_key, key, unitNumber
+    end
+    # controller_key, key, unitNumber
+    ([nil, nil, nil])
+  end
+
   #####################
   # Miq Alarm methods.
   #####################
