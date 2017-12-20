@@ -925,6 +925,21 @@ class MiqVimVm
     ([nil, nil])
   end # def getDeviceKeysByBacking
 
+  #
+  # Returns the device details
+  # associated with the given backing file.
+  #
+  def getDeviceByBacking(backingFile)
+    devs = getProp("config.hardware")["config"]["hardware"]["device"]
+
+    devs.each do |dev|
+      next if dev.xsiType != "VirtualDisk"
+      next if dev["backing"]["fileName"] != backingFile
+      return dev
+    end
+    (nil)
+  end # def getDeviceByBacking
+
   #####################
   # Miq Alarm methods.
   #####################
