@@ -916,8 +916,8 @@ class MiqVimVm
   #
   def getDeviceKeysByBacking(backingFile, hardware = nil)
     dev = getDeviceByBacking(backingFile, hardware)
-    return ([nil, nil]) if dev.nil?
-    return([dev["controllerKey"], dev["key"]])
+    return [nil, nil] if dev.nil?
+    [dev["controllerKey"], dev["key"]]
   end
 
   #
@@ -925,14 +925,14 @@ class MiqVimVm
   # associated with the given backing file.
   #
   def getDeviceByBacking(backingFile, hardware = nil)
-    hardware ||= getHardware()
-    
+    hardware ||= getHardware
+
     hardware["device"].to_a.each do |dev|
       next if dev.xsiType != "VirtualDisk"
       next if dev["backing"]["fileName"] != backingFile
       return dev
     end
-    (nil)
+    nil
   end
 
   #####################
