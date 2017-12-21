@@ -23,6 +23,13 @@ class MiqVimVm
                                   VirtualLsiLogicSASController
                                   ParaVirtualSCSIController
                                 ).freeze
+  VIRTUAL_NICS              = %w( VirtualE1000
+                                  VirtualE1000e
+                                  VirtualPCNet32
+                                  VirtualVmxnet
+                                  VirtualVmxnet2
+                                  VirtualVmxnet3
+                                ).freeze
   MAX_SCSI_DEVICES          = 15
   MAX_SCSI_CONTROLLERS      = 4
 
@@ -925,11 +932,11 @@ class MiqVimVm
     ([nil, nil])
   end # def getDeviceKeysByBacking
 
-  def getDeviceKeysByNetwork(networkName)
-    devs = getProp("config.hardware")["config"]["hardware"]["device"]
-    devs.each do |dev|
-      next if !["VirtualVmxnet3","VirtualE1000e","VirtualPCNet32"].include? dev.xsiType
-      next if dev["deviceInfo"]["label"] != networkName
+  def getDeviceKeysByLabel(deviceLabel)
+    hardware = getHardware()
+    hardware["device"].to_a.each do |dev|
+      next unless VIRTUAL_NICS.include?(dev.xsiType)
+      next unless dev["deviceInfo"]["label"] == deviceLabel
       controller_key = dev["controllerKey"]
       key = dev["key"]
       unitNumber = dev["unitNumber"]
