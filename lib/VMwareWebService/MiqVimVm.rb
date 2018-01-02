@@ -21,15 +21,13 @@ class MiqVimVm
   VIRTUAL_SCSI_CONTROLLERS  = %w( VirtualBusLogicController
                                   VirtualLsiLogicController
                                   VirtualLsiLogicSASController
-                                  ParaVirtualSCSIController
-                                ).freeze
+                                  ParaVirtualSCSIController ).freeze
   VIRTUAL_NICS              = %w( VirtualE1000
                                   VirtualE1000e
                                   VirtualPCNet32
                                   VirtualVmxnet
                                   VirtualVmxnet2
-                                  VirtualVmxnet3
-                                ).freeze
+                                  VirtualVmxnet3 ).freeze
   MAX_SCSI_DEVICES          = 15
   MAX_SCSI_CONTROLLERS      = 4
 
@@ -932,18 +930,18 @@ class MiqVimVm
     ([nil, nil])
   end # def getDeviceKeysByBacking
 
-  def getDeviceKeysByLabel(deviceLabel)
-    hardware = getHardware()
+  def getDeviceKeysByLabel(device_label)
+    hardware = getHardware
     hardware["device"].to_a.each do |dev|
       next unless VIRTUAL_NICS.include?(dev.xsiType)
-      next unless dev["deviceInfo"]["label"] == deviceLabel
+      next unless dev["deviceInfo"]["label"] == device_label
       controller_key = dev["controllerKey"]
       key = dev["key"]
-      unitNumber = dev["unitNumber"]
-      return controller_key, key, unitNumber
+      unit_number = dev["unitNumber"]
+      return controller_key, key, unit_number
     end
-    # controller_key, key, unitNumber
-    ([nil, nil, nil])
+    # controller_key, key, unit_number
+    [nil, nil, nil]
   end
 
   #####################
