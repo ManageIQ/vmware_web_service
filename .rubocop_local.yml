@@ -2,5 +2,3 @@ GlobalVars:
   AllowedVariables:
   # Logger
   - $vim_log
-AllCops:
-  TargetRubyVersion: 2.2
