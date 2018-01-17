@@ -113,7 +113,7 @@ class MiqVimBroker
   end
 
   private def create_client_broker(port)
-    druby_host = ENV['CONTAINER'] ? "vim-broker" : "127.0.0.1"
+    druby_host = ENV['CONTAINER'] ? ENV['VIM_BROKER_SERVICE_HOST'] : "127.0.0.1"
     @broker = DRbObject.new(nil, "druby://#{druby_host}:#{port}")
   end
 
