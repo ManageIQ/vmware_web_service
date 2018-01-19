@@ -62,12 +62,6 @@ class MiqVimBroker
 
       @mode = :client
 
-      # start DRb service if it hasn't been started before
-      begin
-        DRb.current_server
-      rescue DRb::DRbServerNotFound
-        DRb.start_service
-      end
       create_client_broker(port)
     elsif mode == :server
       require 'timeout'
@@ -109,7 +103,13 @@ class MiqVimBroker
       DRb.install_acl(acl)
     end
 
-    DRb.start_service("druby://#{binding_address}:#{port}", self, :idconv => VimBrokerIdConv.new)
+    server = DRb.start_service("druby://#{binding_address}:#{port}", self, :idconv => VimBrokerIdConv.new)
+
+    # hack the protocol uri if we're in a container
+    if ENV['CONTAINER']
+      proto = server.instance_variable_get(:@protocol)
+      proto.instance_variable_set(:@uri, "druby://#{ENV['VIM_BROKER_SERVICE_HOST']}:#{port}")
+    end
   end
 
   private def create_client_broker(port)
