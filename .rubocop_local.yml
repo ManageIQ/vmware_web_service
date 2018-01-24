@@ -1,3 +1,6 @@
+AllCops:
+  Exclude:
+  - lib/VMwareWebService/wsdl41/vimws25MappingRegistry.rb
 GlobalVars:
   AllowedVariables:
   # Logger
