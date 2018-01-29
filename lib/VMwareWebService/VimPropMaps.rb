@@ -551,6 +551,7 @@ module VimPropMaps
       :baseName => "@virtualMachines",
       :keyPath  => ['summary', 'config', 'vmPathName'],
       :props    => [
+        "summary.config.uuid",
         "summary.config.vmPathName",
         "summary.runtime.host"
       ]
