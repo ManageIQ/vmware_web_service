@@ -62,13 +62,7 @@ class MiqVimBroker
 
       @mode = :client
 
-      # start DRb service if it hasn't been started before
-      begin
-        DRb.current_server
-      rescue DRb::DRbServerNotFound
-        DRb.start_service
-      end
-      @broker = DRbObject.new(nil, "druby://127.0.0.1:#{port}")
+      create_client_broker(port)
     elsif mode == :server
       require 'timeout'
       require 'VMwareWebService/broker_timeout'
@@ -95,12 +89,32 @@ class MiqVimBroker
       @selectorHash = @@selectorHash
       @cacheScope   = @@cacheScope
 
-      acl = ACL.new(%w( deny all allow 127.0.0.1/32 ))
-      DRb.install_acl(acl)
-      DRb.start_service("druby://127.0.0.1:#{port}", self, :idconv => VimBrokerIdConv.new)
+      start_server(port)
     else
       raise "MiqVimBroker: unrecognized mode #{mode}"
     end
+  end
+
+  private def start_server(port)
+    binding_address = ENV['BINDING_ADDRESS'] || "127.0.0.1"
+
+    unless ENV['CONTAINER']
+      acl = ACL.new(%w( deny all allow 127.0.0.1/32 ))
+      DRb.install_acl(acl)
+    end
+
+    server = DRb.start_service("druby://#{binding_address}:#{port}", self, :idconv => VimBrokerIdConv.new)
+
+    # hack the protocol uri if we're in a container
+    if ENV['CONTAINER']
+      proto = server.instance_variable_get(:@protocol)
+      proto.instance_variable_set(:@uri, "druby://#{ENV['VIM_BROKER_SERVICE_HOST']}:#{port}")
+    end
+  end
+
+  private def create_client_broker(port)
+    druby_host = ENV['CONTAINER'] ? ENV['VIM_BROKER_SERVICE_HOST'] : "127.0.0.1"
+    @broker = DRbObject.new(nil, "druby://#{druby_host}:#{port}")
   end
 
   # Can be overridden by BrokerSyncDebug.
