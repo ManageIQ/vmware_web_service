@@ -389,7 +389,7 @@ class MiqVimVm
 
     if wait
       snMor = waitForTask(taskMor)
-      $vim_log.debug "MiqVimVm::createSnapshot: snMor = #{snMor}" if $vim_log
+      $vim_log.warn "MiqVimVm::createSnapshot: snMor = #{snMor}" if $vim_log
       return snMor
     end
 
@@ -398,12 +398,12 @@ class MiqVimVm
   end # def createSnapshot
 
   def removeSnapshot(snMor, subTree = "false", wait = true, free_space_percent = 100)
-    $vim_log.debug "MiqVimVm::removeSnapshot(#{snMor}, #{subTree})" if $vim_log
+    $vim_log.warn "MiqVimVm::removeSnapshot(#{snMor}, #{subTree})" if $vim_log
     snMor = getSnapMor(snMor)
     snapshot_free_space_check('remove', free_space_percent)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: calling removeSnapshot_Task" if $vim_log
+    $vim_log.warn "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: calling removeSnapshot_Task: snMor [#{snMor}] subtree [#{subTree}]" if $vim_log
     taskMor = @invObj.removeSnapshot_Task(snMor, subTree)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: returned from removeSnapshot_Task" if $vim_log
+    $vim_log.warn "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: returned from removeSnapshot_Task: snMor [#{snMor}]" if $vim_log
     $vim_log.debug "MiqVimVm::removeSnapshot: taskMor = #{taskMor}" if $vim_log
     return taskMor unless wait
     waitForTask(taskMor)
