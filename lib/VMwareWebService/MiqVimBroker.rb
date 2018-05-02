@@ -20,7 +20,7 @@ class MiqVimBroker
   attr_reader :shuttingDown
 
   MB = 1048576
-  DRb::DRbServer.default_load_limit(50 * MB)
+  DRb::DRbServer.default_load_limit(100 * MB)
 
   @@preLoad   = false
   @@debugUpdates  = false
