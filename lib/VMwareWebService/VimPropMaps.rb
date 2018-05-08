@@ -184,6 +184,7 @@ module VimPropMaps
         "config.hotPlugMemoryIncrementSize",
         "config.hotPlugMemoryLimit",
         "config.memoryHotAddEnabled",
+        "config.uuid",
         "config.version",
         "datastore",
         "guest.net",
