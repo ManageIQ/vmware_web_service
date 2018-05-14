@@ -940,18 +940,14 @@ class MiqVimVm
     nil
   end
 
-  def getDeviceKeysByLabel(device_label)
-    hardware = getHardware
-    hardware["device"].to_a.each do |dev|
-      next unless VIRTUAL_NICS.include?(dev.xsiType)
-      next unless dev["deviceInfo"]["label"] == device_label
-      controller_key = dev["controllerKey"]
-      key = dev["key"]
-      unit_number = dev["unitNumber"]
-      return controller_key, key, unit_number
-    end
-    # controller_key, key, unit_number
-    [nil, nil, nil]
+  def getDeviceByLabel(device_label, hardware = nil)
+    hardware ||= getHardware
+    hardware["device"].to_a.detect { |dev| dev["deviceInfo"]["label"] == device_label }
+  end
+
+  def getDeviceKeysByLabel(device_label, hardware = nil)
+    dev = getDeviceByLabel(device_label, hardware)
+    dev.values_at("controllerKey", "key", "unitNumber") unless dev.nil?
   end
 
   #####################
