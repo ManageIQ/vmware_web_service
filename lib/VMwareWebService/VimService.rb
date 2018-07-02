@@ -838,6 +838,16 @@ class VimService < Handsoap::Service
     (parse_response(response, 'RemoveSnapshot_TaskResponse')['returnval'])
   end
 
+  def rename_Task(vmMor, newName)
+    response = invoke("n1:Rename_Task") do |message|
+      message.add("n1:_this", vmMor) do |i|
+        i.set_attr("type", vmMor.vimType)
+      end
+      message.add("n1:newName", newName)
+    end
+    parse_response(response, 'Rename_TaskResponse')['returnval']
+  end
+
   def renameSnapshot(snMor, name, desc)
     response = invoke("n1:RenameSnapshot") do |message|
       message.add "n1:_this", snMor do |i|
