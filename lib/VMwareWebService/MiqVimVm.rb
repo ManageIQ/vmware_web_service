@@ -209,6 +209,14 @@ class MiqVimVm
     waitForTask(taskMor)
   end
 
+  def renameVM(newName)
+    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameVM: calling rename_Task, vm=<#{@vmMor.inspect}>, newName=<#{newName}>" if $vim_log
+    task_mor = @invObj.rename_Task(@vmMor, newName)
+    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameVM: returned from rename_Task" if $vim_log
+    $vim_log.debug "MiqVimVm::renameVM: taskMor = #{task_mor}" if $vim_log
+    waitForTask(task_mor)
+  end
+
   def relocateVM(host, pool = nil, datastore = nil, disk_move_type = nil, transform = nil, priority = "defaultPriority", disk = nil)
     pmor  = (pool.kind_of?(Hash) ? pool['MOR'] : pool)    if pool
     hmor  = (host.kind_of?(Hash) ? host['MOR'] : host)    if host
