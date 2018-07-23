@@ -1,6 +1,7 @@
 require 'drb'
 require 'drb/acl'
 require 'sync'
+require 'tmpdir'
 
 require 'VMwareWebService/MiqVimInventory'
 require 'VMwareWebService/VimTypes'
@@ -32,7 +33,7 @@ class MiqVimBroker
   @@maxWait    = 60
   @@maxObjects = 250
 
-  def initialize(mode = :client, port = 9001)
+  def initialize(mode = :client, uri = nil)
     if mode == :client
       require 'rubygems'
       require 'httpclient'  # needed for exception classes
@@ -66,7 +67,8 @@ class MiqVimBroker
       rescue DRb::DRbServerNotFound
         DRb.start_service
       end
-      @broker = DRbObject.new(nil, "druby://127.0.0.1:#{port}")
+
+      @broker = DRbObject.new(nil, uri)
     elsif mode == :server
       require 'timeout'
       require 'VMwareWebService/broker_timeout'
@@ -95,7 +97,11 @@ class MiqVimBroker
 
       acl = ACL.new(%w( deny all allow 127.0.0.1/32 ))
       DRb.install_acl(acl)
-      DRb.start_service("druby://127.0.0.1:#{port}", self, :idconv => VimBrokerIdConv.new)
+
+      Dir::Tmpname.create('MiqVimBroker', nil) do |path|
+        DRb.start_service("drbunix://#{path}", self, :idconv => VimBrokerIdConv.new)
+        FileUtils.chmod(0o750, path)
+      end
     else
       raise "MiqVimBroker: unrecognized mode #{mode}"
     end

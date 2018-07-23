@@ -16,19 +16,19 @@ class MiqFaultTolerantVim
 
     @use_broker = options.key?(:use_broker) ? options[:use_broker] : true
     if @use_broker
-      if options[:vim_broker_drb_port].respond_to?(:call)
-        @vim_broker_drb_port_method = options[:vim_broker_drb_port]
-        @vim_broker_drb_port        = @vim_broker_drb_port_method.call
+      if options[:vim_broker_drb_uri].respond_to?(:call)
+        @vim_broker_drb_uri_method = options[:vim_broker_drb_uri]
+        @vim_broker_drb_uri        = @vim_broker_drb_uri_method.call
       else
-        @vim_broker_drb_port_method = nil
-        @vim_broker_drb_port        = options[:vim_broker_drb_port]
+        @vim_broker_drb_uri_method = nil
+        @vim_broker_drb_uri        = options[:vim_broker_drb_uri]
       end
     end
 
     begin
       _connect
     rescue MiqException::MiqVimBrokerUnavailable
-      retry if _handle_broker_port_change
+      retry if _handle_broker_uri_change
       raise
     end
   end
@@ -57,8 +57,8 @@ class MiqFaultTolerantVim
     @use_broker
   end
 
-  def _vim_broker_drb_port
-    @vim_broker_drb_port
+  def _vim_broker_drb_uri
+    @vim_broker_drb_uri
   end
 
   def _reconnect
@@ -116,7 +116,7 @@ class MiqFaultTolerantVim
       #   'DRb::DRbConnError: druby://localhost:9001 - #<Errno::ECONNREFUSED: Connection refused - connect(2)>'
       #
       if err.kind_of?(DRb::DRbConnError)
-        if _handle_broker_port_change
+        if _handle_broker_uri_change
           _connect
           retry
         end
@@ -204,9 +204,9 @@ class MiqFaultTolerantVim
 
   def _connect_broker_client
     return unless $vim_broker_client.nil?
-    raise MiqException::MiqVimBrokerUnavailable, "Broker is not available (not running)." if @vim_broker_drb_port.blank?
-    $vim_broker_client = MiqVimBroker.new(:client, @vim_broker_drb_port)
-    $vim_broker_client_port = @vim_broker_drb_port
+    raise MiqException::MiqVimBrokerUnavailable, "Broker is not available (not running)." if @vim_broker_drb_uri.blank?
+    $vim_broker_client = MiqVimBroker.new(:client, @vim_broker_drb_uri)
+    $vim_broker_client_uri = @vim_broker_drb_uri
   end
 
   def _disconnect_broker_client
@@ -229,16 +229,16 @@ class MiqFaultTolerantVim
     err.to_s
   end
 
-  def _handle_broker_port_change
-    log_header = "MIQ(#{self.class.name}._handle_broker_port_change)"
-    if @vim_broker_drb_port_method
-      new_port = @vim_broker_drb_port_method.call
-      if new_port != $vim_broker_client_port
-        $log.warn("#{log_header} Retrying communication via VimBroker to [#{_ems_address}] because [Broker DRb Port changed from #{$vim_broker_client_port} to #{new_port}]") if $log && !new_port.blank?
-        @vim_broker_drb_port = new_port
+  def _handle_broker_uri_change
+    log_header = "MIQ(#{self.class.name}._handle_broker_uri_change)"
+    if @vim_broker_drb_uri_method
+      new_uri = @vim_broker_drb_uri_method.call
+      if new_uri != $vim_broker_client_uri
+        $log.warn("#{log_header} Retrying communication via VimBroker to [#{_ems_address}] because [Broker DRb URI changed from #{$vim_broker_client_uri} to #{new_uri}]") if $log && !new_uri.blank?
+        @vim_broker_drb_uri = new_uri
         _disconnect
         _disconnect_broker_client
-        return (new_port.blank? ? false : true)
+        return (new_uri.blank? ? false : true)
       end
     end
     false
