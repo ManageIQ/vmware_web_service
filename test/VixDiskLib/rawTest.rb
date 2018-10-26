@@ -1,6 +1,6 @@
 $:.push("#{File.dirname(__FILE__)}/..")
 
-require "util/miq-password"
+require "manageiq/password"
 require "VixDiskLib_raw"
 
 vmdk =  "/vmfs/volumes/StarM2-LUN1/VMmini-101/VMmini-101.vmdk"
