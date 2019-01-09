@@ -5,7 +5,7 @@ require 'VMwareWebService/VimTypes'
 class VimService < Handsoap::Service
   attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :serviceInstanceMor, :session_cookie
 
-  Handsoap.http_driver = :HTTPClient
+  Handsoap.http_driver = :httpclient
 
   def initialize(ep)
     super
