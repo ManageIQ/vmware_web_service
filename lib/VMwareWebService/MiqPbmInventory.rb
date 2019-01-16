@@ -8,6 +8,7 @@ module MiqPbmInventory
       @pbm_svc = PbmService.new(vim) if apiVersion >= '5.5' && isVirtualCenter
     rescue => err
       $vim_log.warn("MiqPbmInventory: Failed to connect to SPBM endpoint: #{err}")
+      raise err.to_s
     end
   end
 
