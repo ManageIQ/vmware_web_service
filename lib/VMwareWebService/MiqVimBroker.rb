@@ -418,9 +418,9 @@ class MiqVimBroker
     end
   end
 
-  def getMiqVim(server, username, password)
+  def getMiqVim(server, username, password, cacheScope = nil, proxyHost = nil, proxyPort =nil)
     if @mode == :client
-      vim = @broker.getMiqVim(server, username, password)
+      vim = @broker.getMiqVim(server, username, password, cacheScope, proxyHost, proxyPort)
       vim.extend(MiqVimDump)
       vim.extend(MiqVimVdlConnectionMod)
       return(vim)

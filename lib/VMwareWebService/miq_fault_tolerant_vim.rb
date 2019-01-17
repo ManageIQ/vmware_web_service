@@ -7,12 +7,14 @@ class MiqFaultTolerantVim
     options = options.first if options.first.kind_of?(Hash)
     @vim = nil
 
-    @erec     = options[:ems]
-    auth_type = options[:auth_type] || :ws
-    ip        = options[:ip] || @erec.hostname
-    user      = options[:user] || @erec.authentication_userid(auth_type)
-    pass      = options[:pass] || @erec.authentication_password(auth_type)
-    @ems      = [ip, user, pass]
+    @erec      = options[:ems]
+    auth_type  = options[:auth_type] || :ws
+    ip         = options[:ip] || @erec.hostname
+    user       = options[:user] || @erec.authentication_userid(auth_type)
+    pass       = options[:pass] || @erec.authentication_password(auth_type)
+    proxy_host = options[:proxy_host]
+    proxy_port = options[:proxy_port]
+    @ems      = [ip, user, pass, nil, proxy_host, proxy_port]
 
     @use_broker = options.key?(:use_broker) ? options[:use_broker] : true
     if @use_broker

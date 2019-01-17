@@ -18,9 +18,13 @@ class MiqVim < MiqVimInventory
   include MiqVimVdlConnectionMod
   include MiqPbmInventory
 
-  def initialize(server, username, password, cacheScope = nil)
-    super
+  attr_reader :proxyHost, :proxyPort
 
+  def initialize(server, username, password, cacheScope = nil, proxyHost = nil, proxyPort =nil)
+    super(server, username, password, cacheScope)
+
+    @proxyHost = proxyHost
+    @proxyPort = proxyPort
     pbm_initialize(self)
   end
 
