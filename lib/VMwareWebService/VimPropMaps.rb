@@ -287,6 +287,7 @@ module VimPropMaps
         "datastoreFolder",
         "hostFolder",
         "name",
+        "networkFolder",
         "parent",
         "vmFolder"
       ]
@@ -475,6 +476,7 @@ module VimPropMaps
         "datastoreFolder",
         "hostFolder",
         "name",
+        "networkFolder",
         "parent",
         "vmFolder"
       ]
