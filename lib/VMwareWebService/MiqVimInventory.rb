@@ -2294,6 +2294,7 @@ class MiqVimInventory < MiqVimClientBase
   private :ss2pp
 
   def applySelector(topObj, selSpec)
+    return topObj # TODO fix selector
     selSpec = getSelSpec(selSpec)
 
     if topObj.kind_of?(VimHash)
