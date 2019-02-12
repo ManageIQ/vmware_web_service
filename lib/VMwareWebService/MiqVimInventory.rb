@@ -2102,57 +2102,23 @@ class MiqVimInventory < MiqVimClientBase
   # Retrieve the properties for a single object, given its managed object reference.
   #
   def getMoProp_local(mo, path = nil)
-    pfSpec = VimHash.new("PropertyFilterSpec") do |pfs|
-      pfs.propSet = VimArray.new("ArrayOfPropertySpec") do |psa|
-        psa << VimHash.new("PropertySpec") do |ps|
-          ps.type = mo.vimType
-          if !path
-            ps.all = "true"
-          else
-            ps.all = "false"
-            ps.pathSet = path
-          end
-        end
-      end
-      pfs.objectSet = VimArray.new("ArrayOfObjectSpec") do |osa|
-        osa << VimHash.new("ObjectSpec") do |os|
-          os.obj = mo
-        end
-      end
-    end
+    spec = RbVmomi::VIM::PropertyFilterSpec(
+      :propSet   => [RbVmomi::VIM::PropertySpec(:type => mo.class.wsdl_name, :all => !path, :pathSet => path)],
+      :objectSet => [RbVmomi::VIM::ObjectSpec(:obj => mo)],
+    )
 
-    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: calling retrieveProperties(#{mo.vimType})" if $vim_log
-    oca = retrievePropertiesCompat(@propCol, pfSpec)
-    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: return from retrieveProperties(#{mo.vimType})" if $vim_log
+    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: calling retrieveProperties(#{mo.class.wsdl_name})" if $vim_log
+    oca = retrievePropertiesCompat(@propCol, [spec])
+    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: return from retrieveProperties(#{mo.class.wsdl_name})" if $vim_log
 
     return nil if !oca || !oca[0] || !oca[0].propSet
 
     oc = oca[0]
-    oc.MOR = oc.obj
-    oc.delete('obj')
+    result = VimHash.new
+    result.MOR = oc.obj
 
-    oc.propSet = Array(oc.propSet) unless oc.propSet.kind_of?(Array)
-    oc.propSet.each do |ps|
-      #
-      # Here, ps.name can be a property path in the form: a.b.c
-      # If that's the case, we should set the target to: propHash['a']['b']['c']
-      # creating intermediate nodes as needed.
-      #
-      h, k = hashTarget(oc, ps.name)
-      if !h[k]
-        h[k] = ps.val
-      elsif h[k].kind_of? Array
-        h[k] << ps.val
-      else
-        h[k] = VimArray.new do |arr|
-          arr << h[k]
-          arr << ps.val
-        end
-      end
-    end # oc.propSet.each
-    oc.delete('propSet')
-
-    oc
+    prop_set_to_hash(result, Array(oc.propSet))
+    result
   end
 
   #
