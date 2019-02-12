@@ -1,23 +1,11 @@
-require "handsoap"
 require 'active_support/core_ext/numeric/bytes'
 require 'VMwareWebService/VimTypes'
 
-class VimService < Handsoap::Service
-  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :serviceInstanceMor, :session_cookie
+class VimService
+  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :serviceInstanceMor
 
-  Handsoap.http_driver = :HTTPClient
-
-  def initialize(ep)
-    super
-
-    setNameSpace('urn:vim25')
-
+  def initialize(host)
     @serviceInstanceMor = VimString.new("ServiceInstance", "ServiceInstance")
-    @session_cookie     = nil
-
-    @xml_payload_len  = 0
-    @xml_payload_max  = 10.megabytes
-    @xml_payload_lock = Mutex.new
 
     @sic = retrieveServiceContent
 
