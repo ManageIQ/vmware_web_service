@@ -29,125 +29,35 @@ class VimService
   end
 
   def acquireCloneTicket(sm)
-    response = invoke("n1:AcquireCloneTicket") do |message|
-      message.add "n1:_this", sm do |i|
-        i.set_attr "type", sm.vimType
-      end
-    end
-    (parse_response(response, 'AcquireCloneTicketResponse')['returnval'])
+    sm.AcquireCloneTicket
   end
 
   def acquireMksTicket(mor)
-    response = invoke("n1:AcquireMksTicket") do |message|
-      message.add "n1:_this", mor do |i|
-        i.set_attr "type", mor.vimType
-      end
-    end
-    (parse_response(response, 'AcquireMksTicketResponse')['returnval'])
+    mor.AcquireMksTicker
   end
 
   def acquireTicket(mor, ticketType)
-    response = invoke("n1:AcquireTicket") do |message|
-      message.add "n1:_this", mor do |i|
-        i.set_attr "type", mor.vimType
-      end
-      message.add "n1:ticketType", ticketType
-    end
-    (parse_response(response, 'AcquireTicketResponse')['returnval'])
+    mor.AcquireTicker(:ticketType => ticketType)
   end
 
   def addHost_Task(clustMor, spec, asConnected, resourcePool = nil, license = nil)
-    response = invoke("n1:AddHost_Task") do |message|
-      message.add "n1:_this", clustMor do |i|
-        i.set_attr "type", clustMor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", spec.xsiType
-        marshalObj(i, spec)
-      end
-      message.add "n1:asConnected", asConnected
-      message.add "n1:resourcePool", resourcePool do |i|
-        i.set_attr "type", resourcePool.vimType
-      end unless resourcePool.nil?
-      message.add "n1:license", license unless license.nil?
-    end
-    (parse_response(response, 'AddHost_TaskResponse')['returnval'])
+    clustMor.AddHost_Task(:spec => spec, :asConnected => asConnected, :resourcePool => resourcePool, :license => license)
   end
 
   def addInternetScsiSendTargets(hssMor, iScsiHbaDevice, targets)
-    response = invoke("n1:AddInternetScsiSendTargets") do |message|
-      message.add "n1:_this", hssMor do |i|
-        i.set_attr "type", hssMor.vimType
-      end
-      message.add "n1:iScsiHbaDevice", iScsiHbaDevice
-      if targets.kind_of?(Array)
-        targets.each do |t|
-          message.add "n1:targets" do |i|
-            i.set_attr "xsi:type", t.xsiType
-            marshalObj(i, t)
-          end
-        end
-      else
-        message.add "n1:targets" do |i|
-          i.set_attr "xsi:type", targets.xsiType
-          marshalObj(i, targets)
-        end
-      end
-    end
-    (parse_response(response, 'AddInternetScsiSendTargetsResponse'))
+    hssMor.AddInternetScsiSendTargets(:iScsiHbaDevice => iScsiHbaDevice, :targets => targets)
   end
 
   def addInternetScsiStaticTargets(hssMor, iScsiHbaDevice, targets)
-    response = invoke("n1:AddInternetScsiStaticTargets") do |message|
-      message.add "n1:_this", hssMor do |i|
-        i.set_attr "type", hssMor.vimType
-      end
-      message.add "n1:iScsiHbaDevice", iScsiHbaDevice
-      if targets.kind_of?(Array)
-        targets.each do |t|
-          message.add "n1:targets" do |i|
-            i.set_attr "xsi:type", t.xsiType
-            marshalObj(i, t)
-          end
-        end
-      else
-        message.add "n1:targets" do |i|
-          i.set_attr "xsi:type", targets.xsiType
-          marshalObj(i, targets)
-        end
-      end
-    end
-    (parse_response(response, 'AddInternetScsiStaticTargetsResponse'))
+    hssMor.AddInternetScsiStaticTargets(:iScsiHbaDevice => iScsiHbaDevice, :targets => targets)
   end
 
   def addStandaloneHost_Task(folderMor, spec, addConnected, license = nil)
-    response = invoke("n1:AddStandaloneHost_Task") do |message|
-      message.add "n1:_this", folderMor do |i|
-        i.set_attr "type", folderMor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", spec.xsiType
-        marshalObj(i, spec)
-      end
-      message.add "n1:addConnected", addConnected
-      message.add "n1:license", license unless license.nil?
-    end
-    (parse_response(response, 'AddStandaloneHost_TaskResponse')['returnval'])
+    folderMor.AddStandaloneHost_Task(:spec => spec, :addConnected => addConnected, :license => license)
   end
 
   def browseDiagnosticLog(diagnosticManager, host, key, start, lines)
-    response = invoke("n1:BrowseDiagnosticLog") do |message|
-      message.add "n1:_this", diagnosticManager do |i|
-        i.set_attr "type", diagnosticManager.vimType
-      end
-      message.add "n1:host", host do |i|
-        i.set_attr "type", host.vimType
-      end if host
-      message.add "n1:key", key
-      message.add "n1:start", start if start
-      message.add "n1:lines", lines if lines
-    end
-    (parse_response(response, 'BrowseDiagnosticLogResponse')['returnval'])
+    diagnosticManager.BrowseDiagnosticLog(:host => host, :key => key, :start => start, :lines => lines)
   end
 
   def cancelRetrievePropertiesEx(propCol, token)
@@ -155,12 +65,7 @@ class VimService
   end
 
   def cancelTask(tmor)
-    response = invoke("n1:CancelTask") do |message|
-      message.add "n1:_this", tmor do |i|
-        i.set_attr "type", tmor.vimType
-      end
-    end
-    (parse_response(response, 'CancelTaskResponse'))
+    tmor.CancelTask
   end
 
   def cancelWaitForUpdates(propCol)
@@ -168,20 +73,7 @@ class VimService
   end
 
   def cloneVM_Task(vmMor, fmor, name, cspec)
-    response = invoke("n1:CloneVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-      message.add "n1:folder", fmor do |i|
-        i.set_attr "type", fmor.vimType
-      end
-      message.add "n1:name", name
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", cspec.xsiType
-        marshalObj(i, cspec)
-      end
-    end
-    (parse_response(response, 'CloneVM_TaskResponse')['returnval'])
+    vmMor.CloneVM_Task(:folder => fmor, :name => name, :spec => cspec)
   end
 
   def continueRetrievePropertiesEx(propCol, token)
@@ -189,45 +81,15 @@ class VimService
   end
 
   def createAlarm(alarmManager, mor, aSpec)
-    response = invoke("n1:CreateAlarm") do |message|
-      message.add "n1:_this", alarmManager do |i|
-        i.set_attr "type", alarmManager.vimType
-      end
-      message.add "n1:entity", mor do |i|
-        i.set_attr "type", mor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", aSpec.xsiType
-        marshalObj(i, aSpec)
-      end
-    end
-    (parse_response(response, 'CreateAlarmResponse')['returnval'])
+    alarmManager.CreateAlarm(:entity => mor, :spec => aSpec)
   end
 
   def createCollectorForEvents(eventManager, eventFilterSpec)
-    response = invoke("n1:CreateCollectorForEvents") do |message|
-      message.add "n1:_this", eventManager do |i|
-        i.set_attr "type", eventManager.vimType
-      end
-      message.add "n1:filter" do |i|
-        i.set_attr "xsi:type", eventFilterSpec.xsiType
-        marshalObj(i, eventFilterSpec)
-      end
-    end
-    (parse_response(response, 'CreateCollectorForEventsResponse')['returnval'])
+    eventManager.CreateCollectorForEvents(:filter => eventFilterSpec)
   end
 
   def createCustomizationSpec(csmMor, item)
-    response = invoke("n1:CreateCustomizationSpec") do |message|
-      message.add "n1:_this", csmMor do |i|
-        i.set_attr "type", csmMor.vimType
-      end
-      message.add "n1:item" do |i|
-        i.set_attr "xsi:type", item.xsiType
-        marshalObj(i, item)
-      end
-    end
-    (parse_response(response, 'CreateCustomizationSpecResponse')['returnval'])
+    csmMor.CreateCustomizationSpec(:item => item)
   end
 
   def createFilter(propCol, pfSpec, partialUpdates)
@@ -235,204 +97,75 @@ class VimService
   end
 
   def createFolder(pfMor, fname)
-    response = invoke("n1:CreateFolder") do |message|
-      message.add "n1:_this", pfMor do |i|
-        i.set_attr "type", pfMor.vimType
-      end
-      message.add "n1:name", fname
-    end
-    (parse_response(response, 'CreateFolderResponse')['returnval'])
+    pfMor.CreateFolder(:name => fname)
   end
 
   def createNasDatastore(dssMor, spec)
-    response = invoke("n1:CreateNasDatastore") do |message|
-      message.add "n1:_this", dssMor do |i|
-        i.set_attr "type", dssMor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", spec.xsiType
-        marshalObj(i, spec)
-      end
-    end
-    (parse_response(response, 'CreateNasDatastoreResponse')['returnval'])
+    dssMor.CreateNasDatastore(:spec => spec)
   end
 
   def createSnapshot_Task(vmMor, name, desc, memory, quiesce)
-    response = invoke("n1:CreateSnapshot_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-      message.add "n1:name", name
-      message.add "n1:description", desc  if desc
-      message.add "n1:memory", memory.to_s
-      message.add "n1:quiesce", quiesce
-    end
-    (parse_response(response, 'CreateSnapshot_TaskResponse')['returnval'])
+    vmMor.CreateSnapshot_Task(:name => name, :description => desc, :memory => memory, :quiesce => quiesce)
   end
 
   def createVM_Task(fMor, vmcs, pool, hMor)
-    response = invoke("n1:CreateVM_Task") do |message|
-      message.add "n1:_this", fMor do |i|
-        i.set_attr "type", fMor.vimType
-      end
-      message.add "n1:config" do |i|
-        i.set_attr "xsi:type", vmcs.xsiType
-        marshalObj(i, vmcs)
-      end
-      message.add "n1:pool", pool do |i|
-        i.set_attr "type", "ResourcePool"
-      end
-      # hMor is not mandatory since it's ok to miss it for DRS clusters or single host clusters
-      unless hMor.nil?
-        message.add "n1:host", hMor do |i|
-          i.set_attr "type", hMor.vimType
-        end
-      end
-    end
-    parse_response(response, 'CreateVM_TaskResponse')['returnval']
+    fMor.CreateVM_Task(:config => vmcs, :pool => pool, :host => hMor)
   end
 
   def currentTime
-    response = invoke("n1:CurrentTime") do |message|
-      message.add "n1:_this", "ServiceInstance" do |i|
-        i.set_attr "type", "ServiceInstance"
-      end
-    end
-    (parse_response(response, 'CurrentTimeResponse')['returnval'])
+    serviceInstanceMor.CurrentTime
   end
 
   def customizationSpecItemToXml(csmMor, item)
-    response = invoke("n1:CustomizationSpecItemToXml") do |message|
-      message.add "n1:_this", csmMor do |i|
-        i.set_attr "type", csmMor.vimType
-      end
-      message.add "n1:item" do |i|
-        i.set_attr "xsi:type", item.xsiType
-        marshalObj(i, item)
-      end
-    end
-    (parse_response(response, 'CustomizationSpecItemToXmlResponse')['returnval'])
+    csmMor.CustomizationSpecItemToXml(:item => item)
   end
 
   def deleteCustomizationSpec(csmMor, name)
-    response = invoke("n1:DeleteCustomizationSpec") do |message|
-      message.add "n1:_this", csmMor do |i|
-        i.set_attr "type", csmMor.vimType
-      end
-      message.add "n1:name", name
-    end
-    (parse_response(response, 'DeleteCustomizationSpecResponse'))['returnval']
+    csmMor.DeleteCustomizationSpec(:name => name)
   end
 
   def deselectVnicForNicType(vnmMor, nicType, device)
-    response = invoke("n1:DeselectVnicForNicType") do |message|
-      message.add "n1:_this", vnmMor do |i|
-        i.set_attr "type", vnmMor.vimType
-      end
-      message.add "n1:nicType", nicType
-      message.add "n1:device", device
-    end
-    (parse_response(response, 'DeselectVnicForNicTypeResponse'))
+    vnmMor.DeselectVnicForNicType(:nicType => nicType, :device => device)
   end
 
   def destroy_Task(mor)
-    response = invoke("n1:Destroy_Task") do |message|
-      message.add "n1:_this", mor do |i|
-        i.set_attr "type", mor.vimType
-      end
-    end
-    (parse_response(response, 'Destroy_TaskResponse')['returnval'])
+    mor.Destroy_Task
   end
 
   def destroyCollector(collectorMor)
-    response = invoke("n1:DestroyCollector") do |message|
-      message.add "n1:_this", collectorMor do |i|
-        i.set_attr "type", collectorMor.vimType
-      end
-    end
-    (parse_response(response, 'DestroyCollectorResponse'))
+    collectorMor.DestroyCollector
   end
 
   def destroyPropertyFilter(filterSpecRef)
-    response = invoke("n1:DestroyPropertyFilter") do |message|
-      message.add "n1:_this", filterSpecRef do |i|
-        i.set_attr "type", filterSpecRef.vimType
-      end
-    end
-    (parse_response(response, 'DestroyPropertyFilterResponse'))
+    filterSpecRef.DestroyPropertyFilter
   end
 
   def disableRuleset(fwsMor, rskey)
-    response = invoke("n1:DisableRuleset") do |message|
-      message.add "n1:_this", fwsMor do |i|
-        i.set_attr "type", fwsMor.vimType
-      end
-      message.add "n1:id", rskey
-    end
-    (parse_response(response, 'DisableRulesetResponse'))
+    fwsMor.DisableRuleset(:id => rskey)
   end
 
   def doesCustomizationSpecExist(csmMor, name)
-    response = invoke("n1:DoesCustomizationSpecExist") do |message|
-      message.add "n1:_this", csmMor do |i|
-        i.set_attr "type", csmMor.vimType
-      end
-      message.add "n1:name", name
-    end
-    (parse_response(response, 'DoesCustomizationSpecExistResponse'))['returnval']
+    csmMor.DoesCustomizationSpecExist(:name => name)
   end
 
   def enableRuleset(fwsMor, rskey)
-    response = invoke("n1:EnableRuleset") do |message|
-      message.add "n1:_this", fwsMor do |i|
-        i.set_attr "type", fwsMor.vimType
-      end
-      message.add "n1:id", rskey
-    end
-    (parse_response(response, 'EnableRulesetResponse'))
+    fwsMor.EnableRuleset(:id => rskey)
   end
 
   def enterMaintenanceMode_Task(hMor, timeout = 0, evacuatePoweredOffVms = false)
-    response = invoke("n1:EnterMaintenanceMode_Task") do |message|
-      message.add "n1:_this", hMor do |i|
-        i.set_attr "type", hMor.vimType
-      end
-      message.add "n1:timeout", timeout.to_s
-      message.add "n1:evacuatePoweredOffVms", evacuatePoweredOffVms.to_s
-    end
-    (parse_response(response, 'EnterMaintenanceMode_TaskResponse'))['returnval']
+    hMor.EnterMaintenanceMode_Task(:timeout => timeout, :evacuatePoweredOffVms => evacuatePoweredOffVms)
   end
 
   def exitMaintenanceMode_Task(hMor, timeout = 0)
-    response = invoke("n1:ExitMaintenanceMode_Task") do |message|
-      message.add "n1:_this", hMor do |i|
-        i.set_attr "type", hMor.vimType
-      end
-      message.add "n1:timeout", timeout.to_s
-    end
-    (parse_response(response, 'ExitMaintenanceMode_TaskResponse'))['returnval']
+    hMor.ExitMaintenanceMode_Task(:timeout => timeout)
   end
 
   def getAlarm(alarmManager, mor)
-    response = invoke("n1:GetAlarm") do |message|
-      message.add "n1:_this", alarmManager do |i|
-        i.set_attr "type", alarmManager.vimType
-      end
-      message.add "n1:entity", mor do |i|
-        i.set_attr "type", mor.vimType
-      end if mor
-    end
-    (parse_response(response, 'GetAlarmResponse')['returnval'])
+    alarmManager.GetAlarm(:entity => mor)
   end
 
   def getCustomizationSpec(csmMor, name)
-    response = invoke("n1:GetCustomizationSpec") do |message|
-      message.add "n1:_this", csmMor do |i|
-        i.set_attr "type", csmMor.vimType
-      end
-      message.add "n1:name", name
-    end
-    (parse_response(response, 'GetCustomizationSpecResponse'))['returnval']
+    csmMor.GetCustomizationSpec(:name => name)
   end
 
   def login(sessionManager, username, password)
@@ -444,416 +177,152 @@ class VimService
   end
 
   def logUserEvent(eventManager, entity, msg)
-    response = invoke("n1:LogUserEvent") do |message|
-      message.add "n1:_this", eventManager do |i|
-        i.set_attr "type", eventManager.vimType
-      end
-      message.add "n1:entity", entity do |i|
-        i.set_attr "type", entity.vimType
-      end
-      message.add "n1:msg", msg
-    end
-    (parse_response(response, 'LogUserEventResponse'))
+    eventManager.LogUserEvent(:entity => entity, :msg => msg)
   end
 
   def markAsTemplate(vmMor)
-    response = invoke("n1:MarkAsTemplate") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'MarkAsTemplateResponse'))
+    vmMor.MarkAsTemplate
   end
 
   def markAsVirtualMachine(vmMor, pmor, hmor = nil)
-    response = invoke("n1:MarkAsVirtualMachine") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-      message.add "n1:pool", pmor do |i|
-        i.set_attr "type", pmor.vimType
-      end
-      message.add "n1:host", hmor do |i|
-        i.set_attr "type", hmor.vimType
-      end if hmor
-    end
-    (parse_response(response, 'MarkAsVirtualMachineResponse'))
+    vmMor.MarkAsVirtualMachine(:pool => pmor, :host => hmor)
   end
 
   def migrateVM_Task(vmMor, pmor = nil, hmor = nil, priority = "defaultPriority", state = nil)
-    response = invoke("n1:MigrateVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-      message.add "n1:pool", pmor do |i|
-        i.set_attr "type", pmor.vimType
-      end if pmor
-      message.add "n1:host", hmor do |i|
-        i.set_attr "type", hmor.vimType
-      end if hmor
-      message.add "n1:priority", priority
-      message.add "n1:state", state if state
-    end
-    (parse_response(response, 'MigrateVM_TaskResponse')['returnval'])
+    vmMor.MigrateVM_Task(:pool => pmor, :hmor => hmor, :priority => priority, :state => state)
   end
 
   def moveIntoFolder_Task(fMor, oMor)
-    response = invoke("n1:MoveIntoFolder_Task") do |message|
-      message.add "n1:_this", fMor do |i|
-        i.set_attr "type", fMor.vimType
-      end
-      message.add "n1:list", oMor do |i|
-        i.set_attr "type", oMor.vimType
-      end
-    end
-    parse_response(response, 'MoveIntoFolder_TaskResponse')['returnval']
+    fMor.MoveIntoFolder_Task(:list => oMor)
   end
 
   def relocateVM_Task(vmMor, cspec, priority = "defaultPriority")
-    response = invoke("n1:RelocateVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", cspec.xsiType
-        marshalObj(i, cspec)
-      end
-      message.add "n1:priority", priority
-    end
-    (parse_response(response, 'RelocateVM_TaskResponse')['returnval'])
+    vmMor.RelocateVM_Task(:spec => cspec, :priority => priority)
   end
 
   def powerDownHostToStandBy_Task(hMor, timeoutSec = 0, evacuatePoweredOffVms = false)
-    response = invoke("n1:PowerDownHostToStandBy_Task") do |message|
-      message.add "n1:_this", hMor do |i|
-        i.set_attr "type", hMor.vimType
-      end
-      message.add "n1:timeoutSec", timeoutSec.to_s
-      message.add "n1:evacuatePoweredOffVms", evacuatePoweredOffVms.to_s
-    end
-    (parse_response(response, 'PowerDownHostToStandBy_TaskResponse'))['returnval']
+    hMor.PowerDownHostToStandBy_Task(:timeoutSec => timeoutSec, :evacuatePoweredOffVms => evacuatePoweredOffVms)
   end
 
   def powerOffVM_Task(vmMor)
-    response = invoke("n1:PowerOffVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'PowerOffVM_TaskResponse')['returnval'])
+    vmMor.PowerOffVM_Task
   end
 
-  def powerOnVM_Task(vmMor)
-    response = invoke("n1:PowerOnVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'PowerOnVM_TaskResponse')['returnval'])
+  def powerOnVM_Task(vmMor, hMor = nil)
+    vmMor.PowerOnVM_Task(:host => hMor)
   end
 
   def powerUpHostFromStandBy_Task(hMor, timeoutSec = 0)
-    response = invoke("n1:PowerUpHostFromStandBy_Task") do |message|
-      message.add "n1:_this", hMor do |i|
-        i.set_attr "type", hMor.vimType
-      end
-      message.add "n1:timeoutSec", timeoutSec.to_s
-    end
-    (parse_response(response, 'PowerUpHostFromStandBy_TaskResponse'))['returnval']
+    hMor.PowerUpHostFromStandBy_Task(:timeoutSec => timeoutSec)
   end
 
   def queryAvailablePerfMetric(perfManager, entity, beginTime = nil, endTime = nil, intervalId = nil)
-    response = invoke("n1:QueryAvailablePerfMetric") do |message|
-      message.add "n1:_this", perfManager do |i|
-        i.set_attr "type", perfManager.vimType
-      end
-      message.add "n1:entity", entity do |i|
-        i.set_attr "type", entity.vimType
-      end
-      message.add "n1:beginTime", beginTime.to_s  if beginTime
-      message.add "n1:endTime", endTime.to_s    if endTime
-      message.add "n1:intervalId", intervalId   if intervalId
-    end
-    (parse_response(response, 'QueryAvailablePerfMetricResponse')['returnval'])
+    perfManager.QueryAvailablePerfMetric(
+      :entity     => entity,
+      :beginTime  => beginTime,
+      :endTime    => endTime,
+      :intervalId => intervalId
+    )
   end
 
   def queryDescriptions(diagnosticManager, entity)
-    response = invoke("n1:QueryDescriptions") do |message|
-      message.add "n1:_this", diagnosticManager do |i|
-        i.set_attr "type", diagnosticManager.vimType
-      end
-      message.add "n1:host", entity do |i|
-        i.set_attr "type", entity.vimType
-      end if entity
-    end
-    (parse_response(response, 'QueryDescriptionsResponse')['returnval'])
+    diagnosticManager.QueryDescriptions(:host => entity)
   end
 
-  def queryDvsConfigTarget(dvsManager, hmor, _dvs)
-    response = invoke("n1:QueryDvsConfigTarget") do |message|
-      message.add "n1:_this", dvsManager do |i|
-        i.set_attr "type", dvsManager.vimType
-      end
-      message.add "n1:host", hmor do |i|
-        i.set_attr "type", hmor.vimType
-      end if hmor
-    end
-    (parse_response(response, 'QueryDvsConfigTargetResponse')['returnval'])
-    # TODO: dvs
+  def queryDvsConfigTarget(dvsManager, hmor, dvs)
+    dvsManager.QueryDvsConfigTarget(:host => hmor, :dvs => dvs)
   end
 
   def queryNetConfig(vnmMor, nicType)
-    response = invoke("n1:QueryNetConfig") do |message|
-      message.add "n1:_this", vnmMor do |i|
-        i.set_attr "type", vnmMor.vimType
-      end
-      message.add "n1:nicType", nicType
-    end
-    (parse_response(response, 'QueryNetConfigResponse')['returnval'])
+    vnmMor.QueryNetConfig(:nicType => nicType)
   end
 
   def queryOptions(omMor, name)
-    response = invoke("n1:QueryOptions") do |message|
-      message.add "n1:_this", omMor do |i|
-        i.set_attr "type", omMor.vimType
-      end
-      message.add "n1:name", name
-    end
-    (parse_response(response, 'QueryOptionsResponse')['returnval'])
+    omMor.QueryOptions(:name => name)
   end
 
   def queryPerf(perfManager, querySpec)
-    response = invoke("n1:QueryPerf") do |message|
-      message.add "n1:_this", perfManager do |i|
-        i.set_attr "type", perfManager.vimType
-      end
-      if querySpec.kind_of?(Array)
-        querySpec.each do |qs|
-          message.add "n1:querySpec" do |i|
-            i.set_attr "xsi:type", qs.xsiType
-            marshalObj(i, qs)
-          end
-        end
-      else
-        message.add "n1:querySpec" do |i|
-          i.set_attr "xsi:type", querySpec.xsiType
-          marshalObj(i, querySpec)
-        end
-      end
-    end
-    (parse_response(response, 'QueryPerfResponse')['returnval'])
+    perfManager.QueryPerf(:querySpec => querySpec)
   end
 
   def queryPerfComposite(perfManager, querySpec)
-    response = invoke("n1:QueryPerfComposite") do |message|
-      message.add "n1:_this", perfManager do |i|
-        i.set_attr "type", perfManager.vimType
-      end
-      message.add "n1:querySpec" do |i|
-        i.set_attr "xsi:type", querySpec.xsiType
-        marshalObj(i, querySpec)
-      end
-    end
-    (parse_response(response, 'QueryPerfCompositeResponse')['returnval'])
+    perfManager.QueryPerfComposite(:querySpec => querySpec)
   end
 
   def queryPerfProviderSummary(perfManager, entity)
-    response = invoke("n1:QueryPerfProviderSummary") do |message|
-      message.add "n1:_this", perfManager do |i|
-        i.set_attr "type", perfManager.vimType
-      end
-      message.add "n1:entity", entity do |i|
-        i.set_attr "type", entity.vimType
-      end
-    end
-    (parse_response(response, 'QueryPerfProviderSummaryResponse')['returnval'])
+    perfManager.QueryPerfProviderSummary(:entity => entity)
   end
 
   def readNextEvents(ehcMor, maxCount)
-    response = invoke("n1:ReadNextEvents") do |message|
-      message.add "n1:_this", ehcMor do |i|
-        i.set_attr "type", ehcMor.vimType
-      end
-      message.add "n1:maxCount", maxCount
-    end
-    (parse_response(response, 'ReadNextEventsResponse')['returnval'])
+    ehcMor.ReadNextEvents(:maxCount => maxCount)
   end
 
   def readPreviousEvents(ehcMor, maxCount)
-    response = invoke("n1:ReadPreviousEvents") do |message|
-      message.add "n1:_this", ehcMor do |i|
-        i.set_attr "type", ehcMor.vimType
-      end
-      message.add "n1:maxCount", maxCount
-    end
-    (parse_response(response, 'ReadPreviousEventsResponse')['returnval'])
+    ehcMor.ReadPreviousEvents(:maxCount => maxCount)
   end
 
   def rebootGuest(vmMor)
-    response = invoke("n1:RebootGuest") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'RebootGuestResponse'))
+    vmMor.RebootGuest
   end
 
   def rebootHost_Task(hMor, force = false)
-    response = invoke("n1:RebootHost_Task") do |message|
-      message.add "n1:_this", hMor do |i|
-        i.set_attr "type", hMor.vimType
-      end
-      message.add "n1:force", force.to_s
-    end
-    (parse_response(response, 'RebootHost_TaskResponse'))['returnval']
+    hMor.RebootHost_Task(:force => force)
   end
 
   def reconfigureAlarm(aMor, aSpec)
-    response = invoke("n1:ReconfigureAlarm") do |message|
-      message.add "n1:_this", aMor do |i|
-        i.set_attr "type", aMor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", aSpec.xsiType
-        marshalObj(i, aSpec)
-      end
-    end
-    (parse_response(response, 'ReconfigureAlarmResponse'))
+    aMor.ReconfigureAlarm(:spec => aSpec)
   end
 
   def reconfigVM_Task(vmMor, vmConfigSpec)
-    response = invoke("n1:ReconfigVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", vmConfigSpec.xsiType
-        marshalObj(i, vmConfigSpec)
-      end
-    end
-    (parse_response(response, 'ReconfigVM_TaskResponse')['returnval'])
+    vmMor.ReconfigVM_Task(:spec => vmConfigSpec)
   end
 
   def refreshFirewall(fwsMor)
-    response = invoke("n1:RefreshFirewall") do |message|
-      message.add "n1:_this", fwsMor do |i|
-        i.set_attr "type", fwsMor.vimType
-      end
-    end
-    (parse_response(response, 'RefreshFirewallResponse'))
+    fwsMor.RefreshFirewall
   end
 
   def refreshNetworkSystem(nsMor)
-    response = invoke("n1:RefreshNetworkSystem") do |message|
-      message.add "n1:_this", nsMor do |i|
-        i.set_attr "type", nsMor.vimType
-      end
-    end
-    (parse_response(response, 'RefreshNetworkSystemResponse'))
+    nsMor.RefreshNetworkSystem
   end
 
   def refreshServices(ssMor)
-    response = invoke("n1:RefreshServices") do |message|
-      message.add "n1:_this", ssMor do |i|
-        i.set_attr "type", ssMor.vimType
-      end
-    end
-    (parse_response(response, 'RefreshServicesResponse'))
+    ssMor.RefreshServices
   end
 
   def registerVM_Task(fMor, path, name, asTemplate, pmor, hmor)
-    response = invoke("n1:RegisterVM_Task") do |message|
-      message.add "n1:_this", fMor do |i|
-        i.set_attr "type", fMor.vimType
-      end
-      message.add "n1:path", path
-      message.add "n1:name", name if name
-      message.add "n1:asTemplate", asTemplate
-      message.add "n1:pool", pmor do |i|
-        i.set_attr "type", pmor.vimType
-      end if pmor
-      message.add "n1:host", hmor do |i|
-        i.set_attr "type", hmor.vimType
-      end if hmor
-    end
-    (parse_response(response, 'RegisterVM_TaskResponse')['returnval'])
+    fMor.RegisterVM_Task(:path => path, :name => name, :asTemplate => asTemplate, :pool => pmor, :host => hmor)
   end
 
   def removeAlarm(aMor)
-    response = invoke("n1:RemoveAlarm") do |message|
-      message.add "n1:_this", aMor do |i|
-        i.set_attr "type", aMor.vimType
-      end
-    end
-    (parse_response(response, 'RemoveAlarmResponse'))
+    aMor.RemoveAlarm
   end
 
   def removeAllSnapshots_Task(vmMor)
-    response = invoke("n1:RemoveAllSnapshots_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'RemoveAllSnapshots_TaskResponse')['returnval'])
+    vmMor.RemoveAllSnapshots_Task
   end
 
   def removeSnapshot_Task(snMor, subTree)
-    response = invoke("n1:RemoveSnapshot_Task") do |message|
-      message.add "n1:_this", snMor do |i|
-        i.set_attr "type", snMor.vimType
-      end
-      message.add "n1:removeChildren", subTree
-    end
-    (parse_response(response, 'RemoveSnapshot_TaskResponse')['returnval'])
+    snMor.RemoveSnapshot_Task(:removeChildren => subTree)
   end
 
   def rename_Task(vmMor, newName)
-    response = invoke("n1:Rename_Task") do |message|
-      message.add("n1:_this", vmMor) do |i|
-        i.set_attr("type", vmMor.vimType)
-      end
-      message.add("n1:newName", newName)
-    end
-    parse_response(response, 'Rename_TaskResponse')['returnval']
+    vmMor.Rename_Task(:newName => newName)
   end
 
   def renameSnapshot(snMor, name, desc)
-    response = invoke("n1:RenameSnapshot") do |message|
-      message.add "n1:_this", snMor do |i|
-        i.set_attr "type", snMor.vimType
-      end
-      message.add "n1:name", name if name
-      message.add "n1:description", desc if desc
-    end
-    (parse_response(response, 'RenameSnapshotResponse'))
+    snMor.RenameSnapshot(:name => name, :description => desc)
   end
 
   def resetCollector(collectorMor)
-    response = invoke("n1:ResetCollector") do |message|
-      message.add "n1:_this", collectorMor do |i|
-        i.set_attr "type", collectorMor.vimType
-      end
-    end
-    (parse_response(response, 'ResetCollectorResponse'))
+    collectionMor.ResetCollector
   end
 
   def resetVM_Task(vmMor)
-    response = invoke("n1:ResetVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'ResetVM_TaskResponse')['returnval'])
+    vmMor.ResetVM_Task
   end
 
   def restartService(ssMor, skey)
-    response = invoke("n1:RestartService") do |message|
-      message.add "n1:_this", ssMor do |i|
-        i.set_attr "type", ssMor.vimType
-      end
-      message.add "n1:id", skey
-    end
-    (parse_response(response, 'RestartServiceResponse'))
+    ssMor.RestartService(:id => skey)
   end
 
   def retrieveProperties(propCol, specSet)
@@ -861,8 +330,12 @@ class VimService
   end
 
   def retrievePropertiesEx(propCol, specSet, max_objects = nil)
-    options = RbVmomi::VIM::RetrieveOptions.new(:maxObjects => max_objects)
-    propCol.RetrievePropertiesEx(:specSet => specSet, :options => options)
+    propCol.RetrievePropertiesEx(
+      :specSet => specSet,
+      :options => RbVmomi::VIM::RetrieveOptions(
+        :maxObjects => max_objects
+      ),
+    )
   end
 
   def retrievePropertiesIter(propCol, specSet, max_objects = nil)
@@ -895,411 +368,104 @@ class VimService
   end
 
   def revertToCurrentSnapshot_Task(vmMor)
-    response = invoke("n1:RevertToCurrentSnapshot_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'RevertToCurrentSnapshot_TaskResponse')['returnval'])
+    vmMor.RevertToCurrentSnapshot_Task
   end
 
   def revertToSnapshot_Task(snMor)
-    response = invoke("n1:RevertToSnapshot_Task") do |message|
-      message.add "n1:_this", snMor do |i|
-        i.set_attr "type", snMor.vimType
-      end
-    end
-    (parse_response(response, 'RevertToSnapshot_TaskResponse')['returnval'])
+    snMor.RevertToSnapshot_Task
   end
 
   def rewindCollector(collectorMor)
-    response = invoke("n1:RewindCollector") do |message|
-      message.add "n1:_this", collectorMor do |i|
-        i.set_attr "type", collectorMor.vimType
-      end
-    end
-    (parse_response(response, 'RewindCollectorResponse'))
+    collectorMor.RewindCollector
   end
 
   def searchDatastore_Task(browserMor, dsPath, searchSpec)
-    response = invoke("n1:SearchDatastore_Task") do |message|
-      message.add "n1:_this", browserMor do |i|
-        i.set_attr "type", browserMor.vimType
-      end
-      message.add "n1:datastorePath", dsPath
-      message.add "n1:searchSpec" do |i|
-        i.set_attr "xsi:type", searchSpec.xsiType
-        marshalObj(i, searchSpec)
-      end if searchSpec
-    end
-    (parse_response(response, 'SearchDatastore_TaskResponse')['returnval'])
+    browserMor.SearchDatastore_Task(:datastorePath => dsPath, :searchSpec => searchSpec)
   end
 
   def searchDatastoreSubFolders_Task(browserMor, dsPath, searchSpec)
-    response = invoke("n1:SearchDatastoreSubFolders_Task") do |message|
-      message.add "n1:_this", browserMor do |i|
-        i.set_attr "type", browserMor.vimType
-      end
-      message.add "n1:datastorePath", dsPath
-      message.add "n1:searchSpec" do |i|
-        i.set_attr "xsi:type", searchSpec.xsiType
-        marshalObj(i, searchSpec)
-      end if searchSpec
-    end
-    (parse_response(response, 'SearchDatastoreSubFolders_TaskResponse')['returnval'])
+    browserMor.SearchDatastoreSubFolders_Task(:datastorePath => dsPath, :searchSpec => searchSpec)
   end
 
   def selectVnicForNicType(vnmMor, nicType, device)
-    response = invoke("n1:SelectVnicForNicType") do |message|
-      message.add "n1:_this", vnmMor do |i|
-        i.set_attr "type", vnmMor.vimType
-      end
-      message.add "n1:nicType", nicType
-      message.add "n1:device", device
-    end
-    (parse_response(response, 'SelectVnicForNicTypeResponse'))
+    vnmMor.SelectVnicForNicType(:nicType => nicType, :device => device)
   end
 
   def setCollectorPageSize(collector, maxCount)
-    response = invoke("n1:SetCollectorPageSize") do |message|
-      message.add "n1:_this", collector do |i|
-        i.set_attr "type", collector.vimType
-      end
-      message.add "n1:maxCount", maxCount
-    end
-    (parse_response(response, 'SetCollectorPageSizeResponse'))
+    collector.SetCollectorPageSize(:maxCount => maxCount)
   end
 
   def setField(cfManager, mor, key, value)
-    response = invoke("n1:SetField") do |message|
-      message.add "n1:_this", cfManager do |i|
-        i.set_attr "type", cfManager.vimType
-      end
-      message.add "n1:entity", mor do |i|
-        i.set_attr "type", mor.vimType
-      end
-      message.add "n1:key", key
-      message.add "n1:value", value
-    end
-    (parse_response(response, 'SetFieldResponse'))
+    cfManager.SetField(:entity => mor, :key => key, :value => value)
   end
 
   def setTaskDescription(tmor, description)
-    response = invoke("n1:SetTaskDescription") do |message|
-      message.add "n1:_this", tmor do |i|
-        i.set_attr "type", tmor.vimType
-      end
-      message.add "n1:description" do |i|
-        i.set_attr "xsi:type", description.xsiType
-        marshalObj(i, description)
-      end
-    end
-    (parse_response(response, 'SetTaskDescriptionResponse'))
+    tmor.SetTaskDescription(:description => description)
   end
 
   def setTaskState(tmor, state, result = nil, fault = nil)
-    response = invoke("n1:SetTaskState") do |message|
-      message.add "n1:_this", tmor do |i|
-        i.set_attr "type", tmor.vimType
-      end
-      message.add "n1:state", state do |i|
-        i.set_attr "xsi:type", "TaskInfoState"
-      end
-      message.add "n1:result" do |i|
-        i.set_attr "xsi:type", result.xsiType
-        marshalObj(i, result)
-      end if result
-      message.add "n1:fault" do |i|
-        i.set_attr "xsi:type", fault.xsiType
-        marshalObj(i, fault)
-      end if fault
-    end
-    (parse_response(response, 'SetTaskStateResponse'))
+    tmor.SetTaskState(:state => state, :result => result, :fault => fault)
   end
 
   def shutdownGuest(vmMor)
-    response = invoke("n1:ShutdownGuest") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'ShutdownGuestResponse'))
+    vmMor.ShutdownGuest
   end
 
   def shutdownHost_Task(hMor, force = false)
-    response = invoke("n1:ShutdownHost_Task") do |message|
-      message.add "n1:_this", hMor do |i|
-        i.set_attr "type", hMor.vimType
-      end
-      message.add "n1:force", force.to_s
-    end
-    (parse_response(response, 'ShutdownHost_TaskResponse'))['returnval']
+    hMor.ShutdownHost_Task(:force => force)
   end
 
   def standbyGuest(vmMor)
-    response = invoke("n1:StandbyGuest") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'StandbyGuestResponse'))
+    vmMor.StandbyGuest
   end
 
   def startService(ssMor, skey)
-    response = invoke("n1:StartService") do |message|
-      message.add "n1:_this", ssMor do |i|
-        i.set_attr "type", ssMor.vimType
-      end
-      message.add "n1:id", skey
-    end
-    (parse_response(response, 'StartServiceResponse'))
+    ssMor.StartService(:id => skey)
   end
 
   def stopService(ssMor, skey)
-    response = invoke("n1:StopService") do |message|
-      message.add "n1:_this", ssMor do |i|
-        i.set_attr "type", ssMor.vimType
-      end
-      message.add "n1:id", skey
-    end
-    (parse_response(response, 'StopServiceResponse'))
+    ssMor.StopService(:id => skey)
   end
 
   def suspendVM_Task(vmMor)
-    response = invoke("n1:SuspendVM_Task") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'SuspendVM_TaskResponse')['returnval'])
+    vmMor.SuspendVM_Task
   end
 
   def uninstallService(ssMor, skey)
-    response = invoke("n1:UninstallService") do |message|
-      message.add "n1:_this", ssMor do |i|
-        i.set_attr "type", ssMor.vimType
-      end
-      message.add "n1:id", skey
-    end
-    (parse_response(response, 'UninstallServiceResponse'))
+    ssMor.UninstallService(:id => skey)
   end
 
   def unregisterVM(vmMor)
-    response = invoke("n1:UnregisterVM") do |message|
-      message.add "n1:_this", vmMor do |i|
-        i.set_attr "type", vmMor.vimType
-      end
-    end
-    (parse_response(response, 'UnregisterVMResponse'))
+    vmMor.UnregisterVM
   end
 
   def updateDefaultPolicy(fwsMor, defaultPolicy)
-    response = invoke("n1:UpdateDefaultPolicy") do |message|
-      message.add "n1:_this", fwsMor do |i|
-        i.set_attr "type", fwsMor.vimType
-      end
-      message.add "n1:defaultPolicy" do |i|
-        i.set_attr "xsi:type", defaultPolicy.xsiType
-        marshalObj(i, defaultPolicy)
-      end
-    end
-    (parse_response(response, 'UpdateDefaultPolicyResponse'))
+    fwsMor.UpdateDefaultPolicy(:defaultPolicy => defaultPolicy)
   end
 
   def updateServicePolicy(sMor, skey, policy)
-    response = invoke("n1:UpdateServicePolicy") do |message|
-      message.add "n1:_this", sMor do |i|
-        i.set_attr "type", sMor.vimType
-      end
-      message.add "n1:id", skey
-      message.add "n1:policy", policy
-    end
-    (parse_response(response, 'UpdateServicePolicyResponse'))
+    sMor.UpdateServicePolicy(:id => skey, :policy => policy)
   end
 
   def updateSoftwareInternetScsiEnabled(hssMor, enabled)
-    response = invoke("n1:UpdateSoftwareInternetScsiEnabled") do |message|
-      message.add "n1:_this", hssMor do |i|
-        i.set_attr "type", hssMor.vimType
-      end
-      message.add "n1:enabled", enabled.to_s
-    end
-    (parse_response(response, 'UpdateSoftwareInternetScsiEnabledResponse'))
+    hssMor.UpdateSoftwareInternetScsiEnabled(:enabled => enabled)
   end
 
   def waitForUpdates(propCol, version = nil)
-    response = invoke("n1:WaitForUpdates") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-      message.add "n1:version", version if version
-    end
-    (parse_response(response, 'WaitForUpdatesResponse')['returnval'])
+    propCol.WaitForUpdates(:version => version)
   end
 
   def waitForUpdatesEx(propCol, version = nil, options = {})
-    max_wait    = options[:max_wait]
-    max_objects = options[:max_objects]
-
-    options = VimHash.new("WaitOptions") do |opts|
-      opts.maxObjectUpdates = max_objects.to_s if max_objects
-      opts.maxWaitSeconds   = max_wait.to_s    if max_wait
-    end
-
-    response = invoke("n1:WaitForUpdatesEx") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-
-      message.add "n1:version", version if version
-      message.add "n1:options" do |i|
-        i.set_attr "type", options.vimType
-        marshalObj(i, options)
-      end
-    end
-    (parse_response(response, 'WaitForUpdatesExResponse')['returnval'])
+    propCol.WaitForUpdatesEx(
+      :version => version,
+      :options => RbVmomi::VIM::WaitOptions(
+        :maxObjectUpdates => options[:max_objects],
+        :maxWaitSeconds   => options[:max_wait],
+      ),
+    )
   end
 
   def xmlToCustomizationSpecItem(csmMor, specItemXml)
-    response = invoke("n1:XmlToCustomizationSpecItem") do |message|
-      message.add "n1:_this", csmMor do |i|
-        i.set_attr "type", csmMor.vimType
-      end
-      message.add "n1:specItemXml", specItemXml
-    end
-    (parse_response(response, 'XmlToCustomizationSpecItemResponse')['returnval'])
-  end
-
-  private
-
-  def setNameSpace(ns)
-    @ns = {'n1' => ns}
-    on_create_document do |doc|
-      doc.alias 'n1', ns
-      doc.find("Envelope").set_attr "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"
-    end
-  end
-
-  def marshalObj(node, obj)
-    if obj.kind_of? Array
-      obj.each do |v|
-        marshalObj(node, v)
-      end
-    elsif obj.kind_of? VimHash
-      obj.each_arg do |k, v|
-        if v.kind_of? Array
-          v.each do |av|
-            node.add "n1:#{k}" do |i|
-              marshalObj(i, av)
-              i.set_attr "xsi:type", "n1:#{av.xsiType}" if av.respond_to?(:xsiType) && av.xsiType
-              i.set_attr "type", v.vimType if v.respond_to?(:vimType) && v.vimType
-            end
-          end
-        else
-          node.add "n1:#{k}" do |i|
-            marshalObj(i, v)
-            i.set_attr "type", v.vimType if v.respond_to?(:vimType) && v.vimType
-            i.set_attr "xsi:type", "n1:#{v.xsiType}" if v.respond_to?(:xsiType) && v.xsiType
-          end
-        end
-      end
-    else
-      node.set_value(obj)
-    end
-  end
-
-  def handle_memory_and_gc(response)
-    log_prefix = "#{self.class.name}##{__method__}:"
-
-    xml_len = response.instance_variable_get(:@http_body).length
-
-    # At this point we don't need the internal raw XML content since we
-    #   have the parsed XML document, so we can free it for the GC.
-    response.instance_variable_set(:@http_body, nil)
-
-    @xml_payload_lock.synchronize do
-      @xml_payload_len += xml_len
-
-      if @xml_payload_len > @xml_payload_max
-        @xml_payload_len = 0
-
-        $vim_log.debug("#{log_prefix} Running garbage collection")
-
-        # Force a GC, because Ruby's GC is triggered on number of objects without
-        #   regard to size.  The object we just freed may not be released right away.
-        gc_time = Benchmark.realtime { GC.start }
-
-        gc_log_level = gc_time >= 5 ? :warn : :debug
-        $vim_log.send(gc_log_level, "#{log_prefix} Garbage collection took #{gc_time} seconds")
-      end
-    end
-  end
-
-  def parse_response(response, rType)
-    doc  = response.document
-    raise "Response <#{response.inspect}> has no XML document" if doc.nil?
-
-    # Cleanup the raw XML document from the response and kick a GC
-    handle_memory_and_gc(response)
-
-    search_path = "//n1:#{rType}"
-    node = doc.xpath(search_path, @ns).first
-    raise "Node (search=<#{search_path}> namespace=<#{@ns}>) not found in XML document <#{doc.inspect}>" if node.nil?
-    ur   = unmarshal_response(node, rType)
-    # puts
-    # puts "***** #{rType}"
-    # dumpObj(ur)
-    # puts
-    (ur)
-  end
-
-  def unmarshal_response(node, vType = nil)
-    return(node.text) if node.text?
-
-    vimType = node.attribute_with_ns('type', nil)
-    vimType = vimType.value if vimType
-    xsiType = node.attribute_with_ns('type', 'http://www.w3.org/2001/XMLSchema-instance')
-    xsiType = xsiType.value if xsiType
-    xsiType ||= vType.to_s
-
-    if node.children.length == 1 && (c = node.child) && c.text?
-      return VimString.new(c.text, vimType, xsiType)
-    end
-    if xsiType == "SOAP::SOAPString"
-      return VimString.new("", vimType, xsiType)
-    end
-
-    if xsiType =~ /^ArrayOf(.*)$/
-      nextType = $1
-      obj = VimArray.new(xsiType)
-      node.children.each do |child|
-        next if child.blank?
-        obj << unmarshal_response(child, nextType)
-      end
-      return(obj)
-    end
-
-    aih = VimMappingRegistry.argInfoMap(xsiType)
-    obj = VimHash.new(xsiType)
-
-    node.children.each do |child|
-      next if child.blank?
-      name = child.name.freeze
-
-      ai = aih[name] if aih
-
-      unless (v = obj[name])
-        v = obj[name] = VimArray.new("ArrayOf#{ai[:type]}") if ai && ai[:isArray]
-      end
-
-      nextType = (ai ? ai[:type] : nil)
-
-      if v.kind_of?(Array)
-        obj[name] << unmarshal_response(child, nextType)
-      else
-        obj[name] = unmarshal_response(child, nextType)
-      end
-    end
-    (obj)
+    csmMor.XmlToCustomizationSpecItem(:specItemXml => specItemXml)
   end
 end
