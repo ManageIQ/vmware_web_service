@@ -1,11 +1,12 @@
 require 'active_support/core_ext/numeric/bytes'
 require 'rbvmomi/vim'
+require 'VMwareWebService/VimTypes'
 
 class VimService
-  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :vim
+  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :serviceInstanceMor, :vim
 
   def initialize(host, namespace: "urn:vim25", ssl: true, insecure: true, path: "/sdk", port: 443, vc_version: "6.7")
-    vim = RbVmomi::VIM.new(
+    @vim = RbVmomi::VIM.new(
       :ns       => namespace,
       :host     => host,
       :ssl      => ssl,
@@ -15,7 +16,9 @@ class VimService
       :rev      => vc_version,
     )
 
-    @sic = vim.serviceContent
+    @serviceInstanceMor = vim.serviceInstance
+
+    @sic = retrieveServiceContent
 
     @about           = @sic.about
     @apiVersion      = @about.apiVersion
@@ -947,13 +950,7 @@ class VimService
   end
 
   def retrieveServiceContent
-    response = invoke("n1:RetrieveServiceContent") do |message|
-      message.add "n1:_this", @serviceInstanceMor do |i|
-        i.set_attr "type", @serviceInstanceMor.vimType
-      end
-    end
-    @session_cookie ||= response.cookie
-    (parse_response(response, 'RetrieveServiceContentResponse')['returnval'])
+    serviceInstanceMor.RetrieveServiceContent
   end
 
   def revertToCurrentSnapshot_Task(vmMor)
