@@ -1,13 +1,21 @@
 require 'active_support/core_ext/numeric/bytes'
-require 'VMwareWebService/VimTypes'
+require 'rbvmomi/vim'
 
 class VimService
-  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :serviceInstanceMor
+  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :vim
 
-  def initialize(host)
-    @serviceInstanceMor = VimString.new("ServiceInstance", "ServiceInstance")
+  def initialize(host, namespace: "urn:vim25", ssl: true, insecure: true, path: "/sdk", port: 443, vc_version: "6.7")
+    vim = RbVmomi::VIM.new(
+      :ns       => namespace,
+      :host     => host,
+      :ssl      => ssl,
+      :insecure => insecure,
+      :path     => path,
+      :port     => port,
+      :rev      => vc_version,
+    )
 
-    @sic = retrieveServiceContent
+    @sic = vim.serviceContent
 
     @about           = @sic.about
     @apiVersion      = @about.apiVersion
