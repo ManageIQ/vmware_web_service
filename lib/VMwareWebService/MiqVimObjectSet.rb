@@ -6,141 +6,137 @@ module MiqVimObjectSet
     #
     # Traverse VirtualApp to Vm.
     #
-    virtualAppTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name = "virtualAppTraversalSpec"
-      ts.type = "VirtualApp"
-      ts.path = "vm"
-      ts.skip = "false"
-    end unless @v2
+    virtualAppTs = unless @v2
+      RbVmomi::VIM::TraversalSpec(
+       :name => "virtualAppTraversalSpec",
+       :type => "VirtualApp",
+       :path => "vm",
+       :skip => false,
+      )
+    end
 
     #
     # Traverse ResourcePool to ResourcePool and VirtualApp.
     #
-    resourcePoolTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name      = "resourcePoolTraversalSpec"
-      ts.type      = "ResourcePool"
-      ts.path      = "resourcePool"
-      ts.skip      = "false"
-      ts.selectSet = VimArray.new("ArrayOfSelectionSpec") do |ssa|
-        ssa << VimHash.new("SelectionSpec") { |ss| ss.name = "resourcePoolTraversalSpec" }
-      end
-    end
+    resourcePoolTs = RbVmomi::VIM::TraversalSpec(
+      :name      => "resourcePoolTraversalSpec",
+      :type      => "ResourcePool",
+      :path      => "resourcePool",
+      :skip      => false,
+      :selectSet => [
+        RbVmomi::VIM::SelectionSpec(:name => "resourcePoolTraversalSpec"),
+      ],
+    )
 
     #
     # Traverse ComputeResource to ResourcePool.
     #
-    computeResourceRpTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name      = "computeResourceRpTraversalSpec"
-      ts.type      = "ComputeResource"
-      ts.path      = "resourcePool"
-      ts.skip      = "false"
-      ts.selectSet = VimArray.new("ArrayOfSelectionSpec") do |ssa|
-        ssa << VimHash.new("SelectionSpec") { |ss| ss.name = "resourcePoolTraversalSpec" }
-      end
-    end
+    computeResourceRpTs = RbVmomi::VIM::TraversalSpec(
+      :name      => "computeResourceRpTraversalSpec",
+      :type      => "ComputeResource",
+      :path      => "resourcePool",
+      :skip      => false,
+      :selectSet => [
+        RbVmomi::VIM::SelectionSpec(:name => "resourcePoolTraversalSpec"),
+      ],
+    )
 
     #
     # Traverse ComputeResource to host.
     #
-    computeResourceHostTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name = "computeResourceHostTraversalSpec"
-      ts.type = "ComputeResource"
-      ts.path = "host"
-      ts.skip = "false"
-    end
+    computeResourceHostTs = RbVmomi::VIM::TraversalSpec(
+      :name => "computeResourceHostTraversalSpec",
+      :type => "ComputeResource",
+      :path => "host",
+      :skip => false,
+    )
 
     #
     # Traverse Datacenter to host folder.
     #
-    datacenterHostTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name      = "datacenterHostTraversalSpec"
-      ts.type      = "Datacenter"
-      ts.path      = "hostFolder"
-      ts.skip      = "false"
-      ts.selectSet = VimArray.new("ArrayOfSelectionSpec") do |ssa|
-        ssa << VimHash.new("SelectionSpec") { |ss| ss.name = "folderTraversalSpec" }
-      end
-    end
+    datacenterHostTs = RbVmomi::VIM::TraversalSpec(
+      :name      => "datacenterHostTraversalSpec",
+      :type      => "Datacenter",
+      :path      => "hostFolder",
+      :skip      => false,
+      :selectSet => [
+        RbVmomi::VIM::SelectionSpec(:name => "folderTraversalSpec"),
+      ],
+    )
 
     #
     # Traverse Datacenter to VM folder.
     #
-    datacenterVmTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name      = "datacenterVmTraversalSpec"
-      ts.type      = "Datacenter"
-      ts.path      = "vmFolder"
-      ts.skip      = "false"
-      ts.selectSet = VimArray.new("ArrayOfSelectionSpec") do |ssa|
-        ssa << VimHash.new("SelectionSpec") { |ss| ss.name = "folderTraversalSpec" }
-      end
-    end
+    datacenterVmTs = RbVmomi::VIM::TraversalSpec(
+      :name      => "datacenterVmTraversalSpec",
+      :type      => "Datacenter",
+      :path      => "vmFolder",
+      :skip      => false,
+      :selectSet => [
+        RbVmomi::VIM::SelectionSpec(:name => "folderTraversalSpec"),
+      ],
+    )
 
     #
     # Traverse Datacenter to Datastore folder.
     #
-    datacenterDsFolderTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name      = "dcTodf"
-      ts.type      = "Datacenter"
-      ts.path      = "datastoreFolder"
-      ts.skip      = "false"
-      ts.selectSet = VimArray.new("ArrayOfSelectionSpec") do |ssa|
-        ssa << VimHash.new("SelectionSpec") { |ss| ss.name = "folderTraversalSpec" }
-      end
-    end
+    datacenterDsFolderTs = RbVmomi::VIM::TraversalSpec(
+      :name      => "dcTodf",
+      :type      => "Datacenter",
+      :path      => "datastoreFolder",
+      :skip      => false,
+      :selectSet => [
+        RbVmomi::VIM::SelectionSpec(:name => "folderTraversalSpec"),
+      ],
+    )
 
     #
     # Traverse Datacenter to Datastore.
     #
-    datacenterDsTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name = "datacenterDsTraversalSpec"
-      ts.type = "Datacenter"
-      ts.path = "datastore"
-      ts.skip = "false"
-    end
+    datacenterDsTs = RbVmomi::VIM::TraversalSpec(
+      :name => "datacenterDsTraversalSpec",
+      :type => "Datacenter",
+      :path => "datastore",
+      :skip => false,
+    )
 
     #
     # Traverse Datacenter to Network folder
     #
-    datacenterNetworkFolderTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name = "dcTonf"
-      ts.type = "Datacenter"
-      ts.path = "networkFolder"
-      ts.skip = "false"
-      ts.selectSet = VimArray.new("ArrayOfSelectionSpec") do |ssa|
-        ssa << VimHash.new("SelectionSpec") { |ss| ss.name = "folderTraversalSpec" }
-      end
-    end
+    datacenterNetworkFolderTs = RbVmomi::VIM::TraversalSpec(
+      :name      => "dcTonf",
+      :type      => "Datacenter",
+      :path      => "networkFolder",
+      :skip      => false,
+      :selectSet => [
+        RbVmomi::VIM::SelectionSpec(:name => "folderTraversalSpec"),
+      ],
+    )
 
     #
     # Traverse Folder to children.
     #
-    folderTs = VimHash.new("TraversalSpec") do |ts|
-      ts.name      = "folderTraversalSpec"
-      ts.type      = "Folder"
-      ts.path      = "childEntity"
-      ts.skip      = "false"
-      ts.selectSet = VimArray.new("ArrayOfSelectionSpec") do |ssa|
-        ssa << VimHash.new("SelectionSpec") { |ss| ss.name = "folderTraversalSpec" }
-        ssa << datacenterHostTs
-        ssa << datacenterVmTs
-        ssa << datacenterDsTs
-        ssa << datacenterDsFolderTs
-        ssa << datacenterNetworkFolderTs
-        ssa << computeResourceRpTs
-        ssa << computeResourceHostTs
-        ssa << resourcePoolTs
-        ssa << virtualAppTs unless @v2
-      end
-    end
+    folderTs = RbVmomi::VIM::TraversalSpec(
+      :name      => "folderTraversalSpec",
+      :type      => "Folder",
+      :path      => "childEntity",
+      :skip      => false,
+      :selectSet => [
+        RbVmomi::VIM::SelectionSpec(:name => "folderTraversalSpec"),
+        datacenterHostTs,
+        datacenterVmTs,
+        datacenterDsTs,
+        datacenterDsFolderTs,
+        datacenterNetworkFolderTs,
+        computeResourceRpTs,
+        computeResourceHostTs,
+        resourcePoolTs,
+        virtualAppTs,
+      ],
+    )
 
-    aOobjSpec = VimArray.new("ArrayOfObjectSpec") do |osa|
-      osa << VimHash.new("ObjectSpec") do |os|
-        os.obj       = @sic.rootFolder
-        os.skip      = "false"
-        os.selectSet = VimArray.new("ArrayOfSelectionSpec") { |ssa| ssa << folderTs }
-      end
-    end
-
-    (aOobjSpec)
+    [
+      RbVmomi::VIM::ObjectSpec(:obj => @sic.rootFolder, :skip => false, :selectSet => [folderTs])
+    ]
   end # def objectSet
 end

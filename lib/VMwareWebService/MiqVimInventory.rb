@@ -192,22 +192,15 @@ class MiqVimInventory < MiqVimClientBase
   # own entry.
   #
   def spec
-    propSpecAry = VimArray.new("ArrayOfPropertySpec") do |psa|
-      psa << VimHash.new("PropertySpec") do |ps|
-        ps.type = "ManagedEntity"
-        ps.all  = "false"
-      end
-      psa << VimHash.new("PropertySpec") do |ps|
-        ps.type = "Datastore"
-        ps.all  = "false"
-      end
-    end
-    VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
-      pfsa << VimHash.new("PropertyFilterSpec") do |pfs|
-        pfs.propSet   = propSpecAry
-        pfs.objectSet = @objectSet
-      end
-    end
+    [
+      RbVmomi::VIM::PropertyFilterSpec(
+        :propSet  => [
+          RbVmomi::VIM::PropertySpec(:type => "ManagedEntity", :all => false),
+          RbVmomi::VIM::PropertySpec(:type => "Datastore",     :all => false),
+        ],
+        :objectSet => @objectSet,
+      )
+    ]
   end
 
   def updateSpecByPropMap(propMap)

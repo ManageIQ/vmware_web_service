@@ -150,6 +150,10 @@ class VimService
     (parse_response(response, 'BrowseDiagnosticLogResponse')['returnval'])
   end
 
+  def cancelRetrievePropertiesEx(propCol, token)
+    propCol.CancelRetrievePropertiesEx(:token => token)
+  end
+
   def cancelTask(tmor)
     response = invoke("n1:CancelTask") do |message|
       message.add "n1:_this", tmor do |i|
@@ -160,12 +164,7 @@ class VimService
   end
 
   def cancelWaitForUpdates(propCol)
-    response = invoke("n1:CancelWaitForUpdates") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-    end
-    (parse_response(response, 'CancelWaitForUpdatesResponse'))
+    propCol.CancelWaitForUpdates
   end
 
   def cloneVM_Task(vmMor, fmor, name, cspec)
@@ -186,13 +185,7 @@ class VimService
   end
 
   def continueRetrievePropertiesEx(propCol, token)
-    response = invoke("n1:ContinueRetrievePropertiesEx") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-      message.add "n1:token", token
-    end
-    (parse_response(response, 'ContinueRetrievePropertiesExResponse')['returnval'])
+    propCol.ContinueRetrievePropertiesEx(:token => token)
   end
 
   def createAlarm(alarmManager, mor, aSpec)
@@ -238,17 +231,7 @@ class VimService
   end
 
   def createFilter(propCol, pfSpec, partialUpdates)
-    response = invoke("n1:CreateFilter") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", pfSpec.xsiType
-        marshalObj(i, pfSpec)
-      end
-      message.add "n1:partialUpdates", partialUpdates
-    end
-    (parse_response(response, 'CreateFilterResponse')['returnval'])
+    propCol.CreateFilter(:spec => pfSpec, :partialUpdates => partialUpdates)
   end
 
   def createFolder(pfMor, fname)
@@ -453,24 +436,11 @@ class VimService
   end
 
   def login(sessionManager, username, password)
-    response = invoke("n1:Login") do |message|
-      message.add "n1:_this", sessionManager do |i|
-        i.set_attr "type", "SessionManager"
-      end
-      message.add "n1:userName", username
-      message.add "n1:password", password
-    end
-    @session_cookie ||= response.cookie
-    (parse_response(response, 'LoginResponse')['returnval'])
+    sessionManager.Login(:userName => username, :password => password)
   end
 
   def logout(sessionManager)
-    response = invoke("n1:Logout") do |message|
-      message.add "n1:_this", sessionManager do |i|
-        i.set_attr "type", "SessionManager"
-      end
-    end
-    (parse_response(response, 'LogoutResponse'))
+    sessionManager.Logout
   end
 
   def logUserEvent(eventManager, entity, msg)
@@ -887,65 +857,36 @@ class VimService
   end
 
   def retrieveProperties(propCol, specSet)
-    response = invoke("n1:RetrieveProperties") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-      message.add "n1:specSet" do |i|
-        i.set_attr "xsi:type", "PropertyFilterSpec"
-        marshalObj(i, specSet)
-      end
-    end
-    (parse_response(response, 'RetrievePropertiesResponse')['returnval'])
+    propCol.RetrieveProperties(:specSet => specSet)
   end
 
   def retrievePropertiesEx(propCol, specSet, max_objects = nil)
-    options = VimHash.new("RetrieveOptions") do |opts|
-      opts.maxObjects = max_objects.to_s if max_objects
-    end
-
-    response = invoke("n1:RetrievePropertiesEx") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-      message.add "n1:specSet" do |i|
-        i.set_attr "xsi:type", "PropertyFilterSpec"
-        marshalObj(i, specSet)
-      end
-      message.add "n1:options" do |i|
-        i.set_attr "xsi:type", "RetrieveOptions"
-        marshalObj(i, options)
-      end
-    end
-    (parse_response(response, 'RetrievePropertiesExResponse')['returnval'])
+    options = RbVmomi::VIM::RetrieveOptions.new(:maxObjects => max_objects)
+    propCol.RetrievePropertiesEx(:specSet => specSet, :options => options)
   end
 
   def retrievePropertiesIter(propCol, specSet, max_objects = nil)
     result = retrievePropertiesEx(propCol, specSet, max_objects)
 
     while result
-      begin
-        result['objects'].to_a.each { |oc| yield oc }
-      rescue
-        # if for some reason the caller breaks out of the block let the
-        # server know we are going to cancel this retrievePropertiesEx call
-        cancelRetrievePropertiesEx(propCol, result['token']) if result['token']
-      end
+      result.objects.each { |oc| yield oc }
 
       # if there is no token returned then all results fit in a single page
       # and we are done
-      break if result['token'].nil?
+      break if result.token.nil?
 
       # there is more than one page of result so continue getting the rest
-      result = continueRetrievePropertiesEx(propCol, result['token'])
+      result = continueRetrievePropertiesEx(propCol, result.token)
     end
+  rescue
+    # if for some reason the caller breaks out of the block let the
+    # server know we are going to cancel this retrievePropertiesEx call
+    cancelRetrievePropertiesEx(propCol, result.token) if result&.token
   end
 
   def retrievePropertiesCompat(propCol, specSet, max_objects = nil)
-    objects = VimArray.new('ArrayOfObjectContent')
-
+    objects = []
     retrievePropertiesIter(propCol, specSet, max_objects) { |oc| objects << oc }
-
     objects
   end
 
