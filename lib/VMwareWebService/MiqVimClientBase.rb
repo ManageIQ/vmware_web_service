@@ -83,7 +83,7 @@ class MiqVimClientBase < VimService
     when Array
       val.map { |v| dynamic_property_to_hash(v) }
     when RbVmomi::VIM::DataObject
-      val.props.each_with_object({}) do |(k, v), hash|
+      val.props.each_with_object(VimHash.new(val.class.wsdl_name)) do |(k, v), hash|
         hash[k.to_s] = dynamic_property_to_hash(v)
       end
     else
