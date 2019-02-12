@@ -52,14 +52,14 @@ class DMiqVim < MiqVim
     $vim_log.info "#{log_prefix}: update monitor ready" if $vim_log
   end
 
-  # VC sometimes throws: Handsoap::Fault { :code => 'ServerFaultCode', :reason => 'The session is not authenticated.' }
+  # VC sometimes throws: RbVmomi::VIM::NotAuthenticated
   # Handle this condition by reconnecting and monitoring again
   # See http://communities.vmware.com/thread/190531
   def handleSessionNotAuthenticated(err)
-    return false unless err.respond_to?(:reason) && err.reason == 'The session is not authenticated.'
+    return false unless err.kind_of?(RbVmomi::VIM::NotAuthenticated)
 
     log_prefix = "DMiqVim.handleSessionNotAuthenticated (#{@connId})"
-    $vim_log.error "#{log_prefix}: Reconnecting Session because '#{err.reason}'" if $vim_log
+    $vim_log.error "#{log_prefix}: Reconnecting Session because '#{err.to_s}'" if $vim_log
     $vim_log.info "#{log_prefix}: Session(server=#{server}, username=#{username}) isAlive? => #{self.isAlive?.inspect}" if $vim_log
 
     begin

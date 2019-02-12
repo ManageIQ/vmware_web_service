@@ -84,10 +84,10 @@ class MiqFaultTolerantVim
     retries = 0
     begin
       yield @vim
-    rescue RangeError, DRb::DRbConnError, Handsoap::Fault, Errno::EMFILE => err
+    rescue RangeError, DRb::DRbConnError, RbVmomi::Fault, Errno::EMFILE => err
       modified_exception = nil
 
-      if err.kind_of?(Handsoap::Fault)
+      if err.kind_of?(RbVmomi::Fault)
         #
         # Raise all SOAP Errors, if executing
         #
@@ -95,10 +95,10 @@ class MiqFaultTolerantVim
 
         #
         #  Retry any SOAP Errors, except for authentication or authorization errors
-        #   'Handsoap::FaultError: Permission to perform this operation was denied.'
-        #   'Handsoap::FaultError: The session is not authenticated.'
+        #   'RbVmomi::VIM::NoPermission: Permission to perform this operation was denied.'
+        #   'RbVmomi::VIM::NotAuthenticated: The session is not authenticated.'
         #
-        raise if err.to_s !~ /Permission to perform this operation was denied/i && err.to_s !~ /^The session is not authenticated/i
+        raise unless err.kind_of?(RbVmomi::VIM::NoPermission) || err.kind_of?(RbVmomi::VIM::NotAuthenticated)
       end
 
       #
