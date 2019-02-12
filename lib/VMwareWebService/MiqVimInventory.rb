@@ -1782,7 +1782,7 @@ class MiqVimInventory < MiqVimClientBase
 
       @inventoryHash = {}
       retrievePropertiesIter(@propCol, @spec) do |oc|
-        (@inventoryHash[oc.obj.vimType] ||= []) << oc.obj
+        (@inventoryHash[oc.obj.class.wsdl_name] ||= []) << oc.obj
       end
 
       $vim_log.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: returned from retrieveProperties" if $vim_log
