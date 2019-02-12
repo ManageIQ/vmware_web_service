@@ -1,6 +1,5 @@
 require 'VMwareWebService/VimConstants'
 require 'set'
-autoload :VimMappingRegistry, 'VMwareWebService/VimMappingRegistry'
 
 module VimType
   def vimType
@@ -38,14 +37,6 @@ class VimHash < Hash
     super()
     self.default = nil
     yield(self) if block_given?
-  end
-
-  def each_arg
-    raise "No arg map for #{xsiType}" unless (am = VimMappingRegistry.args(xsiType))
-    am.each do |a|
-      next unless self.key?(a)
-      yield(a, self[a])
-    end
   end
 
   def method_missing(sym, *args)
