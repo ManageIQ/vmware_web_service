@@ -58,4 +58,36 @@ class MiqVimClientBase < VimService
     end
     is_ok
   end
+
+  private
+
+  def prop_set_to_hash(hash, prop_set)
+    prop_set.each do |dynamic_property|
+      val = dynamic_property_to_hash(dynamic_property.val)
+      h, k = hashTarget(hash, dynamic_property.name)
+      if !h[k]
+        h[k] = val
+      elsif h[k].kind_of?(Array)
+        h[k] << val
+      else
+        h[k] = VimArray.new do |arr|
+          arr << h[k]
+          arr << val
+        end
+      end
+    end
+  end
+
+  def dynamic_property_to_hash(val)
+    case val
+    when Array
+      val.map { |v| dynamic_property_to_hash(v) }
+    when RbVmomi::VIM::DataObject
+      val.props.each_with_object({}) do |(k, v), hash|
+        hash[k.to_s] = dynamic_property_to_hash(v)
+      end
+    else
+      val
+    end
+  end
 end # class MiqVimClientBase

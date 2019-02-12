@@ -296,9 +296,9 @@ class MiqVimInventory < MiqVimClientBase
     baseName = pmap[:baseName]
     keyPath  = pmap[:keyPath]
 
-    mor = props['MOR']
+    mor = props['MOR']._ref
     if keyPath
-      key = props.fetch_path(keyPath)
+      key = props.dig(*keyPath)
       if !key
         $vim_log.debug "hashObj: key is nil for #{mor}: #{keyPath}"
       elsif key.empty?
@@ -2166,67 +2166,27 @@ class MiqVimInventory < MiqVimClientBase
   # Retrieve the properties for multiple objects of the same type,
   # given an array of managed object references.
   #
-  def getMoPropMulti(moa, path = nil)
-    return [] if !moa || moa.empty?
-    tmor = moa.first
-    raise "getMoPropMulti: item is not a managed object reference" unless tmor.respond_to? :vimType
+  def getMoPropMulti(objects, path = nil)
+    return [] if !objects || objects.empty?
+    tmor = objects.first
+    raise "getMoPropMulti: item is not a managed object reference" unless tmor.kind_of?(RbVmomi::VIM::ManagedObject)
 
-    args = VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
-      pfsa << VimHash.new("PropertyFilterSpec") do |pfs|
-        pfs.propSet = VimArray.new("ArrayOfPropertySpec") do |psa|
-          psa << VimHash.new("PropertySpec") do |ps|
-            ps.type = tmor.vimType
-            if !path
-              ps.all = "true"
-            else
-              ps.all = "false"
-              ps.pathSet = path
-            end
-          end
-        end
+    spec = RbVmomi::VIM::PropertyFilterSpec(
+      :objectSet => objects.map { |obj| RbVmomi::VIM::ObjectSpec(:obj => obj) },
+      :propSet   => [
+        RbVmomi::VIM::PropertySpec(:type => tmor.class.wsdl_name, :all => !path, :pathSet => path)
+      ]
+    )
 
-        pfs.objectSet = VimArray.new("ArrayOfObjectSpec") do |osa|
-          moa.each do |mor|
-            VimHash.new("ObjectSpec") do |os|
-              os.obj = mor
-              osa << os
-            end
-          end
-        end
-      end
+    results = []
+    retrievePropertiesIter(@propCol, [spec]) do |oc|
+      result = VimHash.new
+      result.MOR = oc.obj
+      prop_set_to_hash(result, Array(oc.propSet))
+      results << result
     end
 
-    oca = VimArray.new('ArrayOfObjectContent')
-
-    retrievePropertiesIter(@propCol, args) do |oc|
-      oc.MOR = oc.obj
-      oc.delete('obj')
-
-      oc.propSet = Array(oc.propSet) unless oc.propSet.kind_of?(Array)
-      oc.propSet.each do |ps|
-        #
-        # Here, ps.name can be a property path in the form: a.b.c
-        # If that's the case, we should set the target to: propHash['a']['b']['c']
-        # creating intermediate nodes as needed.
-        #
-        h, k = hashTarget(oc, ps.name)
-        if !h[k]
-          h[k] = ps.val
-        elsif h[k].kind_of? Array
-          h[k] << ps.val
-        else
-          h[k] = VimArray.new do |arr|
-            arr << h[k]
-            arr << ps.val
-          end
-        end
-      end # oc.propSet.each
-      oc.delete('propSet')
-
-      oca << oc
-    end
-
-    oca
+    results
   end # def getMoPropMulti
 
   def getMoPropMultiIter(moa, path = nil)
