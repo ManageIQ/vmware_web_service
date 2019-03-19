@@ -1,6 +1,6 @@
 $:.push("#{File.dirname(__FILE__)}/..")
 
-require "manageiq/password"
+require "manageiq-password"
 require "VixDiskLib_raw"
 
 vmdk =  "/vmfs/volumes/StarM2-LUN1/VMmini-101/VMmini-101.vmdk"
@@ -14,7 +14,7 @@ conParms = {
 }
 
 def getKey
-  MiqPassword::Key.new("aes-256-cbc", MiqPassword::Key.generate_key("55555", "999999999"))
+  ManageIQ::Password::Key.new("aes-256-cbc", ManageIQ::Password::Key.generate_key("55555", "999999999"))
 end
 
 puts "***** cs1"
