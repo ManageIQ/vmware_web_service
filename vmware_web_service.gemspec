@@ -20,7 +20,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "handsoap",             "~>0.2.5"
   spec.add_dependency "httpclient",           "~>2.8.0"
   spec.add_dependency "more_core_extensions", "~>3.2"
-  spec.add_dependency "rbvmomi",              "~>2.0.0"
+  spec.add_dependency "rbvmomi",              "~>2.1.0"
 
   spec.add_development_dependency 'bundler'
   spec.add_development_dependency 'codeclimate-test-reporter', '~> 1.0.0'
