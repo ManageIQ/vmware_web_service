@@ -73,10 +73,6 @@ class MiqVimBroker
       require 'timeout'
       require 'VMwareWebService/broker_timeout'
 
-      # Un-comment following 2 lines to enable Sync lock debugging.
-      # require 'broker_sync_debug'
-      # extend BrokerSyncDebug
-
       unless @@classModed
         DRb.instance_variable_set(:@mutex, sync_for_drb)
         DRb::DRbConn.instance_variable_set(:@mutex, sync_for_drb_drbconn)
@@ -107,27 +103,22 @@ class MiqVimBroker
     end
   end
 
-  # Can be overridden by BrokerSyncDebug.
   def connection_lock
     Sync.new
   end
 
-  # Can be overridden by BrokerSyncDebug.
   def config_lock
     Sync.new
   end
 
-  # Can be overridden by BrokerSyncDebug.
   def sync_for_lock_hash(_key)
     Sync.new
   end
 
-  # Can be overridden by BrokerSyncDebug.
   def sync_for_drb_drbconn
     Sync.new
   end
 
-  # Can be overridden by BrokerSyncDebug.
   def sync_for_drb
     Sync.new
   end

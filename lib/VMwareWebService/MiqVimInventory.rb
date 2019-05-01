@@ -1,4 +1,3 @@
-require 'VMwareWebService/VimSyncDebug'
 require 'sync'
 require 'enumerator'
 require 'VMwareWebService/MiqVimClientBase'
@@ -93,9 +92,6 @@ class MiqVimInventory < MiqVimClientBase
 
     @cacheLock  = Sync.new
     @configLock = Sync.new
-
-    # Un-comment to enable Sync lock debugging.
-    # extend VimSyncDebug
 
     resetCache
     __connect
