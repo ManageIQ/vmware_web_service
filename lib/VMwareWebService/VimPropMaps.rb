@@ -303,6 +303,8 @@ module VimPropMaps
         "config.network.dnsConfig.domainName",
         "config.network.dnsConfig.hostName",
         "config.network.ipRouteConfig.defaultGateway",
+        "config.network.opaqueNetwork",
+        "config.network.opaqueSwitch",
         "config.network.pnic",
         "config.network.portgroup",
         "config.network.vnic",
