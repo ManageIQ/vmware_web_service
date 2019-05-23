@@ -201,6 +201,14 @@ class MiqVimInventory < MiqVimClientBase
         ps.type = "Datastore"
         ps.all  = "false"
       end
+      psa << VimHash.new("PropertySpec") do |ps|
+        ps.type = "LicenseManager"
+        ps.all  = "false"
+      end
+      psa << VimHash.new("PropertySpec") do |ps|
+        ps.type = "ExtensionManager"
+        ps.all  = "false"
+      end
     end
     VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
       pfsa << VimHash.new("PropertyFilterSpec") do |pfs|
@@ -1770,6 +1778,226 @@ class MiqVimInventory < MiqVimClientBase
 
   def addStoragePodObj(spObj)
     addObjHash(:StoragePod, spObj)
+  end
+
+  ###################
+  # License Managers
+  ###################
+
+  #
+  # For internal use.
+  # Must be called with cache lock held
+  # Returns with the cache lock held - must be unlocked by caller.
+  #
+  def licenseManagers_locked
+    raise "licenseManagers_locked: cache lock not held" unless @cacheLock.sync_locked?
+    return(@licenseManagers) if @licenseManagers
+
+    $vim_log.info "MiqVimInventory.licenseManagers_locked: loading LicenseManager cache for #{@connId}"
+    begin
+      @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
+
+      ra = getMoPropMulti(inventoryHash_locked['LicenseManager'], @propMap[:LicenseManager][:props])
+
+      @licenseManagers      = {}
+      @licenseManagersByMor = {}
+      ra.each do |licenseManagerObj|
+        addLicenseManagerObj(licenseManagerObj)
+      end
+    ensure
+      @cacheLock.sync_unlock if unlock
+    end
+    $vim_log.info "MiqVimInventory.licenseManagers_locked: loaded LicenseManager cache for #{@connId}"
+
+    @licenseManagers
+  end # def licenseManagers_locked
+  protected :licenseManagers_locked
+
+  #
+  # For internal use.
+  # Must be called with cache lock held
+  # Returns with the cache lock held - must be unlocked by caller.
+  #
+  def licenseManagersByMor_locked
+    raise "licenseManagerByMor_locked: cache lock not held" unless @cacheLock.sync_locked?
+    return(@licenseManagersByMor) if @licenseManagersByMor
+    licenseManagers_locked
+    @licenseManagersByMor
+  end # def licenseManagersByMor_locked
+  protected :licenseManagersByMor_locked
+
+  #
+  # Public accessor
+  #
+  def licenseManagersByMor(selSpec = nil)
+    license_managers = nil
+    @cacheLock.synchronize(:SH) do
+      if selSpec.nil?
+        license_managers = dupObj(licenseManagersByMor_locked)
+      else
+        license_managers = applySelector(licenseManagersByMor_locked, selSpec)
+      end
+    end
+    assert_no_locks
+    license_managers
+  end
+
+  #
+  # Return a single License Manager object, given its MOR
+  #
+  def licenseManagerByMor(licenseManagerMor, selSpec = nil)
+    @cacheLock.synchronize(:SH) do
+      return(dupObj(licenseManagersByMor_locked[licenseManagerMor])) if selSpec.nil?
+      return(applySelector(licenseManagersByMor_locked[licenseManagerMor], selSpec))
+    end
+  end
+
+  #
+  # Public accessor
+  #
+  # Return an array of license manager objects that match the given property filter.
+  #
+  def licenseManagersByFilter(filter)
+    license_managers = nil
+    @cacheLock.synchronize(:SH) do
+      license_managers = applyFilter(licenseManagersByMor_locked.values, filter)
+      license_managers = dupObj(license_managers)
+    end
+    assert_no_locks
+    license_managers
+  end
+
+  def addLicenseManager(licenseManagerMor)
+    @cacheLock.synchronize(:EX) do
+      return(addObjByMor(licenseManagerMor))
+    end
+  end
+
+  def refreshLicenseManager(licenseManagerMor)
+    @cacheLock.synchronize(:EX) do
+      return(conditionalCopy(addObjByMor(licenseManagerMor)))
+    end
+  end
+
+  def addLicenseManagerObj(licenseManagerObj)
+    addObjHash(:LicenseManager, licenseManagerObj)
+  end
+  protected :addLicenseManagerObj
+
+  def removeLicenseManager(licenseManagerMor)
+    @cacheLock.synchronize(:EX) do
+      removeObjByMor(licenseManagerMor)
+    end
+  end
+
+  ###################
+  # Extension Managers
+  ###################
+
+  #
+  # For internal use.
+  # Must be called with cache lock held
+  # Returns with the cache lock held - must be unlocked by caller.
+  #
+  def extensionManagers_locked
+    raise "extensionManagers_locked: cache lock not held" unless @cacheLock.sync_locked?
+    return(@extensionManagers) if @extensionManagers
+
+    $vim_log.info "MiqVimInventory.extensionManagers_locked: loading ExtensionManager cache for #{@connId}"
+    begin
+      @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
+
+      ra = getMoPropMulti(inventoryHash_locked['ExtensionManager'], @propMap[:ExtensionManager][:props])
+
+      @extensionManagers      = {}
+      @extensionManagersByMor = {}
+      ra.each do |extensionManagerObj|
+        addExtensionManagerObj(extensionManagerObj)
+      end
+    ensure
+      @cacheLock.sync_unlock if unlock
+    end
+    $vim_log.info "MiqVimInventory.extensionManagers_locked: loaded ExtensionManager cache for #{@connId}"
+
+    @extensionManagers
+  end # def extensionManagers_locked
+  protected :extensionManagers_locked
+
+  #
+  # For internal use.
+  # Must be called with cache lock held
+  # Returns with the cache lock held - must be unlocked by caller.
+  #
+  def extensionManagersByMor_locked
+    raise "extensionManagersByMor_locked: cache lock not held" unless @cacheLock.sync_locked?
+    return(@extensionManagersByMor) if @extensionManagersByMor
+    extensionManagers_locked
+    @extensionManagersByMor
+  end # def extensionManagersByMor_locked
+  protected :extensionManagersByMor_locked
+
+  #
+  # Public accessor
+  #
+  def extensionManagersByMor(selSpec = nil)
+    extension_managers = nil
+    @cacheLock.synchronize(:SH) do
+      if selSpec.nil?
+        extension_managers = dupObj(extensionManagersByMor_locked)
+      else
+        extension_managers = applySelector(extensionManagersByMor_locked, selSpec)
+      end
+    end
+    assert_no_locks
+    extension_managers
+  end
+
+  #
+  # Return a single Extension Manager object, given its MOR
+  #
+  def extensionManagerByMor(extensionManagerMor, selSpec = nil)
+    @cacheLock.synchronize(:SH) do
+      return(dupObj(extensionManagersByMor_locked[extensionManagerMor])) if selSpec.nil?
+      return(applySelector(extensionManagersByMor_locked[extensionManagerMor], selSpec))
+    end
+  end
+
+  #
+  # Public accessor
+  #
+  # Return an array of extension manager objects that match the given property filter.
+  #
+  def extensionManagersByFilter(filter)
+    extension_managers = nil
+    @cacheLock.synchronize(:SH) do
+      extension_managers = applyFilter(extensionManagersByMor_locked.values, filter)
+      extension_managers = dupObj(extension_managers)
+    end
+    assert_no_locks
+    extension_managers
+  end
+
+  def addExtensionManager(extensionManagerMor)
+    @cacheLock.synchronize(:EX) do
+      return(addObjByMor(extensionManagerMor))
+    end
+  end
+
+  def refreshExtensionManager(extensionManagerMor)
+    @cacheLock.synchronize(:EX) do
+      return(conditionalCopy(addObjByMor(extensionManagerMor)))
+    end
+  end
+
+  def addExtensionManagerObj(extensionManagerObj)
+    addObjHash(:ExtensionManager, extensionManagerObj)
+  end
+  protected :addExtensionManagerObj
+
+  def removeExtensionManager(extensionManagerMor)
+    @cacheLock.synchronize(:EX) do
+      removeObjByMor(extensionManagerMor)
+    end
   end
 
   #
