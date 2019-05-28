@@ -86,6 +86,20 @@ module VimPropMaps
         'summary',
         'parent'
       ]
+    },
+    :LicenseManager              => {
+      :baseName => "@licenseManagers",
+      :keyPath  => nil,
+      :props    => [
+        'licenses'
+      ]
+    },
+    :ExtensionManager            => {
+      :baseName => "@extensionManagers",
+      :keyPath  => nil,
+      :props    => [
+        'extensionList'
+      ]
     }
   }
 
@@ -394,6 +408,20 @@ module VimPropMaps
         'summary.host',
         'summary.hostMember',
         'parent'
+      ]
+    },
+    :LicenseManager              => {
+      :baseName => "@licenseManagers",
+      :keyPath  => nil,
+      :props    => [
+        'licenses'
+      ]
+    },
+    :ExtensionManager            => {
+      :baseName => "@extensionManagers",
+      :keyPath  => nil,
+      :props    => [
+        'extensionList'
       ]
     }
   }
