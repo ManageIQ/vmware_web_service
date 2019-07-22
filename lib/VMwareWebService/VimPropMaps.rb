@@ -21,6 +21,11 @@ module VimPropMaps
       :keyPath  => nil, # by mor only
       :props    => ["name", "summary.config", "resourcePool", "owner", "parent", "vm"] # childConfiguration currently has a problem updating.  See FB3269
     },
+    :VirtualApp                  => {
+      :baseName => "@virtualApps",
+      :keyPath  => nil, # by mor only
+      :props    => ["name", "summary.config", "resourcePool", "owner", "parent", "vm"] # childConfiguration currently has a problem updating.  See FB3269
+    },
     :Folder                      => {
       :baseName => "@folders",
       :keyPath  => ['name'],
@@ -103,14 +108,6 @@ module VimPropMaps
     }
   }
 
-  PropMap4 = {
-    :VirtualApp       => {
-      :baseName => "@virtualApps",
-      :keyPath  => nil, # by mor only
-      :props    => ["name", "summary.config", "resourcePool", "owner", "parent", "vm"] # childConfiguration currently has a problem updating.  See FB3269
-    }
-  }
-
   UpdatePropMapsByType = [
     {
       :VirtualMachine            => {
@@ -161,6 +158,11 @@ module VimPropMaps
     {
       :ResourcePool => {
         :baseName => "@resourcePools",
+        :keyPath  => nil, # by mor only
+        :props    => ["name", "summary.config", "resourcePool", "owner", "parent", "vm"] # childConfiguration currently has a problem updating.  See FB3269
+      },
+      :VirtualApp   => {
+        :baseName => "@virtualApps",
         :keyPath  => nil, # by mor only
         :props    => ["name", "summary.config", "resourcePool", "owner", "parent", "vm"] # childConfiguration currently has a problem updating.  See FB3269
       },
@@ -284,6 +286,11 @@ module VimPropMaps
         "summary.config.memoryAllocation.shares.shares",
         "vm"
       ] # childConfiguration currently has a problem updating.  See FB3269
+    },
+    :VirtualApp                  => {
+      :baseName => "@virtualApps",
+      :keyPath  => nil, # by mor only
+      :props    => ["name", "summary.config", "resourcePool", "owner", "parent", "vm"] # childConfiguration currently has a problem updating.  See FB3269
     },
     :Folder                      => {
       :baseName => "@folders",
@@ -489,6 +496,11 @@ module VimPropMaps
         "summary.config.memoryAllocation.shares.shares",
         "vm"
       ] # childConfiguration currently has a problem updating.  See FB3269
+    },
+    :VirtualApp                  => {
+      :baseName => "@virtualApps",
+      :keyPath  => nil, # by mor only
+      :props    => ["name", "summary.config", "resourcePool", "owner", "parent", "vm"] # childConfiguration currently has a problem updating.  See FB3269
     },
     :Folder                      => {
       :baseName => "@folders",

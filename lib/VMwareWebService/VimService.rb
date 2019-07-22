@@ -3,7 +3,7 @@ require 'active_support/core_ext/numeric/bytes'
 require 'VMwareWebService/VimTypes'
 
 class VimService < Handsoap::Service
-  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :serviceInstanceMor, :session_cookie
+  attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :v5, :v6, :serviceInstanceMor, :session_cookie
 
   Handsoap.http_driver = :HTTPClient
 
@@ -26,6 +26,8 @@ class VimService < Handsoap::Service
     @v20             = @apiVersion =~ /2\.0\..*/
     @v2              = @apiVersion =~ /2\..*/
     @v4              = @apiVersion =~ /4\..*/
+    @v5              = @apiVersion =~ /5\..*/
+    @v6              = @apiVersion =~ /6\..*/
     @isVirtualCenter = @about.apiType == "VirtualCenter"
   end
 

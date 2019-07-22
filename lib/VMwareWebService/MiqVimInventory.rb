@@ -41,45 +41,6 @@ class MiqVimInventory < MiqVimClientBase
       $vim_log.info "MiqVimInventory: unrecognized cache scope #{cacheScope}, using FullPropMap"
     end
 
-    if @v2
-      @propMap = dupProps(@propMap)
-
-      deleteProperty(:HostSystem, "capability.storageVMotionSupported")
-      deleteProperty(:HostSystem, "capability.vmotionWithStorageVMotionSupported")
-
-      deleteProperty(:Datastore, "summary.uncommitted")
-      deleteProperty(:Datastore, "summary.maintenanceMode")
-
-      deleteProperty(:VirtualMachine, "config.cpuHotAddEnabled")
-      deleteProperty(:VirtualMachine, "config.cpuHotRemoveEnabled")
-      deleteProperty(:VirtualMachine, "config.hardware.numCoresPerSocket")
-      deleteProperty(:VirtualMachine, "config.hotPlugMemoryIncrementSize")
-      deleteProperty(:VirtualMachine, "config.hotPlugMemoryLimit")
-      deleteProperty(:VirtualMachine, "config.memoryHotAddEnabled")
-      deleteProperty(:VirtualMachine, "summary.config.ftInfo.instanceUuids")
-      deleteProperty(:VirtualMachine, "summary.storage.unshared")
-      deleteProperty(:VirtualMachine, "summary.storage.committed")
-
-      deleteProperty(:ClusterComputeResource, "configuration.dasConfig.admissionControlPolicy")
-      if @v20
-        deleteProperty(:VirtualMachine, "availableField")
-        deleteProperty(:HostSystem, "config.dateTimeInfo")
-      end
-    else
-      if @v4
-        @propMap = dupProps(@propMap)
-
-        deleteProperty(:Datastore, "summary.maintenanceMode")
-
-        if cacheScope != :cache_scope_event_monitor
-          addProperty(:VirtualMachine, "runtime.memoryOverhead")
-          deleteProperty(:VirtualMachine, "config.hardware.numCoresPerSocket")
-        end
-      end
-
-      @propMap = @propMap.merge(PropMap4)
-    end
-
     @propCol    = @sic.propertyCollector
     @rootFolder = @sic.rootFolder
     @objectSet  = objectSet
