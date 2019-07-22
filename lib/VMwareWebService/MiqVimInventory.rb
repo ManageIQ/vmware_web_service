@@ -41,6 +41,9 @@ class MiqVimInventory < MiqVimClientBase
       $vim_log.info "MiqVimInventory: unrecognized cache scope #{cacheScope}, using FullPropMap"
     end
 
+    # If we are connected to a virtual center then we can access additional properties
+    @propMap.merge!(PropMapVCenter) if isVirtualCenter && cacheScope != :cache_scope_event_monitor
+
     @propCol    = @sic.propertyCollector
     @rootFolder = @sic.rootFolder
     @objectSet  = objectSet

@@ -91,15 +91,18 @@ module VimPropMaps
         'summary',
         'parent'
       ]
-    },
-    :LicenseManager              => {
+    }
+  }
+
+  PropMapVCenter = {
+    :LicenseManager   => {
       :baseName => "@licenseManagers",
       :keyPath  => nil,
       :props    => [
         'licenses'
       ]
     },
-    :ExtensionManager            => {
+    :ExtensionManager => {
       :baseName => "@extensionManagers",
       :keyPath  => nil,
       :props    => [
