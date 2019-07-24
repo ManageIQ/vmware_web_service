@@ -139,11 +139,14 @@ module MiqVimObjectSet
         os.skip      = "false"
         os.selectSet = VimArray.new("ArrayOfSelectionSpec") { |ssa| ssa << folderTs }
       end
-      osa << VimHash.new("ObjectSpec") do |os|
-        os.obj = @sic.licenseManager
-      end
-      osa << VimHash.new("ObjectSpec") do |os|
-        os.obj = @sic.extensionManager
+
+      if isVirtualCenter
+        osa << VimHash.new("ObjectSpec") do |os|
+          os.obj = @sic.licenseManager
+        end
+        osa << VimHash.new("ObjectSpec") do |os|
+          os.obj = @sic.extensionManager
+        end
       end
     end
 

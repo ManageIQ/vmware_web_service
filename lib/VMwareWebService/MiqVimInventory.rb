@@ -161,13 +161,16 @@ class MiqVimInventory < MiqVimClientBase
         ps.type = "Datastore"
         ps.all  = "false"
       end
-      psa << VimHash.new("PropertySpec") do |ps|
-        ps.type = "LicenseManager"
-        ps.all  = "false"
-      end
-      psa << VimHash.new("PropertySpec") do |ps|
-        ps.type = "ExtensionManager"
-        ps.all  = "false"
+
+      if isVirtualCenter
+        psa << VimHash.new("PropertySpec") do |ps|
+          ps.type = "LicenseManager"
+          ps.all  = "false"
+        end
+        psa << VimHash.new("PropertySpec") do |ps|
+          ps.type = "ExtensionManager"
+          ps.all  = "false"
+        end
       end
     end
     VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
