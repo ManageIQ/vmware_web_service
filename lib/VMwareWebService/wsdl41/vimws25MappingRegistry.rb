@@ -35435,6 +35435,9 @@
       ["datastore", "VimWs25::ManagedObjectReference"],
       ["diskMoveType", "SOAP::SOAPString", [0, 1]],
 
+      # diskBackingInfo added from VIM 5.0
+      ["diskBackingInfo", "VimWs25::VirtualDeviceBackingInfo", [0, 1]],
+
       # profile added from VIM 5.5
       ["profile", "VimWs25::VirtualMachineProfileSpec[]", [0, nil]]
     ]
@@ -78270,6 +78273,9 @@
       ["diskId", "SOAP::SOAPInt"],
       ["datastore", "VimWs25::ManagedObjectReference"],
       ["diskMoveType", "SOAP::SOAPString", [0, 1]],
+
+      # diskBackingInfo added from VIM 5.0
+      ["diskBackingInfo", "VimWs25::VirtualDeviceBackingInfo", [0, 1]],
 
       # profile added from VIM 5.5
       ["profile", "VimWs25::VirtualMachineProfileSpec[]", [0, nil]]
