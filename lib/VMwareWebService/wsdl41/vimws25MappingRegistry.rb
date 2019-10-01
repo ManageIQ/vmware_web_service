@@ -37378,6 +37378,19 @@
     ]
   )
 
+  # NSX Opaque network added from VIM 5.5
+  EncodedRegistry.register(
+    :class => VimWs25::VirtualEthernetCardOpaqueNetworkBackingInfo,
+    :schema_ns => "urn:vim25",
+    :schema_type => "VirtualEthernetCardOpaqueNetworkBackingInfo",
+    :schema_element => [
+      ["dynamicType", "SOAP::SOAPString", [0, 1]],
+      ["dynamicProperty", "VimWs25::DynamicProperty[]", [0, nil]],
+      ["opaqueNetworkId", "SOAP::SOAPString"],
+      ["opaqueNetworkType", "SOAP::SOAPString"]
+    ]
+  )
+
   EncodedRegistry.register(
     :class => VimWs25::VirtualEthernetCard,
     :schema_ns => "urn:vim25",
@@ -80372,6 +80385,21 @@
       ["dynamicType", "SOAP::SOAPString", [0, 1]],
       ["dynamicProperty", "VimWs25::DynamicProperty[]", [0, nil]],
       ["port", "VimWs25::DistributedVirtualSwitchPortConnection"]
+    ]
+  )
+
+
+  # NSX Opaque network added from VIM 5.5
+  LiteralRegistry.register(
+    :class => VimWs25::VirtualEthernetCardOpaqueNetworkBackingInfo,
+    :schema_ns => "urn:vim25",
+    :schema_type => "VirtualEthernetCardOpaqueNetworkBackingInfo",
+    :schema_qualified => false,
+    :schema_element => [
+      ["dynamicType", "SOAP::SOAPString", [0, 1]],
+      ["dynamicProperty", "VimWs25::DynamicProperty[]", [0, nil]],
+      ["opaqueNetworkId", "SOAP::SOAPString"],
+      ["opaqueNetworkType", "SOAP::SOAPString"]
     ]
   )
 
