@@ -198,6 +198,7 @@ module VimPropMaps
         "config.cpuHotAddEnabled",
         "config.cpuHotRemoveEnabled",
         "config.defaultPowerOps.standbyAction",
+        "config.firmware",
         "config.hardware.device",
         "config.hardware.numCoresPerSocket",
         "config.hotPlugMemoryIncrementSize",
