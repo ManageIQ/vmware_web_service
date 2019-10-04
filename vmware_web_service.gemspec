@@ -12,6 +12,7 @@ Gem::Specification.new do |spec|
   spec.description = "A ruby interface to Vmware Web Services SDK"
   spec.licenses    = ["Apache-2.0"]
 
+  spec.required_ruby_version = "> 2.4"
   spec.files = Dir["{app,config,lib}/**/*"]
 
   spec.add_dependency "activesupport",        ">= 5.0", "< 5.3"
