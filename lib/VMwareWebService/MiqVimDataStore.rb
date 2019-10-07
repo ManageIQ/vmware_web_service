@@ -1,5 +1,4 @@
 require 'sync'
-require 'util/miq-extensions'  # Required patch to open-uri for get_file_content
 
 class MiqVimDataStore
   attr_reader :accessible, :multipleHostAccess, :name, :dsType, :url, :freeBytes, :capacityBytes, :uncommitted, :invObj
