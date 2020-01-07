@@ -61,8 +61,6 @@ class MiqVimCoreUpdater < MiqVimClientBase
 
     $vim_log.debug "#{log_prefix}: debugUpdates = #{@debugUpdates}"
 
-    trap(:TERM) { $vim_log.info "#{log_prefix}: ignoring SIGTERM" }
-
     begin
       @umPropCol     = @sic.propertyCollector
       @filterSpecRef = createFilter(@umPropCol, @updateSpec, "true")

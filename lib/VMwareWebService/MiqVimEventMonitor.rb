@@ -20,8 +20,6 @@ class MiqVimEventMonitor < MiqVimInventory
   def monitorEvents
     raise "monitorEvents: no block given" unless block_given?
 
-    trap(:TERM) { $vim_log.info "monitorEvents: ignoring SIGTERM" }
-
     eventHistoryCollector = createCollectorForEvents(@sic.eventManager, @eventFilterSpec)
     setCollectorPageSize(eventHistoryCollector, @pgSize)
 
