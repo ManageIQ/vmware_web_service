@@ -36,7 +36,7 @@
 module Timeout
   def timeout(sec, klass = nil)   #:yield: +sec+
     return yield(sec) if sec.nil? or sec.zero?
-    exception = klass || Class.new(ExitException)
+    exception = klass || Class.new(Timeout::Error)
     state_lock = Mutex.new
     state = :sleeping
 
