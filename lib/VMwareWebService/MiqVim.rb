@@ -13,15 +13,29 @@ require 'VMwareWebService/MiqVimEventHistoryCollector'
 require 'VMwareWebService/MiqCustomFieldsManager'
 require 'VMwareWebService/MiqVimAlarmManager'
 require 'VMwareWebService/MiqVimCustomizationSpecManager'
+require 'VMwareWebService/MiqVimUpdate'
 
 class MiqVim < MiqVimInventory
   include MiqVimVdlConnectionMod
   include MiqPbmInventory
+  include MiqVimUpdate
 
-  def initialize(server, username, password, cacheScope = nil)
-    super
+  attr_reader :updateThread, :monitor_updates
+
+  def initialize(server, username, password, cacheScope = nil, monitor_updates = false, preLoad = false, debugUpdates = false, notifyMethod = nil, maxWait = 60, maxObjects = 250)
+    super(server, username, password, cacheScope)
 
     pbm_initialize(self)
+
+    @monitor_updates    = monitor_updates
+    @updateMonitorReady = false
+    @error              = nil
+    @notifyMethod       = notifyMethod
+    @debugUpdates       = debugUpdates
+    @maxWait            = maxWait
+    @maxObjects         = maxObjects
+
+    start_monitor_updates_thread(preLoad) if @monitor_updates
   end
 
   def getVimVm(path)
@@ -227,6 +241,60 @@ class MiqVim < MiqVimInventory
   end
 
   def disconnect
+    shutdown_monitor_updates_thread if @monitor_updates
+
     super
+  end
+
+  private
+
+  def start_monitor_updates_thread(preLoad)
+    checkForOrphanedMonitors
+    log_prefix          = "MiqVim.initialize (#{@connId})"
+    $vim_log.info "#{log_prefix}: starting update monitor thread" if $vim_log
+    @updateThread = Thread.new { monitor(preLoad) }
+    @updateThread[:vim_connection_id] = connId
+    $vim_log.info "#{log_prefix}: waiting for update monitor to become ready" if $vim_log
+    until @updateMonitorReady
+      raise @error unless @error.nil?
+      break unless @updateThread.alive?
+      Thread.pass
+    end
+    $vim_log.info "#{log_prefix}: update monitor ready" if $vim_log
+  end
+
+  def checkForOrphanedMonitors
+    log_prefix = "MiqVim.checkForOrphanedMonitors (#{@connId})"
+    $vim_log.debug "#{log_prefix}: called..."
+    Thread.list.each do |thr|
+      next unless thr[:vim_connection_id] == connId
+      $vim_log.error "#{log_prefix}: Terminating orphaned update monitor <#{thr.object_id}>"
+      thr.raise "Orphaned update monitor (#{@connId}) <#{thr.object_id}>, terminated by <#{Thread.current.object_id}>"
+      thr.wakeup
+    end
+    $vim_log.debug "#{log_prefix}: done."
+  end
+
+  def monitor(preLoad)
+    log_prefix = "MiqVim.monitor (#{@connId})"
+    begin
+      monitorUpdates(preLoad)
+    rescue Exception => err
+      $vim_log.info "#{log_prefix}: returned from monitorUpdates via #{err.class} exception" if $vim_log
+      @error = err
+    end
+  end
+
+  def shutdown_monitor_updates_thread
+    log_prefix = "MiqVim.disconnect (#{@connId})"
+    stopUpdateMonitor
+    begin
+      if @updateThread != Thread.current && @updateThread.alive?
+        $vim_log.info "#{log_prefix}: waiting for Update Monitor Thread...Starting" if $vim_log
+        @updateThread.join
+        $vim_log.info "#{log_prefix}: waiting for Update Monitor Thread...Complete" if $vim_log
+      end
+    rescue
+    end
   end
 end # module MiqVim
