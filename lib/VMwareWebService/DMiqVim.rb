@@ -32,7 +32,7 @@ class DMiqVim < MiqVim
   # @param maxWait [Integer] How many seconds to wait before breaking out of WaitForUpdates (default: 60)
   # @param maxObjects [Integer] How many objects to return from each WaitForUpdates page (default: 250)
   def initialize(server, username, password, broker, preLoad = false, debugUpdates = false, notifyMethod = nil, cacheScope = nil, maxWait = 60, maxObjects = 250)
-    super(server, username, password, cacheScope, true, preLoad, debugUpdates, notifyMethod, maxWait, maxObjects)
+    super(server, username, password, cacheScope, monitor_updates = true, preLoad, debugUpdates, notifyMethod, maxWait, maxObjects)
 
     @broker                 = broker
     @connectionShuttingDown = false
