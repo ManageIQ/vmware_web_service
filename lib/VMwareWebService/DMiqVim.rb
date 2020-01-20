@@ -21,6 +21,16 @@ class DMiqVim < MiqVim
   include DRb::DRbUndumped
   include DMiqVimSync
 
+  # @param server [String] DNS name or IP address of the vCenter Server 
+  # @param username [String] Username to connect to the vCenter Server
+  # @param password [String] Password to connect to the vCenter Server
+  # @param broker [MiqVimBroker] Instance of the broker worker this connection belongs to
+  # @param preLoad [Bool] Should the cache be built before returning the connection (default: false)
+  # @param debugUpdates [Bool] Should we print debug info for each update (default: false)
+  # @param notifyMethod [Method] A optional method to call for each update (default: nil)
+  # @param cacheScope [Symbol] A pre-defined set of properties to cache (default: nil)
+  # @param maxWait [Integer] How many seconds to wait before breaking out of WaitForUpdates (default: 60)
+  # @param maxObjects [Integer] How many objects to return from each WaitForUpdates page (default: 250)
   def initialize(server, username, password, broker, preLoad = false, debugUpdates = false, notifyMethod = nil, cacheScope = nil, maxWait = 60, maxObjects = 250)
     super(server, username, password, cacheScope, true, preLoad, debugUpdates, notifyMethod, maxWait, maxObjects)
 
