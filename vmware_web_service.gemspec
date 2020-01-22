@@ -16,8 +16,7 @@ Gem::Specification.new do |spec|
   spec.files = Dir["{app,config,lib}/**/*"]
 
   spec.add_dependency "activesupport",        ">= 5.0", "< 5.3"
-  spec.add_dependency "ffi",                  "~>1.9.3"
-  spec.add_dependency "ffi-vix_disk_lib",     "~>1.0.5"  # used by VixDiskLib
+  spec.add_dependency "ffi-vix_disk_lib",     "~>1.1"
   spec.add_dependency "handsoap",             "~>0.2.5"
   spec.add_dependency "httpclient",           "~>2.8.0"
   spec.add_dependency "more_core_extensions", "~>3.2"
