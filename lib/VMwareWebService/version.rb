@@ -1,3 +1,3 @@
 module VMwareWebService
-  VERSION = '0.4.10'.freeze
+  VERSION = '1.0.0'.freeze
 end
