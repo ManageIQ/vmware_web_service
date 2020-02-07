@@ -873,6 +873,34 @@ class MiqVimVm
     waitForTask(taskMor)
   end # def removeDiskByFile
 
+  def resizeDisk(backingFile, newSizeInKb)
+    disk = getDeviceByBacking(backingFile)
+    raise "resizeDisk: no virtual device associated with: #{backingFile}" unless disk
+    raise "resizeDisk: cannot reduce the size of a disk" unless newSizeInKb >= Integer(disk.capacityInKB)
+    $vim_log.debug "MiqVimVm::resizeDisk: backingFile = #{backingFile} current size = #{device.capacityInKB} newSize = #{newSizeInKb} KB" if $vim_log
+
+    vmConfigSpec = VimHash.new("VirtualMachineConfigSpec") do |vmcs|
+      vmcs.deviceChange = VimArray.new("ArrayOfVirtualDeviceConfigSpec") do |vmcs_vca|
+        vmcs_vca << VimHash.new("VirtualDeviceConfigSpec") do |vdcs|
+          vdcs.operation = VirtualDeviceConfigSpecOperation::Edit
+
+          vdcs.device = VimHash.new("VirtualDisk") do |vDev|
+            vDev.backing       = disk.backing
+            vDev.capacityInKB  = newSizeInKb
+            vDev.controllerKey = disk.controllerKey
+            vDev.key           = disk.key
+            vDev.unitNumber    = disk.unitNumber
+          end
+        end
+      end
+    end
+
+    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resizeDisk: calling reconfigVM_Task" if $vim_log
+    taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
+    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resizeDisk: returned from reconfigVM_Task" if $vim_log
+    waitForTask(taskMor)
+  end
+
   #
   # Find a SCSI controller and
   # return its key and next available unit number.
