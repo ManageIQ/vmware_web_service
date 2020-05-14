@@ -4,7 +4,6 @@
 [![Build Status](https://travis-ci.org/ManageIQ/vmware_web_service.svg)](https://travis-ci.org/ManageIQ/vmware_web_service)
 [![Code Climate](https://codeclimate.com/github/ManageIQ/vmware_web_service.svg)](https://codeclimate.com/github/ManageIQ/vmware_web_service)
 [![Test Coverage](https://codeclimate.com/github/ManageIQ/vmware_web_service/badges/coverage.svg)](https://codeclimate.com/github/ManageIQ/vmware_web_service/coverage)
-[![Dependency Status](https://gemnasium.com/ManageIQ/vmware_web_service.svg)](https://gemnasium.com/ManageIQ/vmware_web_service)
 [![Security](https://hakiri.io/github/ManageIQ/vmware_web_service/master.svg)](https://hakiri.io/github/ManageIQ/vmware_web_service/master)
 
 [![Chat](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/ManageIQ/manageiq-providers-vmware?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
