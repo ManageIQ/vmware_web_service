@@ -27,10 +27,11 @@ end
 class VimHash < Hash
   include VimType
 
-  undef_method(:id)   if method_defined?(:id)
-  undef_method(:type) if method_defined?(:type)
-  undef_method(:size) if method_defined?(:size)
-  undef_method(:key)  if method_defined?(:key)
+  undef_method(:id)     if method_defined?(:id)
+  undef_method(:type)   if method_defined?(:type)
+  undef_method(:size)   if method_defined?(:size)
+  undef_method(:key)    if method_defined?(:key)
+  undef_method(:filter) if method_defined?(:filter)
 
   def initialize(xsiType = nil, vimType = nil)
     self.xsiType = xsiType
