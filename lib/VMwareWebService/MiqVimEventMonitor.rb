@@ -120,7 +120,7 @@ class MiqVimEventMonitor < MiqVimInventory
         next unless (vmObj = virtualMachinesByMor_locked[eventVmObj['vm']])
 
         eventVmObj['path'] = vmObj['summary']['config']['vmPathName']
-        eventVmObj['uuid'] = vmObj['summary']['config']['uuid']
+        eventVmObj['uuid'] = vmObj['summary']['config']['uuid'].presence
 
         removeVirtualMachine(eventVmObj['vm']) if event['eventType'] == 'VmRemovedEvent'
       end
