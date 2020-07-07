@@ -87,14 +87,6 @@ class MiqVimVm
     # @invObj.releaseObj(self)
   end
 
-  def vmMor
-    (@vmMor)
-  end
-
-  def vmh
-    (@vmh)
-  end
-
   #######################
   # Power state methods.
   #######################
@@ -317,23 +309,23 @@ class MiqVimVm
     return(@snapshotInfo) if @snapshotInfo && !refresh
 
     begin
-        @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
+      @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
-        unless (ssp = @invObj.getMoProp_local(@vmMor, "snapshot"))
-          @snapshotInfo = nil
-          return(nil)
-        end
-
-        ssObj = ssp["snapshot"]
-        ssMorHash = {}
-        rsl = ssObj['rootSnapshotList']
-        rsl = [rsl] unless rsl.kind_of?(Array)
-        rsl.each { |rs| @invObj.snapshotFixup(rs, ssMorHash) }
-        ssObj['ssMorHash'] = ssMorHash
-        @snapshotInfo = ssObj
-      ensure
-        @cacheLock.sync_unlock if unlock
+      unless (ssp = @invObj.getMoProp_local(@vmMor, "snapshot"))
+        @snapshotInfo = nil
+        return(nil)
       end
+
+      ssObj = ssp["snapshot"]
+      ssMorHash = {}
+      rsl = ssObj['rootSnapshotList']
+      rsl = [rsl] unless rsl.kind_of?(Array)
+      rsl.each { |rs| @invObj.snapshotFixup(rs, ssMorHash) }
+      ssObj['ssMorHash'] = ssMorHash
+      @snapshotInfo = ssObj
+    ensure
+      @cacheLock.sync_unlock if unlock
+    end
 
     (@snapshotInfo)
   end # def snapshotInfo_locked
@@ -800,11 +792,11 @@ class MiqVimVm
               bck.writeThrough  = "false"
               bck.fileName    = backingFile
               begin
-                  dsn = @invObj.path2dsName(@dsPath)
-                  bck.datastore = @invObj.dsName2mo_local(dsn)
-                rescue
-                  bck.datastore = nil
-                end
+                dsn = @invObj.path2dsName(@dsPath)
+                bck.datastore = @invObj.dsName2mo_local(dsn)
+              rescue
+                bck.datastore = nil
+              end
             end
           end
         end
@@ -856,11 +848,11 @@ class MiqVimVm
               bck.writeThrough  = "false"
               bck.fileName    = backingFile
               begin
-                  dsn = @invObj.path2dsName(@dsPath)
-                  bck.datastore = @invObj.dsName2mo(dsn)
-                rescue
-                  bck.datastore = nil
-                end
+                dsn = @invObj.path2dsName(@dsPath)
+                bck.datastore = @invObj.dsName2mo(dsn)
+              rescue
+                bck.datastore = nil
+              end
             end unless deleteBacking
           end
         end
@@ -1037,24 +1029,24 @@ class MiqVimVm
     end
 
     begin
-        @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
+      @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
-        alarmManager = @sic.alarmManager
-        #
-        # Add disabled if VM is running.
-        #
-        if poweredOff?
-          aSpec = @miqAlarmSpecEnabled
-        else
-          aSpec = @miqAlarmSpecDisabled
-        end
-        $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: calling createAlarm" if $vim_log
-        alarmMor = @invObj.createAlarm(alarmManager, @vmMor, aSpec)
-        $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: returned from createAlarm" if $vim_log
-        @miqAlarmMor = alarmMor
-      ensure
-        @cacheLock.sync_unlock if unlock
+      alarmManager = @sic.alarmManager
+      #
+      # Add disabled if VM is running.
+      #
+      if poweredOff?
+        aSpec = @miqAlarmSpecEnabled
+      else
+        aSpec = @miqAlarmSpecDisabled
       end
+      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: calling createAlarm" if $vim_log
+      alarmMor = @invObj.createAlarm(alarmManager, @vmMor, aSpec)
+      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: returned from createAlarm" if $vim_log
+      @miqAlarmMor = alarmMor
+    ensure
+      @cacheLock.sync_unlock if unlock
+    end
 
     (alarmMor)
   end # def addMiqAlarm_locked
