@@ -290,8 +290,8 @@ class MiqVimDataStore
     if block_given?
       open(fileUrl, options) { |ret| yield(ret) }
     else
-      meta = {}; data = nil
-      open(fileUrl, options) { |ret| data = ret.read; meta = ret.meta }
+      data = nil
+      open(fileUrl, options) { |ret| data = ret.read }
       return data
     end
   end
