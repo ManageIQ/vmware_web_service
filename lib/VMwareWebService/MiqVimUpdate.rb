@@ -112,7 +112,7 @@ module MiqVimUpdate
         version = updates_version
         sleep @updateDelay if @updateDelay
       end # while @monitor
-    rescue SignalException => err
+    rescue SignalException
       # Ignore signals, except TERM
     rescue => herr
       if herr.respond_to?(:reason) && herr.reason == 'The task was canceled by a user.'
