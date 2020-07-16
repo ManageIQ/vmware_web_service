@@ -1138,18 +1138,18 @@ class MiqVimInventory < MiqVimClientBase
 
     $vim_log.info "MiqVimInventory.datacenters_locked: loading Datacenter cache for #{@connId}"
     begin
-    @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
+      @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
-    ra = getMoPropMulti(inventoryHash_locked['Datacenter'], @propMap[:Datacenter][:props])
+      ra = getMoPropMulti(inventoryHash_locked['Datacenter'], @propMap[:Datacenter][:props])
 
-    @datacenters      = {}
-    @datacentersByMor = {}
-    ra.each do |dcObj|
-      addObjHash(:Datacenter, dcObj)
+      @datacenters      = {}
+      @datacentersByMor = {}
+      ra.each do |dcObj|
+        addObjHash(:Datacenter, dcObj)
+      end
+    ensure
+      @cacheLock.sync_unlock if unlock
     end
-  ensure
-    @cacheLock.sync_unlock if unlock
-  end
     $vim_log.info "MiqVimInventory.datacenters_locked: loaded Datacenter cache for #{@connId}"
 
     @datacenters
