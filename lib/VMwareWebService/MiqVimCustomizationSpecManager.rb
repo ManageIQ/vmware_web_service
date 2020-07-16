@@ -34,7 +34,7 @@ class MiqVimCustomizationSpecManager
     specs = info
     return [] if specs.nil?
 
-    specs = specs.dup.to_miq_a
+    specs = Array.wrap(specs.dup)
     specs.each { |s| s['spec'] = getCustomizationSpec(s['name'].to_s).spec }
     specs
   end
