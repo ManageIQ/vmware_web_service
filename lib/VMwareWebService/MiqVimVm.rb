@@ -909,13 +909,14 @@ class MiqVimVm
     scsi_controllers.sort_by { |s| s["key"].to_i }.each do |scsi_controller|
       # Skip if all controller units are populated
       # Bus has 16 units, controller takes up 1 unit itself
-      next if scsi_controller["device"].to_miq_a.count >= MAX_SCSI_DEVICES
+      device = Array.wrap(scsi_controller["device"])
+      next if device.count >= MAX_SCSI_DEVICES
 
       # We've found the lowest scsi controller with an available unit
       controller_key = scsi_controller["key"]
 
       # Get a list of disks on this controller
-      disks = devices.select { |dev| scsi_controller["device"].to_miq_a.include?(dev["key"]) }
+      disks = devices.select { |dev| device.include?(dev["key"]) }
 
       # Get a list of all populated units on the controller
       populated_units = disks.collect { |disk| disk["unitNumber"].to_i }
