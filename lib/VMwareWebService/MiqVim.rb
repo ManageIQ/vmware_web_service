@@ -1,7 +1,6 @@
 require 'sync'
 
 require 'VMwareWebService/MiqVimInventory'
-require 'VMwareWebService/MiqPbmInventory'
 require 'VMwareWebService/MiqVimVm'
 require 'VMwareWebService/MiqVimVdlMod'
 require 'VMwareWebService/MiqVimFolder'
@@ -17,7 +16,6 @@ require 'VMwareWebService/MiqVimUpdate'
 
 class MiqVim < MiqVimInventory
   include MiqVimVdlConnectionMod
-  include MiqPbmInventory
   include MiqVimUpdate
 
   attr_reader :updateThread, :monitor_updates
