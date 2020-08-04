@@ -33,8 +33,6 @@ class MiqVim < MiqVimInventory
   def initialize(server, username, password, cacheScope = nil, monitor_updates = false, preLoad = false, debugUpdates = false, notifyMethod = nil, maxWait = 60, maxObjects = 250)
     super(server, username, password, cacheScope)
 
-    pbm_initialize(self)
-
     @monitor_updates    = monitor_updates
     @updateMonitorReady = false
     @error              = nil
