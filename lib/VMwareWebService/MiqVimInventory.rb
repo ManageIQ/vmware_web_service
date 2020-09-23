@@ -366,7 +366,12 @@ class MiqVimInventory < MiqVimClientBase
     #
     # Hash snapshot info by create time.
     #
-    ssMorHash[ssObj['createTime']] = ssObj
+    # VMware API strips trailing '0's from the fractional seconds
+    # which causes the string to not match what .iso8601(6) returns
+    #
+    # Example 12:12:59.123Z instead of 12:12:59.123000Z
+    create_time = Time.parse(ssObj['createTime']).iso8601(6)
+    ssMorHash[create_time] = ssObj
 
     #
     # Ensure childSnapshotList is always present and always an array,
