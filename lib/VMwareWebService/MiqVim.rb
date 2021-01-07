@@ -283,12 +283,15 @@ class MiqVim < MiqVimInventory
 
   def monitor(preLoad)
     log_prefix = "MiqVim.monitor (#{@connId})"
-    begin
-      monitorUpdates(preLoad)
-    rescue Exception => err
-      $vim_log.info "#{log_prefix}: returned from monitorUpdates via #{err.class} exception" if $vim_log
-      @error = err
-    end
+
+    monitorUpdates(preLoad)
+  rescue Exception => err
+    $vim_log.info "#{log_prefix}: returned from monitorUpdates via #{err.class} exception" if $vim_log
+    @error = err
+
+    # If the monitorUpdates loop raised an exception but the underlying connection
+    # is still alive then simply restart the monitorUpdates loop
+    retry if isAlive?
   end
 
   def shutdown_monitor_updates_thread
