@@ -22,7 +22,7 @@ class MiqVim < MiqVimInventory
 
   attr_reader :updateThread, :monitor_updates
 
-  # @param server [String] DNS name or IP address of the vCenter Server 
+  # @param server [String] DNS name or IP address of the vCenter Server
   # @param username [String] Username to connect to the vCenter Server
   # @param password [String] Password to connect to the vCenter Server
   # @param cacheScope [Symbol] A pre-defined set of properties to cache (default: nil)
@@ -32,10 +32,13 @@ class MiqVim < MiqVimInventory
   # @param notifyMethod [Method] A optional method to call for each update (default: nil)
   # @param maxWait [Integer] How many seconds to wait before breaking out of WaitForUpdates (default: 60)
   # @param maxObjects [Integer] How many objects to return from each WaitForUpdates page (default: 250)
-  def initialize(server, username, password, cacheScope = nil, monitor_updates = false, preLoad = false, debugUpdates = false, notifyMethod = nil, maxWait = 60, maxObjects = 250)
+  def initialize(server, username, password, cacheScope = nil, monitor_updates = nil, preLoad = nil, debugUpdates = false, notifyMethod = nil, maxWait = 60, maxObjects = 250)
     super(server, username, password, cacheScope)
 
     pbm_initialize(self)
+
+    monitor_updates = self.class.monitor_updates if monitor_updates.nil?
+    preLoad         = self.class.pre_load        if preLoad.nil?
 
     @monitor_updates    = monitor_updates
     @updateMonitorReady = false
@@ -46,6 +49,25 @@ class MiqVim < MiqVimInventory
     @maxObjects         = maxObjects
 
     start_monitor_updates_thread(preLoad) if @monitor_updates
+  end
+
+  @@monitor_updates = false
+  @@pre_load        = false
+
+  def self.monitor_updates
+    @@monitor_updates
+  end
+
+  def self.monitor_updates=(val)
+    @@monitor_updates = val
+  end
+
+  def self.pre_load
+    @@pre_load
+  end
+
+  def self.pre_load=(val)
+    @@pre_load = val
   end
 
   def getVimVm(path)
