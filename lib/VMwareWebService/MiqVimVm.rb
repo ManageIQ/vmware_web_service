@@ -1,6 +1,5 @@
 require 'sync'
 
-require 'enumerator'
 require "ostruct"
 
 require 'more_core_extensions/core_ext/hash'

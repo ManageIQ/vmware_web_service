@@ -1,5 +1,4 @@
 require 'sync'
-require 'enumerator'
 require 'VMwareWebService/MiqVimClientBase'
 require 'VMwareWebService/MiqVimDump'
 require 'VMwareWebService/VimPropMaps'

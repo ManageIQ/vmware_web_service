@@ -1,4 +1,3 @@
-require 'enumerator'
 require 'VMwareWebService/MiqVimInventory'
 
 class MiqVimEventMonitor < MiqVimInventory

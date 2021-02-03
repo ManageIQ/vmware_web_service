@@ -1,5 +1,4 @@
 require 'manageiq-gems-pending'
-require 'enumerator'
 require 'VMwareWebService/MiqVim'
 require 'VMwareWebService/MiqVimBroker'
 
