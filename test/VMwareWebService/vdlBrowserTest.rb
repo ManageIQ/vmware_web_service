@@ -1,5 +1,4 @@
 require 'manageiq-gems-pending'
-require 'enumerator'
 
 require 'VMwareWebService/MiqVimBroker'
 require 'VMwareWebService/VixDiskLib/VixDiskLib'

@@ -1,5 +1,4 @@
 require 'VMwareWebService/VixDiskLib/VixDiskLib'
-require 'enumerator'
 
 $vim_log = Logger.new(STDOUT)
 $vim_log.level = Logger::WARN
