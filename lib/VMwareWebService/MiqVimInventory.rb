@@ -17,12 +17,12 @@ class MiqVimInventory < MiqVimClientBase
   @@selectorHash = {}
   @@cacheScope   = :cache_scope_full
 
-  def initialize(server, username, password, cacheScope = nil)
-    super(server, username, password)
+  def initialize(server:, username:, password:, port: 443, cache_scope: nil)
+    super(:server => server, :port => port, :username => username, :password => password)
 
-    cacheScope ||= @@cacheScope
+    cache_scope ||= @@cacheScope
 
-    case cacheScope
+    case cache_scope
     when :cache_scope_full
       @propMap = FullPropMap
       logger.info "MiqVimInventory: using property map FullPropMap"
@@ -41,7 +41,7 @@ class MiqVimInventory < MiqVimClientBase
     end
 
     # If we are connected to a virtual center then we can access additional properties
-    @propMap.merge!(PropMapVCenter) if isVirtualCenter && cacheScope != :cache_scope_event_monitor
+    @propMap.merge!(PropMapVCenter) if isVirtualCenter && cache_scope != :cache_scope_event_monitor
 
     @propCol    = @sic.propertyCollector
     @rootFolder = @sic.rootFolder
