@@ -21,6 +21,7 @@ class MiqVim < MiqVimInventory
   attr_reader :updateThread, :monitor_updates
 
   # @param server [String] DNS name or IP address of the vCenter Server
+  # @param port [Integer] Port to connect to the vCenter Server
   # @param username [String] Username to connect to the vCenter Server
   # @param password [String] Password to connect to the vCenter Server
   # @param cacheScope [Symbol] A pre-defined set of properties to cache (default: nil)
@@ -30,8 +31,8 @@ class MiqVim < MiqVimInventory
   # @param notifyMethod [Method] A optional method to call for each update (default: nil)
   # @param maxWait [Integer] How many seconds to wait before breaking out of WaitForUpdates (default: 60)
   # @param maxObjects [Integer] How many objects to return from each WaitForUpdates page (default: 250)
-  def initialize(server, username, password, cacheScope = nil, monitor_updates = nil, preLoad = nil, debugUpdates = false, notifyMethod = nil, maxWait = 60, maxObjects = 250)
-    super(server, username, password, cacheScope)
+  def initialize(server, port, username, password, cacheScope = nil, monitor_updates = nil, preLoad = nil, debugUpdates = false, notifyMethod = nil, maxWait = 60, maxObjects = 250)
+    super(server, port, username, password, cacheScope)
 
     monitor_updates = self.class.monitor_updates if monitor_updates.nil?
     preLoad         = self.class.pre_load        if preLoad.nil?
