@@ -8,10 +8,11 @@ require 'VMwareWebService/VimService'
 class MiqVimClientBase < VimService
   @@receiveTimeout = 120
 
-  attr_reader :server, :username, :password, :connId
+  attr_reader :server, :port, :username, :password, :connId
 
-  def initialize(server, username, password)
+  def initialize(server:, username:, password:, port: 443)
     @server   = server
+    @port     = port
     @username = username
     @password = password
     @connId   = "#{@server}_#{@username}"
@@ -34,7 +35,7 @@ class MiqVimClientBase < VimService
   end
 
   def sdk_uri
-    URI::HTTPS.build(:host => server, :path => "/sdk")
+    URI::HTTPS.build(:host => server, :port => port, :path => "/sdk")
   end
 
   def self.receiveTimeout=(val)
