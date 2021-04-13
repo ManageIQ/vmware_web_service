@@ -1,6 +1,5 @@
 require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
-require 'VMwareWebService/MiqVimBroker'
 
 $vim_log = Logger.new(STDOUT)
 $vim_log.level = Logger::WARN
@@ -39,7 +38,7 @@ SelectionSpec = {}
 #
 # Set SelectionSpec for all broker instances and their connections.
 # Must be set in the broker server.
-# MiqVimBroker.setSelector(SelectionSpec)
+# MiqVim.setSelector(SelectionSpec)
 
 TARGET_HOST = raise "please define"
 hMor = nil

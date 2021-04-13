@@ -1,6 +1,5 @@
 require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
-require 'VMwareWebService/MiqVimBroker'
 
 require 'fs/MiqFS/MiqFS'
 require 'fs/VimDatastoreFS/VimDatastoreFS'

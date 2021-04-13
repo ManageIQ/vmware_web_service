@@ -1,7 +1,4 @@
-USE_BROKER = true
-
 require 'manageiq-gems-pending'
-require 'VMwareWebService/MiqVimBroker'
 require 'VMwareWebService/MiqVim'
 require 'more_core_extensions/core_ext/hash'
 require 'logger'
@@ -27,14 +24,8 @@ begin
 
     begin
 
-      if USE_BROKER
-        puts "Connecting with broker."
-        broker = MiqVimBroker.new(:client)
-        vim = broker.getMiqVim(SERVER, USERNAME, PASSWORD)
-      else
-        puts "Connecting without broker."
-        vim = MiqVim.new(SERVER, USERNAME, PASSWORD)
-      end
+      puts "Connecting without broker."
+      vim = MiqVim.new(SERVER, USERNAME, PASSWORD)
 
       puts "#{vim.server} is #{(vim.isVirtualCenter? ? 'VC' : 'ESX')}"
       puts "API version: #{vim.apiVersion}"
