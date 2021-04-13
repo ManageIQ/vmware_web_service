@@ -1,26 +1,28 @@
-require "handsoap"
 require 'active_support/core_ext/numeric/bytes'
 require 'VMwareWebService/logging'
 require 'VMwareWebService/VimTypes'
 
-class VimService < Handsoap::Service
+class VimService
   include VMwareWebService::Logging
 
   attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :v5, :v6, :serviceInstanceMor, :session_cookie
+  attr_accessor :vim
+  private :vim
 
-  Handsoap.http_driver = :HTTPClient
+  def initialize(uri)
+    require "rbvmomi"
+    self.vim = RbVmomi::VIM.new(
+      :ns       => "urn:vim25",
+      :ssl      => true,
+      :insecure => true,
+      :port     => uri.port,
+      :path     => uri.path,
+      :host     => uri.host,
+      :rev      => "6.5"
+    )
 
-  def initialize(ep)
-    super
-
-    setNameSpace('urn:vim25')
-
-    @serviceInstanceMor = VimString.new("ServiceInstance", "ServiceInstance")
+    @serviceInstanceMor = vim.serviceInstance
     @session_cookie     = nil
-
-    @xml_payload_len  = 0
-    @xml_payload_max  = 10.megabytes
-    @xml_payload_lock = Mutex.new
 
     @sic = retrieveServiceContent
 
@@ -35,31 +37,15 @@ class VimService < Handsoap::Service
   end
 
   def acquireCloneTicket(sm)
-    response = invoke("n1:AcquireCloneTicket") do |message|
-      message.add "n1:_this", sm do |i|
-        i.set_attr "type", sm.vimType
-      end
-    end
-    (parse_response(response, 'AcquireCloneTicketResponse')['returnval'])
+    sm.AcquireCloneTicket
   end
 
   def acquireMksTicket(mor)
-    response = invoke("n1:AcquireMksTicket") do |message|
-      message.add "n1:_this", mor do |i|
-        i.set_attr "type", mor.vimType
-      end
-    end
-    (parse_response(response, 'AcquireMksTicketResponse')['returnval'])
+    mor.AcquireMksTicket
   end
 
   def acquireTicket(mor, ticketType)
-    response = invoke("n1:AcquireTicket") do |message|
-      message.add "n1:_this", mor do |i|
-        i.set_attr "type", mor.vimType
-      end
-      message.add "n1:ticketType", ticketType
-    end
-    (parse_response(response, 'AcquireTicketResponse')['returnval'])
+    mor.AcquireTicket(:ticketType => ticketType)
   end
 
   def addHost_Task(clustMor, spec, asConnected, resourcePool = nil, license = nil)
@@ -316,12 +302,7 @@ class VimService < Handsoap::Service
   end
 
   def currentTime
-    response = invoke("n1:CurrentTime") do |message|
-      message.add "n1:_this", "ServiceInstance" do |i|
-        i.set_attr "type", "ServiceInstance"
-      end
-    end
-    (parse_response(response, 'CurrentTimeResponse')['returnval'])
+    serviceInstanceMor.CurrentTime
   end
 
   def customizationSpecItemToXml(csmMor, item)
@@ -449,34 +430,15 @@ class VimService < Handsoap::Service
   end
 
   def getCustomizationSpec(csmMor, name)
-    response = invoke("n1:GetCustomizationSpec") do |message|
-      message.add "n1:_this", csmMor do |i|
-        i.set_attr "type", csmMor.vimType
-      end
-      message.add "n1:name", name
-    end
-    (parse_response(response, 'GetCustomizationSpecResponse'))['returnval']
+    csmMor.GetCustomizationSpec(:name => name)
   end
 
   def login(sessionManager, username, password)
-    response = invoke("n1:Login") do |message|
-      message.add "n1:_this", sessionManager do |i|
-        i.set_attr "type", "SessionManager"
-      end
-      message.add "n1:userName", username
-      message.add "n1:password", password
-    end
-    @session_cookie ||= response.cookie
-    (parse_response(response, 'LoginResponse')['returnval'])
+    sessionManager.Login(:userName => username, :password => password)
   end
 
   def logout(sessionManager)
-    response = invoke("n1:Logout") do |message|
-      message.add "n1:_this", sessionManager do |i|
-        i.set_attr "type", "SessionManager"
-      end
-    end
-    (parse_response(response, 'LogoutResponse'))
+    sessionManager.Logout
   end
 
   def logUserEvent(eventManager, entity, msg)
@@ -956,13 +918,7 @@ class VimService < Handsoap::Service
   end
 
   def retrieveServiceContent
-    response = invoke("n1:RetrieveServiceContent") do |message|
-      message.add "n1:_this", @serviceInstanceMor do |i|
-        i.set_attr "type", @serviceInstanceMor.vimType
-      end
-    end
-    @session_cookie ||= response.cookie
-    (parse_response(response, 'RetrieveServiceContentResponse')['returnval'])
+    serviceInstanceMor.RetrieveServiceContent
   end
 
   def revertToCurrentSnapshot_Task(vmMor)
@@ -1239,138 +1195,5 @@ class VimService < Handsoap::Service
       message.add "n1:specItemXml", specItemXml
     end
     (parse_response(response, 'XmlToCustomizationSpecItemResponse')['returnval'])
-  end
-
-  private
-
-  def setNameSpace(ns)
-    @ns = {'n1' => ns}
-    on_create_document do |doc|
-      doc.alias 'n1', ns
-      doc.find("Envelope").set_attr "xmlns:xsi", "http://www.w3.org/2001/XMLSchema-instance"
-    end
-  end
-
-  def marshalObj(node, obj)
-    if obj.kind_of? Array
-      obj.each do |v|
-        marshalObj(node, v)
-      end
-    elsif obj.kind_of? VimHash
-      obj.each_arg do |k, v|
-        if v.kind_of? Array
-          v.each do |av|
-            node.add "n1:#{k}" do |i|
-              marshalObj(i, av)
-              i.set_attr "xsi:type", "n1:#{av.xsiType}" if av.respond_to?(:xsiType) && av.xsiType
-              i.set_attr "type", v.vimType if v.respond_to?(:vimType) && v.vimType
-            end
-          end
-        else
-          node.add "n1:#{k}" do |i|
-            marshalObj(i, v)
-            i.set_attr "type", v.vimType if v.respond_to?(:vimType) && v.vimType
-            i.set_attr "xsi:type", "n1:#{v.xsiType}" if v.respond_to?(:xsiType) && v.xsiType
-          end
-        end
-      end
-    else
-      node.set_value(obj)
-    end
-  end
-
-  def handle_memory_and_gc(response)
-    log_prefix = "#{self.class.name}##{__method__}:"
-
-    xml_len = response.instance_variable_get(:@http_body).length
-
-    # At this point we don't need the internal raw XML content since we
-    #   have the parsed XML document, so we can free it for the GC.
-    response.instance_variable_set(:@http_body, nil)
-
-    @xml_payload_lock.synchronize do
-      @xml_payload_len += xml_len
-
-      if @xml_payload_len > @xml_payload_max
-        @xml_payload_len = 0
-
-        logger.debug("#{log_prefix} Running garbage collection")
-
-        # Force a GC, because Ruby's GC is triggered on number of objects without
-        #   regard to size.  The object we just freed may not be released right away.
-        gc_time = Benchmark.realtime { GC.start }
-
-        gc_log_level = gc_time >= 5 ? :warn : :debug
-        logger.send(gc_log_level, "#{log_prefix} Garbage collection took #{gc_time} seconds")
-      end
-    end
-  end
-
-  def parse_response(response, rType)
-    doc  = response.document
-    raise "Response <#{response.inspect}> has no XML document" if doc.nil?
-
-    # Cleanup the raw XML document from the response and kick a GC
-    handle_memory_and_gc(response)
-
-    search_path = "//n1:#{rType}"
-    node = doc.xpath(search_path, @ns).first
-    raise "Node (search=<#{search_path}> namespace=<#{@ns}>) not found in XML document <#{doc.inspect}>" if node.nil?
-    ur   = unmarshal_response(node, rType)
-    # puts
-    # puts "***** #{rType}"
-    # dumpObj(ur)
-    # puts
-    (ur)
-  end
-
-  def unmarshal_response(node, vType = nil)
-    return(node.text) if node.text?
-
-    vimType = node.attribute_with_ns('type', nil)
-    vimType = vimType.value if vimType
-    xsiType = node.attribute_with_ns('type', 'http://www.w3.org/2001/XMLSchema-instance')
-    xsiType = xsiType.value if xsiType
-    xsiType ||= vType.to_s
-
-    if node.children.length == 1 && (c = node.child) && c.text?
-      return VimString.new(c.text, vimType, xsiType)
-    end
-    if xsiType == "SOAP::SOAPString"
-      return VimString.new("", vimType, xsiType)
-    end
-
-    if xsiType =~ /^ArrayOf(.*)$/
-      nextType = $1
-      obj = VimArray.new(xsiType)
-      node.children.each do |child|
-        next if child.blank?
-        obj << unmarshal_response(child, nextType)
-      end
-      return(obj)
-    end
-
-    aih = VimMappingRegistry.argInfoMap(xsiType)
-    obj = VimHash.new(xsiType)
-
-    node.children.each do |child|
-      next if child.blank?
-      name = child.name.freeze
-
-      ai = aih[name] if aih
-
-      unless (v = obj[name])
-        v = obj[name] = VimArray.new("ArrayOf#{ai[:type]}") if ai && ai[:isArray]
-      end
-
-      nextType = (ai ? ai[:type] : nil)
-
-      if v.kind_of?(Array)
-        obj[name] << unmarshal_response(child, nextType)
-      else
-        obj[name] = unmarshal_response(child, nextType)
-      end
-    end
-    (obj)
   end
 end

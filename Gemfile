@@ -9,7 +9,6 @@ gemspec
 # Modified gems (forked on github)
 
 gem "manageiq-gems-pending", ">0", :require => 'manageiq-gems-pending', :git => "https://github.com/ManageIQ/manageiq-gems-pending.git", :branch => "master"
-gem "handsoap", "=0.2.5.5", :require => false, :source => "http://rubygems.manageiq.org"
 
 case ENV['TEST_RAILS_VERSION']
 when "6.0"
