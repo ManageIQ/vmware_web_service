@@ -1,7 +1,10 @@
 require 'active_support/core_ext/numeric/bytes'
+require 'VMwareWebService/logging'
 require 'VMwareWebService/VimTypes'
 
 class VimService
+  include VMwareWebService::Logging
+
   attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :v5, :v6, :serviceInstanceMor, :session_cookie
   attr_accessor :vim
   private :vim

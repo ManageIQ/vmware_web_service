@@ -1,8 +1,8 @@
 $:.push("#{File.dirname(__FILE__)}/..")
 require "VixDiskLib_raw"
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 vmdk = "/vmfs/volumes/47dade33-4f4a4875-3951-00188b404015/rpo-test2/rpo-test2.vmdk"
 

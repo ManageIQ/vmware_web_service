@@ -1,7 +1,7 @@
 require "ffi-vix_disk_lib/api_wrapper"
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 vmdk = "/vmfs/volumes/StarM1-Dev/Citrix-Mahwah2/Citrix-Mahwah2.vmdk"
 

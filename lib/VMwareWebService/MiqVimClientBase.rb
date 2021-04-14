@@ -51,7 +51,7 @@ class MiqVimClientBase < VimService
   end
 
   def connect
-    $vim_log.debug "#{self.class.name}.connect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if $vim_log.debug?
+    logger.debug "#{self.class.name}.connect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if logger.debug?
     @connLock.synchronize(:EX) do
       return if @connected
       login(@sic.sessionManager, @username, @password)
@@ -60,7 +60,7 @@ class MiqVimClientBase < VimService
   end
 
   def disconnect
-    $vim_log.debug "#{self.class.name}.disconnect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if $vim_log.debug?
+    logger.debug "#{self.class.name}.disconnect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if logger.debug?
     @connLock.synchronize(:EX) do
       return unless @connected
       logout(@sic.sessionManager)
