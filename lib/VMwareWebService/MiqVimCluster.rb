@@ -1,4 +1,8 @@
+require 'VMwareWebService/logging'
+
 class MiqVimCluster
+  include VMwareWebService::Logging
+
   attr_reader :name, :invObj
 
   def initialize(invObj, ch)
@@ -44,9 +48,9 @@ class MiqVimCluster
       cs.vmFolder       = ah[:vmFolder]       unless ah[:vmFolder].nil?
     end
 
-    $vim_log.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addHost: calling addHost_Task" if $vim_log
+    logger.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addHost: calling addHost_Task" if logger
     taskMor = @invObj.addHost_Task(@cMor, cspec, ah[:asConnected].to_s, ah[:resourcePool], ah[:license])
-    $vim_log.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addHost: returned from addHost_Task" if $vim_log
+    logger.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addHost: returned from addHost_Task" if logger
     return taskMor unless ah[:wait]
     waitForTask(taskMor)
   end # def addHost

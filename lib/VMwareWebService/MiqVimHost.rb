@@ -3,6 +3,7 @@ require 'sync'
 require "ostruct"
 
 require 'more_core_extensions/core_ext/hash'
+require 'VMwareWebService/logging'
 require 'VMwareWebService/MiqHostDatastoreSystem'
 require 'VMwareWebService/MiqHostStorageSystem'
 require 'VMwareWebService/MiqHostFirewallSystem'
@@ -13,6 +14,8 @@ require 'VMwareWebService/MiqHostAdvancedOptionManager'
 require 'VMwareWebService/MiqHostSnmpSystem'
 
 class MiqVimHost
+  include VMwareWebService::Logging
+
   attr_reader :name, :invObj
 
   def initialize(invObj, hh)
@@ -107,49 +110,49 @@ class MiqVimHost
   end
 
   def enterMaintenanceMode(timeout = 0, evacuatePoweredOffVms = false, wait = true)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: calling enterMaintenanceMode_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: calling enterMaintenanceMode_Task" if logger
     taskMor = @invObj.enterMaintenanceMode_Task(@hMor, timeout, evacuatePoweredOffVms)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: returned from enterMaintenanceMode_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: returned from enterMaintenanceMode_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def exitMaintenanceMode(timeout = 0, wait = true)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: calling exitMaintenanceMode_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: calling exitMaintenanceMode_Task" if logger
     taskMor = @invObj.exitMaintenanceMode_Task(@hMor, timeout)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: returned from exitMaintenanceMode_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: returned from exitMaintenanceMode_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def powerDownHostToStandBy(timeout = 0, evacuatePoweredOffVms = false, wait = true)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: calling powerDownHostToStandBy_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: calling powerDownHostToStandBy_Task" if logger
     taskMor = @invObj.powerDownHostToStandBy_Task(@hMor, timeout, evacuatePoweredOffVms)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: returned from powerDownHostToStandBy_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: returned from powerDownHostToStandBy_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def powerUpHostFromStandBy(timeout = 0, wait = true)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: calling powerUpHostFromStandBy_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: calling powerUpHostFromStandBy_Task" if logger
     taskMor = @invObj.powerUpHostFromStandBy_Task(@hMor, timeout)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: returned from powerUpHostFromStandBy_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: returned from powerUpHostFromStandBy_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def rebootHost(force = false, wait = true)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: calling rebootHost_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: calling rebootHost_Task" if logger
     taskMor = @invObj.rebootHost_Task(@hMor, force)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: returned from rebootHost_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: returned from rebootHost_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def shutdownHost(force = false, wait = true)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: calling shutdownHost_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: calling shutdownHost_Task" if logger
     taskMor = @invObj.shutdownHost_Task(@hMor, force)
-    $vim_log.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: returned from shutdownHost_Task" if $vim_log
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: returned from shutdownHost_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end

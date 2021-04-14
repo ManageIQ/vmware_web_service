@@ -6,11 +6,13 @@ require 'more_core_extensions/core_ext/hash'
 require 'active_support/core_ext/object/try'
 
 require 'VMwareWebService/exception'
+require 'VMwareWebService/logging'
 require 'VMwareWebService/MiqVimVdlMod'
 require 'VMwareWebService/esx_thumb_print'
 require 'VMwareWebService/vcenter_thumb_print'
 
 class MiqVimVm
+  include VMwareWebService::Logging
   include MiqVimVdlVcConnectionMod
 
   EVM_SNAPSHOT_NAME         = "EvmSnapshot".freeze # TODO: externalize - not VIM specific
@@ -91,53 +93,53 @@ class MiqVimVm
   #######################
 
   def start(wait = true)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).start: calling powerOnVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).start: calling powerOnVM_Task" if logger
     taskMor = @invObj.powerOnVM_Task(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).start: returned from powerOnVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).start: returned from powerOnVM_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end # def start
 
   def stop(wait = true)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).stop: calling powerOffVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).stop: calling powerOffVM_Task" if logger
     taskMor = @invObj.powerOffVM_Task(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).stop: returned from powerOffVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).stop: returned from powerOffVM_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end # def stop
 
   def suspend(wait = true)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).suspend: calling suspendVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).suspend: calling suspendVM_Task" if logger
     taskMor = @invObj.suspendVM_Task(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).suspend: returned from suspendVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).suspend: returned from suspendVM_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end # def suspend
 
   def reset(wait = true)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reset: calling resetVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reset: calling resetVM_Task" if logger
     taskMor = @invObj.resetVM_Task(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reset: returned from resetVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reset: returned from resetVM_Task" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def rebootGuest
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).rebootGuest: calling rebootGuest" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).rebootGuest: calling rebootGuest" if logger
     @invObj.rebootGuest(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).rebootGuest: returned from rebootGuest" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).rebootGuest: returned from rebootGuest" if logger
   end
 
   def shutdownGuest
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).shutdownGuest: calling shutdownGuest" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).shutdownGuest: calling shutdownGuest" if logger
     @invObj.shutdownGuest(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).shutdownGuest: returned from shutdownGuest" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).shutdownGuest: returned from shutdownGuest" if logger
   end
 
   def standbyGuest
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).standbyGuest: calling standbyGuest" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).standbyGuest: calling standbyGuest" if logger
     @invObj.standbyGuest(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).standbyGuest: returned from standbyGuest" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).standbyGuest: returned from standbyGuest" if logger
   end
 
   def powerState
@@ -167,18 +169,18 @@ class MiqVimVm
   ############################
 
   def markAsTemplate
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsTemplate: calling markAsTemplate" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsTemplate: calling markAsTemplate" if logger
     @invObj.markAsTemplate(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsTemplate: returned from markAsTemplate" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsTemplate: returned from markAsTemplate" if logger
   end
 
   def markAsVm(pool, host = nil)
     hmor = nil
     hmor = (host.kind_of?(Hash) ? host['MOR'] : host) if host
     pmor = (pool.kind_of?(Hash) ? pool['MOR'] : pool)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsVm: calling markAsVirtualMachine" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsVm: calling markAsVirtualMachine" if logger
     @invObj.markAsVirtualMachine(@vmMor, pmor, hmor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsVm: returned from markAsVirtualMachine" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).markAsVm: returned from markAsVirtualMachine" if logger
   end
 
   def template?
@@ -193,18 +195,18 @@ class MiqVimVm
     hmor = (host.kind_of?(Hash) ? host['MOR'] : host)
     pool = (pool.kind_of?(Hash) ? pool['MOR'] : pool) if pool
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).migrate: calling migrateVM_Task, vm=<#{@vmMor.inspect}>, host=<#{hmor.inspect}>, pool=<#{pool.inspect}>, priority=<#{priority.inspect}>, state=<#{state.inspect}>" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).migrate: calling migrateVM_Task, vm=<#{@vmMor.inspect}>, host=<#{hmor.inspect}>, pool=<#{pool.inspect}>, priority=<#{priority.inspect}>, state=<#{state.inspect}>" if logger
     taskMor = @invObj.migrateVM_Task(@vmMor, pool, hmor, priority, state)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).migrate: returned from migrateVM_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::migrate: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).migrate: returned from migrateVM_Task" if logger
+    logger.debug "MiqVimVm::migrate: taskMor = #{taskMor}" if logger
     waitForTask(taskMor)
   end
 
   def renameVM(newName)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameVM: calling rename_Task, vm=<#{@vmMor.inspect}>, newName=<#{newName}>" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameVM: calling rename_Task, vm=<#{@vmMor.inspect}>, newName=<#{newName}>" if logger
     task_mor = @invObj.rename_Task(@vmMor, newName)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameVM: returned from rename_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::renameVM: taskMor = #{task_mor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameVM: returned from rename_Task" if logger
+    logger.debug "MiqVimVm::renameVM: taskMor = #{task_mor}" if logger
     waitForTask(task_mor)
   end
 
@@ -222,26 +224,26 @@ class MiqVimVm
       rsl.transform    = transform      if transform
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).relocate: calling relocateVM_Task, vm=<#{@vmMor.inspect}>, host=<#{hmor.inspect}>, pool=<#{pool.inspect}>, datastore=<#{dsmor.inspect}>, priority=<#{priority.inspect}>" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).relocate: calling relocateVM_Task, vm=<#{@vmMor.inspect}>, host=<#{hmor.inspect}>, pool=<#{pool.inspect}>, datastore=<#{dsmor.inspect}>, priority=<#{priority.inspect}>" if logger
     taskMor = @invObj.relocateVM_Task(@vmMor, rspec, priority)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).relocate: returned from relocateVM_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::relocate: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).relocate: returned from relocateVM_Task" if logger
+    logger.debug "MiqVimVm::relocate: taskMor = #{taskMor}" if logger
     waitForTask(taskMor)
   end
 
   def cloneVM_raw(folder, name, spec, wait = true)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).cloneVM_raw: calling cloneVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).cloneVM_raw: calling cloneVM_Task" if logger
     taskMor = @invObj.cloneVM_Task(@vmMor, folder, name, spec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).cloneVM_raw: returned from cloneVM_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::cloneVM_raw: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).cloneVM_raw: returned from cloneVM_Task" if logger
+    logger.debug "MiqVimVm::cloneVM_raw: taskMor = #{taskMor}" if logger
 
     if wait
       rv = waitForTask(taskMor)
-      $vim_log.debug "MiqVimVm::cloneVM_raw: rv = #{rv}" if $vim_log
+      logger.debug "MiqVimVm::cloneVM_raw: rv = #{rv}" if logger
       return rv
     end
 
-    $vim_log.debug "MiqVimVm::cloneVM_raw - no wait: taskMor = #{taskMor}" if $vim_log
+    logger.debug "MiqVimVm::cloneVM_raw - no wait: taskMor = #{taskMor}" if logger
     taskMor
   end
 
@@ -287,15 +289,15 @@ class MiqVimVm
   # end
 
   def unregister
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).unregister: calling unregisterVM" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).unregister: calling unregisterVM" if logger
     @invObj.unregisterVM(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).unregister: returned from unregisterVM" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).unregister: returned from unregisterVM" if logger
   end
 
   def destroy
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).destroy: calling destroy_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).destroy: calling destroy_Task" if logger
     taskMor = @invObj.destroy_Task(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).destroy: returned from destroy_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).destroy: returned from destroy_Task" if logger
     waitForTask(taskMor)
   end
 
@@ -377,33 +379,33 @@ class MiqVimVm
   end
 
   def createSnapshot(name, desc, memory, quiesce, wait = true, free_space_percent = 100)
-    $vim_log.debug "MiqVimVm::createSnapshot(#{name}, #{desc}, #{memory}, #{quiesce})" if $vim_log
+    logger.debug "MiqVimVm::createSnapshot(#{name}, #{desc}, #{memory}, #{quiesce})" if logger
     cs = connectionState
     raise "MiqVimVm(#{@invObj.server}, #{@invObj.username}).createSnapshot: VM is not connected, connectionState = #{cs}" if cs != "connected"
     snapshot_free_space_check('create', free_space_percent)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).createSnapshot: calling createSnapshot_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).createSnapshot: calling createSnapshot_Task" if logger
     taskMor = @invObj.createSnapshot_Task(@vmMor, name, desc, memory, quiesce)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).createSnapshot: returned from createSnapshot_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::createSnapshot: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).createSnapshot: returned from createSnapshot_Task" if logger
+    logger.debug "MiqVimVm::createSnapshot: taskMor = #{taskMor}" if logger
 
     if wait
       snMor = waitForTask(taskMor)
-      $vim_log.warn "MiqVimVm::createSnapshot: snMor = #{snMor}" if $vim_log
+      logger.warn "MiqVimVm::createSnapshot: snMor = #{snMor}" if logger
       return snMor
     end
 
-    $vim_log.debug "MiqVimVm::createSnapshot - no wait: taskMor = #{taskMor}" if $vim_log
+    logger.debug "MiqVimVm::createSnapshot - no wait: taskMor = #{taskMor}" if logger
     taskMor
   end # def createSnapshot
 
   def removeSnapshot(snMor, subTree = "false", wait = true, free_space_percent = 100)
-    $vim_log.warn "MiqVimVm::removeSnapshot(#{snMor}, #{subTree})" if $vim_log
+    logger.warn "MiqVimVm::removeSnapshot(#{snMor}, #{subTree})" if logger
     snMor = getSnapMor(snMor)
     snapshot_free_space_check('remove', free_space_percent)
-    $vim_log.warn "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: calling removeSnapshot_Task: snMor [#{snMor}] subtree [#{subTree}]" if $vim_log
+    logger.warn "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: calling removeSnapshot_Task: snMor [#{snMor}] subtree [#{subTree}]" if logger
     taskMor = @invObj.removeSnapshot_Task(snMor, subTree)
-    $vim_log.warn "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: returned from removeSnapshot_Task: snMor [#{snMor}]" if $vim_log
-    $vim_log.debug "MiqVimVm::removeSnapshot: taskMor = #{taskMor}" if $vim_log
+    logger.warn "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeSnapshot: returned from removeSnapshot_Task: snMor [#{snMor}]" if logger
+    logger.debug "MiqVimVm::removeSnapshot: taskMor = #{taskMor}" if logger
     return taskMor unless wait
     waitForTask(taskMor)
   end # def removeSnapshot
@@ -421,40 +423,40 @@ class MiqVimVm
   end # def removeSnapshotByDescription
 
   def removeAllSnapshots(free_space_percent = 100)
-    $vim_log.debug "MiqVimVm::removeAllSnapshots" if $vim_log
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeAllSnapshots: calling removeAllSnapshots_Task" if $vim_log
+    logger.debug "MiqVimVm::removeAllSnapshots" if logger
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeAllSnapshots: calling removeAllSnapshots_Task" if logger
     snapshot_free_space_check('remove_all', free_space_percent)
     taskMor = @invObj.removeAllSnapshots_Task(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeAllSnapshots: returned from removeAllSnapshots_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::removeAllSnapshots: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeAllSnapshots: returned from removeAllSnapshots_Task" if logger
+    logger.debug "MiqVimVm::removeAllSnapshots: taskMor = #{taskMor}" if logger
     waitForTask(taskMor)
   end # def removeAllSnapshots
 
   def revertToSnapshot(snMor)
-    $vim_log.debug "MiqVimVm::revertToSnapshot(#{snMor})" if $vim_log
+    logger.debug "MiqVimVm::revertToSnapshot(#{snMor})" if logger
     snMor = getSnapMor(snMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToSnapshot: calling revertToSnapshot_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToSnapshot: calling revertToSnapshot_Task" if logger
     taskMor = @invObj.revertToSnapshot_Task(snMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToSnapshot: returned from revertToSnapshot_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::revertToSnapshot: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToSnapshot: returned from revertToSnapshot_Task" if logger
+    logger.debug "MiqVimVm::revertToSnapshot: taskMor = #{taskMor}" if logger
     waitForTask(taskMor)
   end # def revertToSnapshot
 
   def revertToCurrentSnapshot
-    $vim_log.debug "MiqVimVm::revertToCurrentSnapshot" if $vim_log
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToCurrentSnapshot: calling revertToCurrentSnapshot_Task" if $vim_log
+    logger.debug "MiqVimVm::revertToCurrentSnapshot" if logger
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToCurrentSnapshot: calling revertToCurrentSnapshot_Task" if logger
     taskMor = @invObj.revertToCurrentSnapshot_Task(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToCurrentSnapshot: returned from revertToCurrentSnapshot_Task" if $vim_log
-    $vim_log.debug "MiqVimVm::revertToCurrentSnapshot: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).revertToCurrentSnapshot: returned from revertToCurrentSnapshot_Task" if logger
+    logger.debug "MiqVimVm::revertToCurrentSnapshot: taskMor = #{taskMor}" if logger
     waitForTask(taskMor)
   end # def revertToCurrentSnapshot
 
   def renameSnapshot(snMor, name, desc)
-    $vim_log.debug "MiqVimVm::renameSnapshot(#{snMor}, #{name}, #{desc})" if $vim_log
+    logger.debug "MiqVimVm::renameSnapshot(#{snMor}, #{name}, #{desc})" if logger
     snMor = getSnapMor(snMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameSnapshot: calling renameSnapshot" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameSnapshot: calling renameSnapshot" if logger
     @invObj.renameSnapshot(snMor, name, desc)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameSnapshot: returned from renameSnapshot" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).renameSnapshot: returned from renameSnapshot" if logger
   end # def renameSnapshot
 
   def snapshot_free_space_check(action, free_space_percent = 100)
@@ -508,13 +510,13 @@ class MiqVimVm
 
   def getSnapMor(snMor)
     unless snMor.respond_to?(:vimType)
-      $vim_log.debug "MiqVimVm::getSnapMor converting #{snMor} to MOR" if $vim_log
+      logger.debug "MiqVimVm::getSnapMor converting #{snMor} to MOR" if logger
       @cacheLock.synchronize(:SH) do
         raise "getSnapMor: VM #{@dsPath} has no snapshots" unless (sni = snapshotInfo_locked(true))
         raise "getSnapMor: snapshot #{snMor} not found" unless (snObj = sni['ssMorHash'][snMor])
         snMor = snObj['snapshot']
       end
-      $vim_log.debug "MiqVimVm::getSnapMor new MOR: #{snMor}" if $vim_log
+      logger.debug "MiqVimVm::getSnapMor new MOR: #{snMor}" if logger
     end
     (snMor)
   end # def getSnapMor
@@ -609,9 +611,9 @@ class MiqVimVm
   end # def getCfg
 
   def reconfig(vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reconfig: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reconfig: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reconfig: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).reconfig: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end
 
@@ -630,9 +632,9 @@ class MiqVimVm
 
   def setMemory(memMB)
     vmConfigSpec = VimHash.new("VirtualMachineConfigSpec") { |cs| cs.memoryMB = memMB }
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setMemory: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setMemory: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setMemory: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setMemory: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end
 
@@ -642,9 +644,9 @@ class MiqVimVm
 
   def setNumCPUs(numCPUs)
     vmConfigSpec = VimHash.new("VirtualMachineConfigSpec") { |cs| cs.numCPUs = numCPUs }
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setNumCPUs: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setNumCPUs: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setNumCPUs: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setNumCPUs: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end
 
@@ -666,9 +668,9 @@ class MiqVimVm
       end
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).connectDevice: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).connectDevice: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).connectDevice: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).connectDevice: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end # def connectDevice
 
@@ -704,9 +706,9 @@ class MiqVimVm
       end
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).attachIsoToCd: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).attachIsoToCd: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).attachIsoToCd: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).attachIsoToCd: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end
 
@@ -722,9 +724,9 @@ class MiqVimVm
       end
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resetCd: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resetCd: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resetCd: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resetCd: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end
 
@@ -802,9 +804,9 @@ class MiqVimVm
       end
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addDisk: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addDisk: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addDisk: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addDisk: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end # def addDisk
 
@@ -819,8 +821,8 @@ class MiqVimVm
     raise "removeDiskByFile: false setting for deleteBacking not yet supported" if deleteBacking == false
     controllerKey, key = getDeviceKeysByBacking(backingFile)
     raise "removeDiskByFile: no virtual device associated with: #{backingFile}" unless key
-    $vim_log.debug "MiqVimVm::MiqVimVm: backingFile = #{backingFile}" if $vim_log
-    $vim_log.debug "MiqVimVm::MiqVimVm: controllerKey = #{controllerKey}, key = #{key}" if $vim_log
+    logger.debug "MiqVimVm::MiqVimVm: backingFile = #{backingFile}" if logger
+    logger.debug "MiqVimVm::MiqVimVm: controllerKey = #{controllerKey}, key = #{key}" if logger
 
     vmConfigSpec = VimHash.new("VirtualMachineConfigSpec") do |vmcs|
       vmcs.deviceChange = VimArray.new("ArrayOfVirtualDeviceConfigSpec") do |vmcs_vca|
@@ -858,9 +860,9 @@ class MiqVimVm
       end
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeDiskByFile: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeDiskByFile: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeDiskByFile: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeDiskByFile: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end # def removeDiskByFile
 
@@ -868,7 +870,7 @@ class MiqVimVm
     disk = getDeviceByBacking(backingFile)
     raise "resizeDisk: no virtual device associated with: #{backingFile}" unless disk
     raise "resizeDisk: cannot reduce the size of a disk" unless newSizeInKb >= Integer(disk.capacityInKB)
-    $vim_log.debug "MiqVimVm::resizeDisk: backingFile = #{backingFile} current size = #{device.capacityInKB} newSize = #{newSizeInKb} KB" if $vim_log
+    logger.debug "MiqVimVm::resizeDisk: backingFile = #{backingFile} current size = #{device.capacityInKB} newSize = #{newSizeInKb} KB" if logger
 
     vmConfigSpec = VimHash.new("VirtualMachineConfigSpec") do |vmcs|
       vmcs.deviceChange = VimArray.new("ArrayOfVirtualDeviceConfigSpec") do |vmcs_vca|
@@ -886,9 +888,9 @@ class MiqVimVm
       end
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resizeDisk: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resizeDisk: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resizeDisk: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).resizeDisk: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
   end
 
@@ -1040,9 +1042,9 @@ class MiqVimVm
       else
         aSpec = @miqAlarmSpecDisabled
       end
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: calling createAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: calling createAlarm" if logger
       alarmMor = @invObj.createAlarm(alarmManager, @vmMor, aSpec)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: returned from createAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).addMiqAlarm_locked: returned from createAlarm" if logger
       @miqAlarmMor = alarmMor
     ensure
       @cacheLock.sync_unlock if unlock
@@ -1073,9 +1075,9 @@ class MiqVimVm
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).getMiqAlarm_locked: calling getAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).getMiqAlarm_locked: calling getAlarm" if logger
       alarms = @invObj.getAlarm(@sic.alarmManager, @vmMor)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).getMiqAlarm_locked: returned from getAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).getMiqAlarm_locked: returned from getAlarm" if logger
       alarms.each do |aMor|
         ap = @invObj.getMoProp(aMor, "info.name")
         next unless ap['info']['name'][MIQ_ALARM_PFX]
@@ -1104,27 +1106,27 @@ class MiqVimVm
   def disableMiqAlarm
     @cacheLock.synchronize(:SH) do
       raise "disableMiqAlarm: MiqAlarm not configured for VM #{@dsPath}" unless (aMor = getMiqAlarm_locked)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).disableMiqAlarm: calling reconfigureAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).disableMiqAlarm: calling reconfigureAlarm" if logger
       @invObj.reconfigureAlarm(aMor, @miqAlarmSpecDisabled)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).disableMiqAlarm: returned from reconfigureAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).disableMiqAlarm: returned from reconfigureAlarm" if logger
     end
   end
 
   def enableMiqAlarm
     @cacheLock.synchronize(:SH) do
       raise "enableMiqAlarm: MiqAlarm not configured for VM #{@dsPath}" unless (aMor = getMiqAlarm_locked)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).enableMiqAlarm: calling reconfigureAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).enableMiqAlarm: calling reconfigureAlarm" if logger
       @invObj.reconfigureAlarm(aMor, @miqAlarmSpecEnabled)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).enableMiqAlarm: returned from reconfigureAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).enableMiqAlarm: returned from reconfigureAlarm" if logger
     end
   end
 
   def removeMiqAlarm
     @cacheLock.synchronize(:SH) do
       return unless (aMor = getMiqAlarm_locked)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeMiqAlarm: calling removeAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeMiqAlarm: calling removeAlarm" if logger
       @invObj.removeAlarm(aMor)
-      $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeMiqAlarm: returned from removeAlarm" if $vim_log
+      logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).removeMiqAlarm: returned from removeAlarm" if logger
       @miqAlarmMor = nil
     end
   end
@@ -1176,9 +1178,9 @@ class MiqVimVm
       end
     end
 
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setExtraConfigAttributes: calling reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setExtraConfigAttributes: calling reconfigVM_Task" if logger
     taskMor = @invObj.reconfigVM_Task(@vmMor, vmConfigSpec)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setExtraConfigAttributes: returned from reconfigVM_Task" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).setExtraConfigAttributes: returned from reconfigVM_Task" if logger
     waitForTask(taskMor)
 
     @extraConfig = nil
@@ -1286,16 +1288,16 @@ class MiqVimVm
   end
 
   def acquireMksTicket
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireMksTicket: calling acquireMksTicket" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireMksTicket: calling acquireMksTicket" if logger
     rv = @invObj.acquireMksTicket(@vmMor)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireMksTicket: returned from acquireMksTicket" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireMksTicket: returned from acquireMksTicket" if logger
     (rv)
   end # def acquireMksTicket
 
   def acquireTicket(ticketType)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireTicket: calling acquireTicket" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireTicket: calling acquireTicket" if logger
     rv = @invObj.acquireTicket(@vmMor, ticketType)
-    $vim_log.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireTicket: returned from acquireTicket" if $vim_log
+    logger.info "MiqVimVm(#{@invObj.server}, #{@invObj.username}).acquireTicket: returned from acquireTicket" if logger
     (rv)
   end # def acquireTicket
 

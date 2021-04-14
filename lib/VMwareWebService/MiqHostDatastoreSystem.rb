@@ -1,4 +1,8 @@
+require 'VMwareWebService/logging'
+
 class MiqHostDatastoreSystem
+  include VMwareWebService::Logging
+
   attr_reader :invObj
 
   def initialize(dssMor, invObj)
@@ -44,7 +48,7 @@ class MiqHostDatastoreSystem
     localPath = dsh.info.nas.name
     type    = dsh.info.nas.type
 
-    $vim_log.info "MiqHostDatastoreSystem.addNasDatastoreByName: remoteHost = #{remoteHost}, remotePath = #{remotePath}, localPath = #{localPath}"
+    logger.info "MiqHostDatastoreSystem.addNasDatastoreByName: remoteHost = #{remoteHost}, remotePath = #{remotePath}, localPath = #{localPath}"
     createNasDatastore(remoteHost, remotePath, localPath, accessMode, type)
   end
 end # class MiqHostDatastoreSystem

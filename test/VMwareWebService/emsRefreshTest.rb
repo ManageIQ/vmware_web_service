@@ -16,7 +16,7 @@ VC_ACCESSORS = [
   [:resourcePoolsByMor, :rp],
 ]
 
-$vim_log = Logger.new("./ems_refresh_test.log") unless USE_BROKER
+VMwareWebService.logger = Logger.new("./ems_refresh_test.log") unless USE_BROKER
 
 begin
   loop do

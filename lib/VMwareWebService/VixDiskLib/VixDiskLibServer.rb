@@ -11,7 +11,7 @@ require 'VMwareWebService/VixDiskLib/vdl_wrapper'
 class VixDiskLibError < RuntimeError
 end
 
-$vim_log = Logger.new $stdout
+$logger = Logger.new $stdout
 
 class VDDKFactory
   include DRb::DRbUndumped
@@ -43,14 +43,14 @@ class VDDKFactory
     thr = DRb.thread
     DRb.stop_service
     thr.join unless thr.nil?
-    $vim_log.info "Finished shutting down DRb"
+    $logger.info "Finished shutting down DRb"
   end
 
   def shut_down_service(msg)
-    $vim_log.info msg.to_s
+    $logger.info msg.to_s
     VdlWrapper.__exit__ if @started
     @running = true
-    $vim_log.info "VdlWrapper.__exit__ finished"
+    $logger.info "VdlWrapper.__exit__ finished"
     shut_down_drb
   end
 
@@ -97,7 +97,7 @@ begin
   DRb.primary_server.verbose = true
   uri_used = DRb.uri
   Thread.abort_on_exception = true
-  $vim_log.info "Started DRb service on URI #{uri_used}"
+  $logger.info "Started DRb service on URI #{uri_used}"
   #
   # Now write the URI used back to the parent (client) process to let it know which port was selected.
   #
@@ -113,21 +113,21 @@ begin
   trap('TERM') { vddk.shut_down_service("Termination Signal received"); exit }
 
   Thread.new do
-    $vim_log.info "Monitoring Thread"
+    $logger.info "Monitoring Thread"
     #
     # This will block until the SmartProxyWorker (our parent) exits
     #
     proc_reader.read
-    $vim_log.info "Shutting down VixDiskLibServer - Worker has exited"
+    $logger.info "Shutting down VixDiskLibServer - Worker has exited"
     exit
   end
   #
   # If we haven't been marked as started yet, wait for it.
   # We may return immediately because startup (and more) has already happened.
   #
-  $vim_log.info "calling watchdog for startup"
+  $logger.info "calling watchdog for startup"
   vddk.wait_for_status("started", 1800)
-  $vim_log.info "startup has happened, shutdown flag is #{vddk.shutdown}"
+  $logger.info "startup has happened, shutdown flag is #{vddk.shutdown}"
   #
   # Wait for the DRb server thread to finish before exiting.
   #
@@ -140,8 +140,8 @@ begin
   end
 
   vddk.shut_down_service("Shutting Down VixDiskLibServer")
-  $vim_log.info "Service has stopped"
+  $logger.info "Service has stopped"
 rescue => err
-  $vim_log.error "VixDiskLibServer ERROR: [#{err}]"
-  $vim_log.debug "VixDiskLibServer ERROR: [#{err.backtrace.join("\n")}]"
+  $logger.error "VixDiskLibServer ERROR: [#{err}]"
+  $logger.debug "VixDiskLibServer ERROR: [#{err.backtrace.join("\n")}]"
 end

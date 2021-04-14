@@ -2,8 +2,8 @@ require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
 require 'VMwareWebService/VimTypes'
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 $miq_wiredump = false
 

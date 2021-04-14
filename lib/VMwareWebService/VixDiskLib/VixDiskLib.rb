@@ -2,6 +2,8 @@ require 'drb/drb'
 require 'sync'
 require 'ffi-vix_disk_lib/const'
 require 'ffi-vix_disk_lib/enum'
+require 'VMwareWebService/logging'
+
 #
 # The path to the VixDiskLib directory to be added to the process' LD_LIBRARY_PATH
 #
@@ -17,6 +19,8 @@ end
 SERVER_PATH = File.expand_path(__dir__)
 
 class VixDiskLib
+  include VMwareWebService::Logging
+
   VIXDISKLIB_FLAG_OPEN_READ_ONLY = FFI::VixDiskLib::API::VIXDISKLIB_FLAG_OPEN_READ_ONLY
   @initialized = nil
   @drb_services = []
@@ -66,12 +70,12 @@ class VixDiskLib
       i = 0
       @drb_services.each do |vdl_service|
         i += 1
-        $vim_log.info "VixDiskLib.exit: shutting down service #{i} of #{@drb_services.size}" if $vim_log
+        logger.info "VixDiskLib.exit: shutting down service #{i} of #{@drb_services.size}" if logger
         unless vdl_service.nil?
           begin
             vdl_service.shutdown = true
           rescue DRb::DRbConnError
-            $vim_log.info "VixDiskLib.exit: DRb connection closed due to service shutdown.  Continuing" if $vim_log
+            logger.info "VixDiskLib.exit: DRb connection closed due to service shutdown.  Continuing" if logger
           end
         end
       end
@@ -95,8 +99,8 @@ class VixDiskLib
     end
 
     my_env["LD_LIBRARY_PATH"] = (my_env["LD_LIBRARY_PATH"].to_s.split(':') << VIXDISKLIB_PATH).compact.join(":")
-    raise VixDiskLibError, "VixDiskLib.connect() failed: No $vim_log defined" unless $vim_log
-    my_env["LOG_FILE"] = $vim_log.logdev.filename.to_s if $vim_log.logdev.kind_of?(Logger::LogDevice)
+    raise VixDiskLibError, "VixDiskLib.connect() failed: No logger defined" unless logger
+    my_env["LOG_FILE"] = logger.logdev.filename.to_s if logger.logdev.kind_of?(Logger::LogDevice)
 
     my_env
   end
@@ -112,7 +116,7 @@ class VixDiskLib
     server_cmd = "ruby #{SERVER_PATH}/VixDiskLibServer.rb"
     log_target = my_env["LOG_FILE"] ? [my_env["LOG_FILE"], "a"] : $stdout
 
-    $vim_log.info "VixDiskLib.start_service: running command = #{server_cmd}"
+    logger.info "VixDiskLib.start_service: running command = #{server_cmd}"
 
     pid = Kernel.spawn(my_env, server_cmd,
                        [:out, :err]     => log_target,
@@ -122,7 +126,7 @@ class VixDiskLib
     uri_writer.close
     proc_reader.close
     Process.detach(pid)
-    $vim_log.info "VixDiskLibServer Process #{pid} started" if $vim_log
+    logger.info "VixDiskLibServer Process #{pid} started" if logger
     DRb.start_service
     retry_num = 5
     uri       = get_uri(uri_reader)

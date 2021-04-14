@@ -4,8 +4,8 @@ require 'VMwareWebService/MiqVim'
 require 'fs/MiqFS/MiqFS'
 require 'fs/VimDatastoreFS/VimDatastoreFS'
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 $stdout.sync = true
 # $miq_wiredump = true

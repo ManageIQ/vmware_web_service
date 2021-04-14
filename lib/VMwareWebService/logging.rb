@@ -1,11 +1,10 @@
-require "logger"
-
 module VMwareWebService
   class << self
-    attr_writter :logger
+    attr_writer :logger
   end
 
   def self.logger
+    require "logger"
     @logger ||= Logger.new(nil)
   end
 

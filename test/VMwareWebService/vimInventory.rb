@@ -6,8 +6,8 @@ USERNAME = raise "please define USERNAME"
 PASSWORD = raise "please define PASSWORD"
 
 $stderr.sync = true
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 # $miq_wiredump       = true
 vim = MiqVimInventory.new(SERVER, USERNAME, PASSWORD)

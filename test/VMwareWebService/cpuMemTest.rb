@@ -1,8 +1,8 @@
 require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 TARGET_VM = "rpo-test2"
 vmMor = nil
