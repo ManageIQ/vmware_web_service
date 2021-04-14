@@ -21,7 +21,7 @@ class VimService
       :rev      => "6.5"
     )
 
-    @serviceInstanceMor = vim.serviceInstance
+    @serviceInstanceMor = rbvmomi_to_vim_types(vim.serviceInstance)
     @session_cookie     = nil
 
     @sic = retrieveServiceContent
@@ -37,15 +37,15 @@ class VimService
   end
 
   def acquireCloneTicket(sm)
-    sm.AcquireCloneTicket
+    rbvmomi_to_vim_types(vim_to_rbvmomi_types(sm).AcquireCloneTicket)
   end
 
   def acquireMksTicket(mor)
-    mor.AcquireMksTicket
+    rbvmomi_to_vim_types(vim_to_rbvmomi_types(mor).AcquireMksTicket)
   end
 
   def acquireTicket(mor, ticketType)
-    mor.AcquireTicket(:ticketType => ticketType)
+    rbvmomi_to_vim_types(vim_to_rbvmomi_types(mor).AcquireTicket(:ticketType => ticketType))
   end
 
   def addHost_Task(clustMor, spec, asConnected, resourcePool = nil, license = nil)
@@ -434,11 +434,13 @@ class VimService
   end
 
   def login(sessionManager, username, password)
-    sessionManager.Login(:userName => username, :password => password)
+    session_manager = vim_to_rbvmomi_types(sessionManager)
+    session_manager.Login(:userName => username, :password => password)
   end
 
   def logout(sessionManager)
-    sessionManager.Logout
+    session_manager = vim_to_rbvmomi_types(sessionManager)
+    session_manager.Logout
   end
 
   def logUserEvent(eventManager, entity, msg)
@@ -918,7 +920,7 @@ class VimService
   end
 
   def retrieveServiceContent
-    serviceInstanceMor.RetrieveServiceContent
+    rbvmomi_to_vim_types(vim.serviceContent)
   end
 
   def revertToCurrentSnapshot_Task(vmMor)
@@ -1195,5 +1197,42 @@ class VimService
       message.add "n1:specItemXml", specItemXml
     end
     (parse_response(response, 'XmlToCustomizationSpecItemResponse')['returnval'])
+  end
+
+  private
+
+  def rbvmomi_to_vim_types(obj)
+    case obj
+    when String
+      obj
+    when Array
+      obj.map { |i| rbvmomi_to_vim_types(i) }
+    when RbVmomi::BasicTypes::ManagedObject
+      VimString.new(obj._ref, obj.class.wsdl_name, :ManagedObjectReference)
+    when RbVmomi::BasicTypes::Base
+      VimHash.new(obj.class.wsdl_name).tap do |vim|
+        obj.props.each do |key, val|
+          vim.send("#{key}=", rbvmomi_to_vim_types(val))
+        end
+      end
+    else
+      raise ArgumentError, "Invalid type #{obj.class}"
+    end
+  end
+
+  def vim_to_rbvmomi_types(obj)
+    case obj
+    when Array
+      obj.map { |i| vim_to_rbvmomi_types(i) }
+    when VimString
+      if obj.xsiType == "ManagedObjectReference"
+        klass = "RbVmomi::VIM::#{obj.vimType}".constantize
+        klass.new(vim, obj.to_s)
+      else
+        obj.to_s
+      end
+    when String
+      obj
+    end
   end
 end
