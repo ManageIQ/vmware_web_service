@@ -60,7 +60,7 @@ module MiqVimDump
 
   def indentedPrint(s, i)
     if @dumpToLog
-      $vim_log.debug @globalIndent + ("    " * i) + s.to_s
+      logger.debug @globalIndent + ("    " * i) + s.to_s
     else
       print @globalIndent + "    " * i
       puts s

@@ -5,9 +5,9 @@ module MiqVimVdlConnectionMod
   #
   def vdlConnection
     require 'VMwareWebService/VixDiskLib/VixDiskLib'
-    VixDiskLib.init(->(s) { $vim_log.info  "VMware(VixDiskLib): #{s}" },
-                    ->(s) { $vim_log.warn  "VMware(VixDiskLib): #{s}" },
-                    ->(s) { $vim_log.error "VMware(VixDiskLib): #{s}" })
+    VixDiskLib.init(->(s) { logger.info  "VMware(VixDiskLib): #{s}" },
+                    ->(s) { logger.warn  "VMware(VixDiskLib): #{s}" },
+                    ->(s) { logger.error "VMware(VixDiskLib): #{s}" })
     $log.info "MiqVimVdlConnectionMod.vdlConnection: server - #{@server}"
     VixDiskLib.connect(:serverName => server,
                        :port       => 902,
@@ -17,7 +17,7 @@ module MiqVimVdlConnectionMod
   end
 
   def closeVdlConnection(connection)
-    $vim_log.info "MiqVimMod.closeVdlConnection: #{connection.serverName}"
+    logger.info "MiqVimMod.closeVdlConnection: #{connection.serverName}"
     connection.disconnect
   end
 end # module MiqVimVdlConnectionMod
@@ -31,9 +31,9 @@ module MiqVimVdlVcConnectionMod
   def vdlVcConnection
     require 'VMwareWebService/VixDiskLib/VixDiskLib'
 
-    VixDiskLib.init(->(s) { $vim_log.info  "VMware(VixDiskLib): #{s}" },
-                    ->(s) { $vim_log.warn  "VMware(VixDiskLib): #{s}" },
-                    ->(s) { $vim_log.error "VMware(VixDiskLib): #{s}" })
+    VixDiskLib.init(->(s) { logger.info  "VMware(VixDiskLib): #{s}" },
+                    ->(s) { logger.warn  "VMware(VixDiskLib): #{s}" },
+                    ->(s) { logger.error "VMware(VixDiskLib): #{s}" })
 
     $log.info "MiqVimVdlVcConnectionMod.vdlVcConnection: server - #{invObj.server}"
     thumb_print = if invObj.isVirtualCenter?

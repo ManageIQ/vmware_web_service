@@ -6,8 +6,8 @@ unless ARGV.length == 1 && ARGV[0] =~ /(add|remove)/
   exit 1
 end
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 targetVm = raise "please define"
 targetVmPath = nil

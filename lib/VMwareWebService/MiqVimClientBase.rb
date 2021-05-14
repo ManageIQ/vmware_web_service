@@ -8,33 +8,25 @@ require 'VMwareWebService/VimService'
 class MiqVimClientBase < VimService
   @@receiveTimeout = 120
 
-  attr_reader :server, :username, :password, :connId
+  attr_reader :server, :port, :username, :password, :connId
 
-  def initialize(server, username, password)
+  def initialize(server, port, username, password)
     @server   = server
+    @port     = port
     @username = username
     @password = password
     @connId   = "#{@server}_#{@username}"
 
     @receiveTimeout = @@receiveTimeout
 
-    on_http_client_init do |http_client, _headers|
-      http_client.ssl_config.verify_mode    = OpenSSL::SSL::VERIFY_NONE
-      http_client.ssl_config.verify_callback  = method(:verify_callback).to_proc
-      http_client.receive_timeout       = @receiveTimeout
-    end
+    super(sdk_uri)
 
-    on_log_header { |msg| $vim_log.info msg }
-    on_log_body   { |msg| $vim_log.debug msg } if $miq_wiredump
-
-    super(:uri => sdk_uri, :version => 1)
-
-    @connected  = false
-    @connLock = Sync.new
+    @connected = false
+    @connLock  = Sync.new
   end
 
   def sdk_uri
-    URI::HTTPS.build(:host => server, :path => "/sdk")
+    URI::HTTPS.build(:host => server, :port => port, :path => "/sdk")
   end
 
   def self.receiveTimeout=(val)
@@ -59,7 +51,7 @@ class MiqVimClientBase < VimService
   end
 
   def connect
-    $vim_log.debug "#{self.class.name}.connect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if $vim_log.debug?
+    logger.debug "#{self.class.name}.connect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if logger.debug?
     @connLock.synchronize(:EX) do
       return if @connected
       login(@sic.sessionManager, @username, @password)
@@ -68,7 +60,7 @@ class MiqVimClientBase < VimService
   end
 
   def disconnect
-    $vim_log.debug "#{self.class.name}.disconnect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if $vim_log.debug?
+    logger.debug "#{self.class.name}.disconnect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" if logger.debug?
     @connLock.synchronize(:EX) do
       return unless @connected
       logout(@sic.sessionManager)
