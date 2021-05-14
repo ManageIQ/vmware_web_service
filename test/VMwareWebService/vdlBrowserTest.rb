@@ -1,6 +1,6 @@
 require 'manageiq-gems-pending'
 
-require 'VMwareWebService/MiqVimBroker'
+require 'VMwareWebService/MiqVim'
 require 'VMwareWebService/VixDiskLib/VixDiskLib'
 
 $vim_log = Logger.new(STDOUT)
@@ -30,15 +30,9 @@ vDisk = nil
 vdlc  = nil
 
 begin
-  broker = MiqVimBroker.new(:client)
-  unless broker.serverAlive?
-    puts "Broker server isn't running"
-    exit
-  end
-
   t0 = Time.now
 
-  vim = broker.getMiqVim.new(SERVER, USERNAME, PASSWORD)
+  vim = MiqVim.new(SERVER, USERNAME, PASSWORD)
 
   puts "vim.class: #{vim.class}"
   puts "#{vim.server} is #{(vim.isVirtualCenter? ? 'VC' : 'ESX')}"

@@ -1,6 +1,5 @@
 require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
-require 'VMwareWebService/MiqVimBroker'
 
 $vim_log = Logger.new(STDOUT)
 $vim_log.level = Logger::WARN

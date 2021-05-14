@@ -1,6 +1,5 @@
 require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
-require 'VMwareWebService/MiqVimBroker'
 
 $vim_log = Logger.new(STDOUT)
 $vim_log.level = Logger::WARN
@@ -10,8 +9,7 @@ $vim_log.level = Logger::WARN
 TARGET_HOST = raise "please define"
 hMor = nil
 
-broker = MiqVimBroker.new(:client)
-vim = broker.getMiqVim(CLIENT, USERNAME, PASSWORD)
+vim = MiqVim.new(CLIENT, USERNAME, PASSWORD)
 
 miqHost = nil
 
