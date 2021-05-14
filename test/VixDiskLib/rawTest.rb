@@ -1,6 +1,5 @@
 $:.push("#{File.dirname(__FILE__)}/..")
 
-require "manageiq-password"
 require "VixDiskLib_raw"
 
 vmdk =  "/vmfs/volumes/StarM2-LUN1/VMmini-101/VMmini-101.vmdk"
@@ -13,45 +12,14 @@ conParms = {
   :password   => "",
 }
 
-def getKey
-  ManageIQ::Password::Key.new("aes-256-cbc", ManageIQ::Password::Key.generate_key("55555", "999999999"))
-end
-
-puts "***** cs1"
-cs1 = getKey
-puts cs1Str = cs1.encrypt("Hello cs1")
-puts cs1.decrypt(cs1Str)
-puts "***** cs1 OK"
-
 VixDiskLib_raw.init(lambda { |s| puts "INFO: #{s}" },
                     lambda { |s| puts "WARN: #{s}" },
                     lambda { |s| puts "ERROR: #{s}" }, nil)
 
-puts "***** cs2"
-cs2 = getKey
-puts cs2.decrypt(cs2.encrypt("Hello cs2"))
-puts "***** cs2 OK"
-
 connection = VixDiskLib_raw.connect(conParms)
-
-puts "***** cs3"
-cs3 = getKey
-puts cs3.decrypt(cs3.encrypt("Hello cs3"))
-puts "***** cs3 OK"
-
 dHandle = VixDiskLib_raw.open(connection, vmdk, VixDiskLib_raw::VIXDISKLIB_FLAG_OPEN_READ_ONLY)
-
-puts "***** cs4"
-cs4 = getKey
-puts cs4.decrypt(cs4.encrypt("Hello cs4"))
-puts "***** cs4 OK"
-
-puts "***** cs5"
-cs5 = getKey
-puts cs5.decrypt(cs1Str)
-puts "***** cs5 OK"
-
 dinfo = VixDiskLib_raw.getInfo(dHandle)
+
 puts
 puts "Disk info:"
 dinfo.each { |k, v| puts "\t#{k} => #{v}" }
