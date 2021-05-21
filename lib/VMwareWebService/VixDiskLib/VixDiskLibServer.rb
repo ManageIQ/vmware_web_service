@@ -11,9 +11,7 @@ require 'VMwareWebService/VixDiskLib/vdl_wrapper'
 class VixDiskLibError < RuntimeError
 end
 
-LOG_FILE    = ENV["LOG_FILE"]
-
-$vim_log = Logger.new LOG_FILE
+$vim_log = Logger.new $stdout
 
 class VDDKFactory
   include DRb::DRbUndumped

@@ -4,9 +4,7 @@ require 'ffi-vix_disk_lib/api_wrapper'
 require 'VMwareWebService/VimTypes'
 require 'time'
 
-LOG_FILE    = ENV["LOG_FILE"]
-
-$vim_log = Logger.new LOG_FILE
+$vim_log = Logger.new $stdout
 
 VixDiskLibApi = FFI::VixDiskLib::ApiWrapper
 class VdlWrapper
