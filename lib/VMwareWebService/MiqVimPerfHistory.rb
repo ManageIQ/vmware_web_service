@@ -98,9 +98,9 @@ class MiqVimPerfHistory
   end
 
   def queryProviderSummary(mor)
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryProviderSummary: calling queryPerfProviderSummary" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryProviderSummary: calling queryPerfProviderSummary"
     psum = @invObj.queryPerfProviderSummary(@perfManager, mor)
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryProviderSummary: returned from queryPerfProviderSummary" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryProviderSummary: returned from queryPerfProviderSummary"
     (psum)
   end
 
@@ -111,9 +111,9 @@ class MiqVimPerfHistory
       beginTime  = ah[:beginTime] || nil
       endTime    = ah[:endTime] || nil
     end
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).availMetricsForEntity: calling queryAvailablePerfMetric" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).availMetricsForEntity: calling queryAvailablePerfMetric"
     pmids = @invObj.queryAvailablePerfMetric(@perfManager, mor, beginTime, endTime, intervalId)
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).availMetricsForEntity: returned from queryAvailablePerfMetric" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).availMetricsForEntity: returned from queryAvailablePerfMetric"
     (pmids)
   end
 
@@ -124,9 +124,9 @@ class MiqVimPerfHistory
     ah[:entity]     = entnty
     pqs             = getPerfQuerySpec(ah)
 
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerf: calling queryPerf" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerf: calling queryPerf"
     umPem = @invObj.queryPerf(@perfManager, pqs)[0]
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerf: returned from queryPerf" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerf: returned from queryPerf"
 
     #
     # Construct an array of (timestamp, value) pairs.
@@ -154,9 +154,9 @@ class MiqVimPerfHistory
       aa.each { |ah| pqsa << getPerfQuerySpec(ah) }
     end
 
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfMulti: calling queryPerf" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfMulti: calling queryPerf"
     pema = @invObj.queryPerf(@perfManager, querySpec)
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfMulti: returned from queryPerf" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfMulti: returned from queryPerf"
 
     return(nil) unless pema
 
@@ -168,9 +168,9 @@ class MiqVimPerfHistory
     ah[:entity]     = entnty
     pqs             = getPerfQuerySpec(ah)
 
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfComposite: calling queryPerfComposite" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfComposite: calling queryPerfComposite"
     umPem = @invObj.queryPerfComposite(@perfManager, pqs)
-    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfComposite: returned from queryPerfComposite" if logger
+    logger.info "MiqVimPerfHistory(#{@invObj.server}, #{@invObj.username}).queryPerfComposite: returned from queryPerfComposite"
 
     umPem['childEntity'] = [umPem['childEntity']] if umPem['childEntity'].kind_of? Hash
 

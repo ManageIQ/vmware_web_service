@@ -70,12 +70,12 @@ class VixDiskLib
       i = 0
       @drb_services.each do |vdl_service|
         i += 1
-        logger.info "VixDiskLib.exit: shutting down service #{i} of #{@drb_services.size}" if logger
+        logger.info "VixDiskLib.exit: shutting down service #{i} of #{@drb_services.size}"
         unless vdl_service.nil?
           begin
             vdl_service.shutdown = true
           rescue DRb::DRbConnError
-            logger.info "VixDiskLib.exit: DRb connection closed due to service shutdown.  Continuing" if logger
+            logger.info "VixDiskLib.exit: DRb connection closed due to service shutdown.  Continuing"
           end
         end
       end
@@ -126,7 +126,7 @@ class VixDiskLib
     uri_writer.close
     proc_reader.close
     Process.detach(pid)
-    logger.info "VixDiskLibServer Process #{pid} started" if logger
+    logger.info "VixDiskLibServer Process #{pid} started"
     DRb.start_service
     retry_num = 5
     uri       = get_uri(uri_reader)

@@ -110,49 +110,49 @@ class MiqVimHost
   end
 
   def enterMaintenanceMode(timeout = 0, evacuatePoweredOffVms = false, wait = true)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: calling enterMaintenanceMode_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: calling enterMaintenanceMode_Task"
     taskMor = @invObj.enterMaintenanceMode_Task(@hMor, timeout, evacuatePoweredOffVms)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: returned from enterMaintenanceMode_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).enterMaintenanceMode: returned from enterMaintenanceMode_Task"
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def exitMaintenanceMode(timeout = 0, wait = true)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: calling exitMaintenanceMode_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: calling exitMaintenanceMode_Task"
     taskMor = @invObj.exitMaintenanceMode_Task(@hMor, timeout)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: returned from exitMaintenanceMode_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).exitMaintenanceMode: returned from exitMaintenanceMode_Task"
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def powerDownHostToStandBy(timeout = 0, evacuatePoweredOffVms = false, wait = true)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: calling powerDownHostToStandBy_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: calling powerDownHostToStandBy_Task"
     taskMor = @invObj.powerDownHostToStandBy_Task(@hMor, timeout, evacuatePoweredOffVms)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: returned from powerDownHostToStandBy_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerDownHostToStandBy: returned from powerDownHostToStandBy_Task"
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def powerUpHostFromStandBy(timeout = 0, wait = true)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: calling powerUpHostFromStandBy_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: calling powerUpHostFromStandBy_Task"
     taskMor = @invObj.powerUpHostFromStandBy_Task(@hMor, timeout)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: returned from powerUpHostFromStandBy_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).powerUpHostFromStandBy: returned from powerUpHostFromStandBy_Task"
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def rebootHost(force = false, wait = true)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: calling rebootHost_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: calling rebootHost_Task"
     taskMor = @invObj.rebootHost_Task(@hMor, force)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: returned from rebootHost_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).rebootHost: returned from rebootHost_Task"
     return taskMor unless wait
     waitForTask(taskMor)
   end
 
   def shutdownHost(force = false, wait = true)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: calling shutdownHost_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: calling shutdownHost_Task"
     taskMor = @invObj.shutdownHost_Task(@hMor, force)
-    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: returned from shutdownHost_Task" if logger
+    logger.info "MiqVimHost(#{@invObj.server}, #{@invObj.username}).shutdownHost: returned from shutdownHost_Task"
     return taskMor unless wait
     waitForTask(taskMor)
   end

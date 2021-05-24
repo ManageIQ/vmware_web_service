@@ -130,13 +130,13 @@ class MiqVimDataStore
 
     taskMor = nil
     if recurse
-      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: calling searchDatastoreSubFolders_Task" if logger
+      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: calling searchDatastoreSubFolders_Task"
       taskMor = @invObj.searchDatastoreSubFolders_Task(browserMor, dsPath, searchSpec)
-      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: returned from searchDatastoreSubFolders_Task" if logger
+      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: returned from searchDatastoreSubFolders_Task"
     else
-      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: calling searchDatastore_Task" if logger
+      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: calling searchDatastore_Task"
       taskMor = @invObj.searchDatastore_Task(browserMor, dsPath, searchSpec)
-      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: returned from searchDatastore_Task" if logger
+      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsSearch: returned from searchDatastore_Task"
     end
 
     retObj = waitForTask(taskMor)
@@ -203,9 +203,9 @@ class MiqVimDataStore
         hdbs.sortFoldersFirst = "true"
       end
 
-      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsHash_locked: calling searchDatastoreSubFolders_Task" if logger
+      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsHash_locked: calling searchDatastoreSubFolders_Task"
       taskMor = @invObj.searchDatastoreSubFolders_Task(browser_locked, "[#{@name}]", searchSpec)
-      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsHash_locked: returned from searchDatastoreSubFolders_Task" if logger
+      logger.info "MiqVimDataStore(#{@invObj.server}, #{@invObj.username}).dsHash_locked: returned from searchDatastoreSubFolders_Task"
 
       retObj = waitForTask(taskMor)
       retObj = [retObj] unless retObj.kind_of?(Array)

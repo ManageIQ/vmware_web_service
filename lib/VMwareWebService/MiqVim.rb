@@ -279,16 +279,16 @@ class MiqVim < MiqVimInventory
   def start_monitor_updates_thread(preLoad)
     checkForOrphanedMonitors
     log_prefix          = "MiqVim.initialize (#{@connId})"
-    logger.info "#{log_prefix}: starting update monitor thread" if logger
+    logger.info "#{log_prefix}: starting update monitor thread"
     @updateThread = Thread.new { monitor(preLoad) }
     @updateThread[:vim_connection_id] = connId
-    logger.info "#{log_prefix}: waiting for update monitor to become ready" if logger
+    logger.info "#{log_prefix}: waiting for update monitor to become ready"
     until @updateMonitorReady
       raise @error unless @error.nil?
       break unless @updateThread.alive?
       Thread.pass
     end
-    logger.info "#{log_prefix}: update monitor ready" if logger
+    logger.info "#{log_prefix}: update monitor ready"
   end
 
   def checkForOrphanedMonitors
@@ -308,7 +308,7 @@ class MiqVim < MiqVimInventory
     begin
       monitorUpdates(preLoad)
     rescue Exception => err
-      logger.info "#{log_prefix}: returned from monitorUpdates via #{err.class} exception" if logger
+      logger.info "#{log_prefix}: returned from monitorUpdates via #{err.class} exception"
       @error = err
     end
   end
@@ -318,9 +318,9 @@ class MiqVim < MiqVimInventory
     stopUpdateMonitor
     begin
       if @updateThread != Thread.current && @updateThread.alive?
-        logger.info "#{log_prefix}: waiting for Update Monitor Thread...Starting" if logger
+        logger.info "#{log_prefix}: waiting for Update Monitor Thread...Starting"
         @updateThread.join
-        logger.info "#{log_prefix}: waiting for Update Monitor Thread...Complete" if logger
+        logger.info "#{log_prefix}: waiting for Update Monitor Thread...Complete"
       end
     rescue
     end

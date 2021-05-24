@@ -27,9 +27,9 @@ module MiqVimUpdate
 
     while truncated
       begin
-        logger.info "#{log_prefix}: call to waitForUpdates...Starting" if logger
+        logger.info "#{log_prefix}: call to waitForUpdates...Starting"
         updateSet = waitForUpdatesEx(@umPropCol, version, wait_options)
-        logger.info "#{log_prefix}: call to waitForUpdates...Complete" if logger
+        logger.info "#{log_prefix}: call to waitForUpdates...Complete"
 
         version   = updateSet.version
         truncated = updateSet.truncated
@@ -46,7 +46,7 @@ module MiqVimUpdate
         # Help out the Ruby Garbage Collector by resetting variables pointing to large objects back to nil
         updateSet = nil
       rescue HTTPClient::ReceiveTimeoutError => terr
-        logger.info "#{log_prefix}: call to waitForUpdates...Timeout" if logger
+        logger.info "#{log_prefix}: call to waitForUpdates...Timeout"
         raise terr if !isAlive?
         retry
       end
@@ -58,9 +58,9 @@ module MiqVimUpdate
   def monitorUpdatesSince(version)
     log_prefix = "MiqVimUpdate.monitorUpdatesSince (#{@connId})"
     begin
-      logger.info "#{log_prefix}: call to waitForUpdates...Starting (version = #{version})" if logger
+      logger.info "#{log_prefix}: call to waitForUpdates...Starting (version = #{version})"
       updateSet = waitForUpdatesEx(@umPropCol, version, :max_wait => @maxWait)
-      logger.info "#{log_prefix}: call to waitForUpdates...Complete (version = #{version})" if logger
+      logger.info "#{log_prefix}: call to waitForUpdates...Complete (version = #{version})"
       return version if updateSet.nil?
 
       version = updateSet.version
@@ -70,11 +70,11 @@ module MiqVimUpdate
       updateSet.filterSet.each do |fu|
         next if fu.filter != @filterSpecRef
         fu.objectSet.each do |objUpdate|
-          logger.info "#{log_prefix}: applying update...Starting (version = #{version})" if logger
+          logger.info "#{log_prefix}: applying update...Starting (version = #{version})"
           @cacheLock.synchronize(:EX) do
             updateObject(objUpdate)
           end
-          logger.info "#{log_prefix}: applying update...Complete (version = #{version})" if logger
+          logger.info "#{log_prefix}: applying update...Complete (version = #{version})"
           Thread.pass
         end
       end # updateSet.filterSet.each
@@ -82,7 +82,7 @@ module MiqVimUpdate
       updateSet = nil
       return version
     rescue HTTPClient::ReceiveTimeoutError => terr
-      logger.info "#{log_prefix}: call to waitForUpdates...Timeout (version = #{version})" if logger
+      logger.info "#{log_prefix}: call to waitForUpdates...Timeout (version = #{version})"
       retry if isAlive?
       logger.warn "#{log_prefix}: connection lost"
       raise terr

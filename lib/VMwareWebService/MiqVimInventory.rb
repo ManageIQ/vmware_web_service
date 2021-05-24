@@ -1980,14 +1980,14 @@ class MiqVimInventory < MiqVimClientBase
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
-      logger.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: calling retrieveProperties" if logger
+      logger.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: calling retrieveProperties"
 
       @inventoryHash = {}
       retrievePropertiesIter(@propCol, @spec) do |oc|
         (@inventoryHash[oc.obj.vimType] ||= []) << oc.obj
       end
 
-      logger.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: returned from retrieveProperties" if logger
+      logger.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: returned from retrieveProperties"
     ensure
       @cacheLock.sync_unlock if unlock
     end
@@ -2008,9 +2008,9 @@ class MiqVimInventory < MiqVimClientBase
   # Generate a user event associated with the given managed object.
   #
   def logUserEvent(entity, msg)
-    logger.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: calling logUserEvent" if logger
+    logger.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: calling logUserEvent"
     super(@sic.eventManager, entity, msg)
-    logger.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: returned from logUserEvent" if logger
+    logger.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: returned from logUserEvent"
   end
 
   ##################################
@@ -2204,7 +2204,7 @@ class MiqVimInventory < MiqVimClientBase
   def waitForTask(tmor, className = nil)
     className ||= self.class.to_s
 
-    logger.info "#{className}(#{@server}, #{@username})::waitForTask(#{tmor})" if logger
+    logger.info "#{className}(#{@server}, #{@username})::waitForTask(#{tmor})"
     args = VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
       pfsa << VimHash.new("PropertyFilterSpec") do |pfs|
         pfs.propSet = VimArray.new("ArrayOfPropertySpec") do |psa|
@@ -2240,14 +2240,14 @@ class MiqVimInventory < MiqVimClientBase
     end
 
     raise VimFault.new(error) if state == TaskInfoState::Error
-    logger.info "#{className}(#{@server}, #{@username})::waitForTask: result = #{result}" if logger
+    logger.info "#{className}(#{@server}, #{@username})::waitForTask: result = #{result}"
     result
   end # def waitForTask
 
   def pollTask(tmor, className = nil)
     className ||= self.class.to_s
 
-    logger.info "#{className}(#{@server}, #{@username})::pollTask(#{tmor})" if logger
+    logger.info "#{className}(#{@server}, #{@username})::pollTask(#{tmor})"
     args = VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
       pfsa << VimHash.new("PropertyFilterSpec") do |pfs|
         pfs.propSet = VimArray.new("ArrayOfPropertySpec") do |psa|
@@ -2323,9 +2323,9 @@ class MiqVimInventory < MiqVimClientBase
       end
     end
 
-    logger.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: calling retrieveProperties(#{mo.vimType})" if logger
+    logger.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: calling retrieveProperties(#{mo.vimType})"
     oca = retrievePropertiesCompat(@propCol, pfSpec)
-    logger.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: return from retrieveProperties(#{mo.vimType})" if logger
+    logger.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: return from retrieveProperties(#{mo.vimType})"
 
     return nil if !oca || !oca[0] || !oca[0].propSet
 
