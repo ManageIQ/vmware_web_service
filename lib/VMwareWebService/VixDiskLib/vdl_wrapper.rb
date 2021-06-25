@@ -2,14 +2,14 @@ require 'drb/drb'
 require 'sync'
 require 'ffi-vix_disk_lib/api_wrapper'
 require 'VMwareWebService/VimTypes'
+require 'VMwareWebService/logging'
 require 'time'
-
-$logger = Logger.new $stdout
 
 VixDiskLibApi = FFI::VixDiskLib::ApiWrapper
 class VdlWrapper
   extend FFI::VixDiskLib::ApiWrapper
   include DRb::DRbUndumped
+  include VMwareWebService::Logging
 
   @initialized       = false
   @server_disk_count = 0
@@ -20,9 +20,9 @@ class VdlWrapper
     @vddk = server
   end
 
-  @info_log  = ->(s) { $logger.info "VMware(VixDiskLib): #{s}" }
-  @warn_log  = ->(s) { $logger.warn "VMware(VixDiskLib): #{s}" }
-  @error_log = ->(s) { $logger.error "VMware(VixDiskLib): #{s}" }
+  @info_log  = ->(s) { logger.info "VMware(VixDiskLib): #{s}" }
+  @warn_log  = ->(s) { logger.warn "VMware(VixDiskLib): #{s}" }
+  @error_log = ->(s) { logger.error "VMware(VixDiskLib): #{s}" }
 
   def self.init
     return if @initialized
@@ -32,10 +32,10 @@ class VdlWrapper
   end
 
   def self.dumpDisks(server_name)
-    $logger.warn "*** Open VdlDisks for server #{server_name}" if $logger
+    logger.warn "*** Open VdlDisks for server #{server_name}"
     @connection.dumpDisks unless @connection.nil? || @connection.serverName != server_name
     @vddk.running = true
-    $logger.warn "*** Open VdlDisks end" if $logger
+    logger.warn "*** Open VdlDisks end"
   end
 
   def self.inc_server_disk_count
@@ -51,7 +51,7 @@ class VdlWrapper
   end
 
   def self.connect(connect_parms)
-    $logger.info "VdlWrapper.connect: #{connect_parms[:server_name]}" if $logger
+    logger.info "VdlWrapper.connect: #{connect_parms[:server_name]}"
     raise VixDiskLibError, "VixDiskLib is not initialized" unless @initialized
     raise VixDiskLibError, "Already connected to #{@connection.serverName}" if @connection
     @connection = VdlConnection.new(connect_parms, @vddk)
@@ -59,7 +59,7 @@ class VdlWrapper
   end
 
   def self.__disconnect__(conn_obj)
-    $logger.info "VdlWrapper.__disconnect__: #{conn_obj.serverName}" if $logger
+    logger.info "VdlWrapper.__disconnect__: #{conn_obj.serverName}"
     raise VixDiskLibError, "VixDiskLib is not initialized" unless @initialized
     FFI::VixDiskLib::API.disconnect(conn_obj.vdl_connection)
     @connection = nil
@@ -74,7 +74,7 @@ class VdlWrapper
     # the DRb service (this process) to segfault during the exit sequence.
     #
     # super
-    $logger.info "VixDiskLib has exited cleanly"
+    logger.info "VixDiskLib has exited cleanly"
     @vddk.running = true
     @vddk.shutdown = true
     @initialized = nil
@@ -90,7 +90,7 @@ class VdlConnection
 
   def initialize(connect_parms, vddk)
     @serverName     = connect_parms[:server_name]
-    $logger.info "VdlConnection.initialize: #{@serverName}" if $logger
+    logger.info "VdlConnection.initialize: #{@serverName}"
     @vdl_connection  = VixDiskLibApi.connect(connect_parms)
     @disks           = []
     @disk_lock       = Sync.new
@@ -98,10 +98,10 @@ class VdlConnection
   end
 
   def disconnect
-    $logger.info "VdlConnection.disconnect: #{@serverName}" if $logger
+    logger.info "VdlConnection.disconnect: #{@serverName}"
     @disk_lock.synchronize(:EX) do
       if !@vdl_connection
-        $logger.warn "VDLConnection.disconnect: server: #{@serverName} not connected" if $logger
+        logger.warn "VDLConnection.disconnect: server: #{@serverName} not connected"
       else
         __close_disks__
         VdlWrapper.__disconnect__(self)
@@ -117,7 +117,7 @@ class VdlConnection
     @vddk.running = true
     @disk_lock.sync_lock(:SH) if (unlock = !@disk_lock.sync_locked?)
     @disks.each do |d|
-      $logger.warn "    VdlDisk: #{d.path}, opened: #{d.timeStamp}" if $logger
+      logger.warn "    VdlDisk: #{d.path}, opened: #{d.timeStamp}"
     end
   ensure
     @disk_lock.sync_unlock if unlock
@@ -130,11 +130,11 @@ class VdlConnection
       disk = VdlDisk.new(self, path, flags)
       @disks << disk
       nd = VdlWrapper.inc_server_disk_count
-      $logger.info "VdlConnection.getDisk: #{@serverName} open disks = #{nd}" if $logger
-      if nd >= MAX_DISK_WARN && $logger
-        $logger.warn "VdlConnection::getDisk: connection to server: #{@serverName}"
-        $logger.warn "VdlConnection::getDisk: number of open disks = #{nd}"
-        $logger.warn "VdlConnection::getDisk: subsequent open calls may fail"
+      logger.info "VdlConnection.getDisk: #{@serverName} open disks = #{nd}"
+      if nd >= MAX_DISK_WARN
+        logger.warn "VdlConnection::getDisk: connection to server: #{@serverName}"
+        logger.warn "VdlConnection::getDisk: number of open disks = #{nd}"
+        logger.warn "VdlConnection::getDisk: subsequent open calls may fail"
         VdlWrapper.dumpDisks(@serverName)
       end
       return disk
@@ -147,11 +147,11 @@ class VdlConnection
     @vddk.running = true
     VixDiskLibApi.close(diskObj.handle)
     if !@vdl_connection
-      $logger.warn "VDLConnection.disconnect: server: #{@serverName} not connected" if $logger
+      logger.warn "VDLConnection.disconnect: server: #{@serverName} not connected"
     else
       @disks.delete(diskObj)
       nd = VdlWrapper.dec_server_disk_count
-      $logger.warn "VdlConnection.__close_disk__: #{@serverName} open disks = #{nd}" if $logger
+      logger.warn "VdlConnection.__close_disk__: #{@serverName} open disks = #{nd}"
     end
   ensure
     @disk_lock.sync_unlock if unlock
@@ -161,7 +161,7 @@ class VdlConnection
     raise VixDiskLibError,
           "VdlConnection::__close_disks__: exclusive disk lock not held" unless @disk_lock.sync_exclusive?
     if !@vdl_connection
-      $logger.warn "VDLConnection.disconnect: server: #{@serverName} not connected" if $logger
+      logger.warn "VDLConnection.disconnect: server: #{@serverName} not connected"
     else
       @disks.each(&:close)
     end
@@ -171,6 +171,7 @@ end # class VdlConnection
 
 class VdlDisk
   include DRb::DRbUndumped
+  include VMwareWebService::Logging
 
   attr_reader :path, :flags, :handle, :sectorSize, :timeStamp, :info
 
@@ -178,7 +179,7 @@ class VdlDisk
 
   def initialize(conn_obj, path, flags)
     @time_stamp = Time.now
-    $logger.debug "VdlDisk.new <#{object_id}>: opening #{path}" if $logger && $logger.debug?
+    logger.debug { "VdlDisk.new <#{object_id}>: opening #{path}" }
     @connection = conn_obj
     @handle = VixDiskLibApi.open(@connection.vdl_connection, path, flags)
     @path = path
@@ -194,11 +195,11 @@ class VdlDisk
   end
 
   def close
-    $logger.debug "VdlDisk.close <#{ssId}>: closing #{@path}" if $logger && $logger.debug?
+    logger.debug { "VdlDisk.close <#{ssId}>: closing #{@path}" }
     @vddk.running = true
     @handle_lock.synchronize(:EX) do
       if !@handle
-        $logger.debug "VdlDisk.close: #{@path} not open" if $logger && $logger.debug?
+        logger.debug { "VdlDisk.close: #{@path} not open" }
       else
         @connection.__close_disk__(self)
         @handle = nil
