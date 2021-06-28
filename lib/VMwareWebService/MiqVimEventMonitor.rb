@@ -1,6 +1,9 @@
+require 'VMwareWebService/logging'
 require 'VMwareWebService/MiqVimInventory'
 
 class MiqVimEventMonitor < MiqVimInventory
+  include VMwareWebService::Logging
+
   def initialize(server, username, password, eventFilterSpec = nil, pgSize = 100, maxWait = 60)
     super(server, username, password, :cache_scope_event_monitor)
 
@@ -72,25 +75,25 @@ class MiqVimEventMonitor < MiqVimInventory
             end
           rescue HTTPClient::ReceiveTimeoutError => terr
             retry if isAlive?
-            $vim_log.debug "MiqVimEventMonitor.monitorEvents: connection lost"
+            logger.debug "MiqVimEventMonitor.monitorEvents: connection lost"
             raise
           end
       rescue SignalException => err
       ensure
-        $vim_log.info "MiqVimEventMonitor: calling destroyPropertyFilter"
+        logger.info "MiqVimEventMonitor: calling destroyPropertyFilter"
         destroyPropertyFilter(filterSpecRef) if filterSpecRef
-        $vim_log.info "MiqVimEventMonitor: returned from destroyPropertyFilter"
+        logger.info "MiqVimEventMonitor: returned from destroyPropertyFilter"
         disconnect
       end
   end # def monitorEvents
 
   def stop
-    $vim_log.info "MiqVimEventMonitor stopping..."
+    logger.info "MiqVimEventMonitor stopping..."
     @_monitorEvents = false
     if @emPropCol
-      $vim_log.info "MiqVimEventMonitor: calling cancelWaitForUpdates"
+      logger.info "MiqVimEventMonitor: calling cancelWaitForUpdates"
       cancelWaitForUpdates(@emPropCol)
-      $vim_log.info "MiqVimEventMonitor: returned from cancelWaitForUpdates"
+      logger.info "MiqVimEventMonitor: returned from cancelWaitForUpdates"
     end
   end
 
@@ -99,14 +102,14 @@ class MiqVimEventMonitor < MiqVimInventory
 
   def fixupEvent(event)
     unless event.kind_of?(Hash)
-      $vim_log.error "MiqVimEventMonitor.fixupEvent: Expecting Hash, got #{event.class}"
+      logger.error "MiqVimEventMonitor.fixupEvent: Expecting Hash, got #{event.class}"
       if event.kind_of?(Array)
         event.each_index do |i|
-          $vim_log.error "MiqVimEventMonitor.fixupEvent: event[#{i}] is a #{event[i].class}"
-          $vim_log.error "\tMiqVimEventMonitor.fixupEvent: event[#{i}] = #{event[i].inspect}"
+          logger.error "MiqVimEventMonitor.fixupEvent: event[#{i}] is a #{event[i].class}"
+          logger.error "\tMiqVimEventMonitor.fixupEvent: event[#{i}] = #{event[i].inspect}"
         end
       else
-        $vim_log.error "\tMiqVimEventMonitor.fixupEvent: event = #{event.inspect}"
+        logger.error "\tMiqVimEventMonitor.fixupEvent: event = #{event.inspect}"
       end
       raise "MiqVimEventMonitor.fixupEvent: Expecting Hash, got #{event.class}"
     end
@@ -163,8 +166,8 @@ class MiqVimEventMonitor < MiqVimInventory
     begin
       cancelTask(String.new(e['info']['task'].to_str))
     rescue => err
-      $vim_log.error err.to_s
-      $vim_log.error err.backtrace.join("\n")
+      logger.error err.to_s
+      logger.error err.backtrace.join("\n")
     end
   end
 end # module MiqVimEventMonitor

@@ -25,19 +25,19 @@ class MiqVimInventory < MiqVimClientBase
     case cacheScope
     when :cache_scope_full
       @propMap = FullPropMap
-      $vim_log.info "MiqVimInventory: using property map FullPropMap"
+      logger.info "MiqVimInventory: using property map FullPropMap"
     when :cache_scope_ems_refresh
       @propMap = EmsRefreshPropMap
-      $vim_log.info "MiqVimInventory: using property map EmsRefreshPropMap"
+      logger.info "MiqVimInventory: using property map EmsRefreshPropMap"
     when :cache_scope_core
       @propMap = CorePropMap
-      $vim_log.info "MiqVimInventory: using property map CorePropMap"
+      logger.info "MiqVimInventory: using property map CorePropMap"
     when :cache_scope_event_monitor
       @propMap = EventMonitorPropMap
-      $vim_log.info "MiqVimInventory: using property map EventMonitorPropMap"
+      logger.info "MiqVimInventory: using property map EventMonitorPropMap"
     else
       @propMap = FullPropMap
-      $vim_log.info "MiqVimInventory: unrecognized cache scope #{cacheScope}, using FullPropMap"
+      logger.info "MiqVimInventory: unrecognized cache scope #{cacheScope}, using FullPropMap"
     end
 
     # If we are connected to a virtual center then we can access additional properties
@@ -87,11 +87,11 @@ class MiqVimInventory < MiqVimClientBase
 
         unless instance_variable_get(hnm).nil?
           hnmc = instance_variable_get(hnm).keys.length
-          $vim_log.info "#{pref}#{hnm}: #{hnmc}"
+          logger.info "#{pref}#{hnm}: #{hnmc}"
         end
         unless instance_variable_get(hn).nil?
           hnc = instance_variable_get(hn).keys.length
-          $vim_log.info "#{pref}#{hn}: #{hnc}"
+          logger.info "#{pref}#{hn}: #{hnc}"
         end
       end
     end
@@ -107,37 +107,37 @@ class MiqVimInventory < MiqVimClientBase
         hashByKey = pm[:keyPath] ? instance_variable_get(hn) : nil
 
         if hashByMor.nil?
-          $vim_log.info "#{pref}#{hnm}: is nil"
+          logger.info "#{pref}#{hnm}: is nil"
           next
         end
 
         keya = hashByMor.keys
         obja = hashByMor.values
-        $vim_log.info "#{pref}#{hnm}: #keys = #{keya.length}"
-        $vim_log.info "#{pref}#{hnm}: #objects = #{obja.length}"
+        logger.info "#{pref}#{hnm}: #keys = #{keya.length}"
+        logger.info "#{pref}#{hnm}: #objects = #{obja.length}"
         obja.compact!
         obja.uniq!
-        $vim_log.info "#{pref}#{hnm}: #unique non-nill objects = #{obja.length}"
+        logger.info "#{pref}#{hnm}: #unique non-nill objects = #{obja.length}"
 
         unless hashByKey.nil?
           keyb = hashByKey.keys
           objb = hashByKey.values
-          $vim_log.info "#{pref}#{hn}: #keys = #{keyb.length}"
-          $vim_log.info "#{pref}#{hn}: #objects = #{objb.length}"
+          logger.info "#{pref}#{hn}: #keys = #{keyb.length}"
+          logger.info "#{pref}#{hn}: #objects = #{objb.length}"
           objb.compact!
           objb.uniq!
-          $vim_log.info "#{pref}#{hn}: #unique non-nill objects = #{objb.length}"
+          logger.info "#{pref}#{hn}: #unique non-nill objects = #{objb.length}"
           obja.concat(objb).uniq!
         end
-        $vim_log.info "#{pref}TOTAL: #unique non-nill objects = #{obja.length}"
+        logger.info "#{pref}TOTAL: #unique non-nill objects = #{obja.length}"
         cacheSz = Marshal.dump(obja).length
-        $vim_log.info "#{pref}TOTAL: size of objects = #{cacheSz}"
-        $vim_log.info "#{pref}****"
+        logger.info "#{pref}TOTAL: size of objects = #{cacheSz}"
+        logger.info "#{pref}****"
         totalCacheSz += cacheSz
       end
-      $vim_log.info "#{pref}****************"
-      $vim_log.info "#{pref}TOTAL: cache size = #{totalCacheSz}"
-      $vim_log.info "#{pref}****************"
+      logger.info "#{pref}****************"
+      logger.info "#{pref}TOTAL: cache size = #{totalCacheSz}"
+      logger.info "#{pref}****************"
     end
     totalCacheSz
   end
@@ -218,7 +218,7 @@ class MiqVimInventory < MiqVimClientBase
   end
 
   def resetCache
-    $vim_log.info "MiqVimInventory.resetCache: clearing cache for #{@connId}"
+    logger.info "MiqVimInventory.resetCache: clearing cache for #{@connId}"
     @cacheLock.synchronize(:EX) do
       @inventoryHash = nil
 
@@ -227,7 +227,7 @@ class MiqVimInventory < MiqVimClientBase
         instance_variable_set(pm[:baseName], nil)
       end
     end
-    $vim_log.info "MiqVimInventory.resetCache: cleared cache for #{@connId}"
+    logger.info "MiqVimInventory.resetCache: cleared cache for #{@connId}"
   end # def resetCache
 
   def currentSession
@@ -238,11 +238,11 @@ class MiqVimInventory < MiqVimClientBase
     return false unless @alive
     begin
         unless currentSession
-          $vim_log.info "MiqVimInventory.isAlive?: Current session no longer exists."
+          logger.info "MiqVimInventory.isAlive?: Current session no longer exists."
           @alive = false
         end
       rescue Exception => err
-        $vim_log.info "MiqVimInventory.isAlive?: Could not access connection - #{err}"
+        logger.info "MiqVimInventory.isAlive?: Could not access connection - #{err}"
         @alive = false
       end
     @alive
@@ -277,9 +277,9 @@ class MiqVimInventory < MiqVimClientBase
     if keyPath
       key = props.fetch_path(keyPath)
       if !key
-        $vim_log.debug "hashObj: key is nil for #{mor}: #{keyPath}"
+        logger.debug "hashObj: key is nil for #{mor}: #{keyPath}"
       elsif key.empty?
-        $vim_log.debug "hashObj: key is empty for #{mor}: #{keyPath}"
+        logger.debug "hashObj: key is empty for #{mor}: #{keyPath}"
         key = nil
         props.store_path(keyPath, nil)
       end
@@ -490,7 +490,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "virtualMachines_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@virtualMachines) if @virtualMachines
 
-    $vim_log.info "MiqVimInventory.virtualMachines_locked: loading VirtualMachine cache for #{@connId}"
+    logger.info "MiqVimInventory.virtualMachines_locked: loading VirtualMachine cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -504,7 +504,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.virtualMachines_locked: loaded VirtualMachine cache for #{@connId}"
+    logger.info "MiqVimInventory.virtualMachines_locked: loaded VirtualMachine cache for #{@connId}"
 
     @virtualMachines
   end # def virtualMachines_locked
@@ -616,7 +616,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "computeResources_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@computeResources) if @computeResources
 
-    $vim_log.info "MiqVimInventory.computeResources_locked: loading ComputeResource cache for #{@connId}"
+    logger.info "MiqVimInventory.computeResources_locked: loading ComputeResource cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -630,7 +630,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.computeResources_locked: loaded ComputeResource cache for #{@connId}"
+    logger.info "MiqVimInventory.computeResources_locked: loaded ComputeResource cache for #{@connId}"
 
     @computeResources
   end # def computeResources_locked
@@ -719,7 +719,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "clusterComputeResources_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@clusterComputeResources) if @clusterComputeResources
 
-    $vim_log.info "MiqVimInventory.clusterComputeResources_locked: loading ClusterComputeResource cache for #{@connId}"
+    logger.info "MiqVimInventory.clusterComputeResources_locked: loading ClusterComputeResource cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -733,7 +733,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.clusterComputeResources_locked: loaded ClusterComputeResource cache for #{@connId}"
+    logger.info "MiqVimInventory.clusterComputeResources_locked: loaded ClusterComputeResource cache for #{@connId}"
 
     @clusterComputeResources
   end # def clusterComputeResources_locked
@@ -822,7 +822,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "resourcePools_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@resourcePools) if @resourcePools
 
-    $vim_log.info "MiqVimInventory.resourcePools_locked: loading ResourcePool cache for #{@connId}"
+    logger.info "MiqVimInventory.resourcePools_locked: loading ResourcePool cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -836,7 +836,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.resourcePools_locked: loaded ResourcePool cache for #{@connId}"
+    logger.info "MiqVimInventory.resourcePools_locked: loaded ResourcePool cache for #{@connId}"
 
     @resourcePools
   end # def resourcePools_locked
@@ -934,7 +934,7 @@ class MiqVimInventory < MiqVimClientBase
 
     return(@virtualApps) if @virtualApps
 
-    $vim_log.info "MiqVimInventory.virtualApps_locked: loading VirtualApp cache for #{@connId}"
+    logger.info "MiqVimInventory.virtualApps_locked: loading VirtualApp cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -948,7 +948,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.virtualApps_locked: loaded VirtualApp cache for #{@connId}"
+    logger.info "MiqVimInventory.virtualApps_locked: loaded VirtualApp cache for #{@connId}"
 
     @virtualApps
   end # def virtualApps_locked
@@ -1037,7 +1037,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "folders_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@folders) if @folders
 
-    $vim_log.info "MiqVimInventory.folders_locked: loading Folder cache for #{@connId}"
+    logger.info "MiqVimInventory.folders_locked: loading Folder cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1051,7 +1051,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.folders_locked: loaded Folder cache for #{@connId}"
+    logger.info "MiqVimInventory.folders_locked: loaded Folder cache for #{@connId}"
 
     @folders
   end # def folders_locked
@@ -1140,7 +1140,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "datacenters_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@datacenters) if @datacenters
 
-    $vim_log.info "MiqVimInventory.datacenters_locked: loading Datacenter cache for #{@connId}"
+    logger.info "MiqVimInventory.datacenters_locked: loading Datacenter cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1154,7 +1154,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.datacenters_locked: loaded Datacenter cache for #{@connId}"
+    logger.info "MiqVimInventory.datacenters_locked: loaded Datacenter cache for #{@connId}"
 
     @datacenters
   end # def datacenters_locked
@@ -1243,7 +1243,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "hostSystems_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@hostSystems) if @hostSystems
 
-    $vim_log.info "MiqVimInventory.hostSystems_locked: loading HostSystem cache for #{@connId}"
+    logger.info "MiqVimInventory.hostSystems_locked: loading HostSystem cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1257,7 +1257,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.hostSystems_locked: loaded HostSystem cache for #{@connId}"
+    logger.info "MiqVimInventory.hostSystems_locked: loaded HostSystem cache for #{@connId}"
 
     @hostSystems
   end # def hostSystems_locked
@@ -1368,7 +1368,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "dataStores_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@dataStores) if @dataStores
 
-    $vim_log.info "MiqVimInventory.dataStores_locked: loading Datastore cache for #{@connId}"
+    logger.info "MiqVimInventory.dataStores_locked: loading Datastore cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1382,7 +1382,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.dataStores_locked: loaded Datastore cache for #{@connId}"
+    logger.info "MiqVimInventory.dataStores_locked: loaded Datastore cache for #{@connId}"
 
     @dataStores
   end # def dataStores_locked
@@ -1487,7 +1487,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "dvPortgroups_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@dvPortgroups) if @dvPortgroups
 
-    $vim_log.info "MiqVimInventory.dvPortgroups_locked: loading DV Portgroup cache for #{@connId}"
+    logger.info "MiqVimInventory.dvPortgroups_locked: loading DV Portgroup cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1501,7 +1501,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.dvPortgroups_locked: loaded DV Portgroup cache for #{@connId}"
+    logger.info "MiqVimInventory.dvPortgroups_locked: loaded DV Portgroup cache for #{@connId}"
 
     @dvPortgroups
   end # def dvPortgroups_locked
@@ -1575,7 +1575,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "dvSwitches_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@dvSwithces) if @dvSwitches
 
-    $vim_log.info "MiqVimInventory.dvSwitches_locked: loading DV Switch cache for #{@connId}"
+    logger.info "MiqVimInventory.dvSwitches_locked: loading DV Switch cache for #{@connId}"
 
     base_class    = 'DistributedVirtualSwitch'.freeze
     child_classes = VimClass.child_classes(base_class)
@@ -1595,7 +1595,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.dvSwitches_locked: loaded DV Switch cache for #{@connId}"
+    logger.info "MiqVimInventory.dvSwitches_locked: loaded DV Switch cache for #{@connId}"
 
     @dvSwitches
   end # def dvSwitches_locked
@@ -1668,7 +1668,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "storagePods_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@storagePods) if @storagePods
 
-    $vim_log.info "MiqVimInventory.storagePods_locked: loading Datastore Cluster cache for #{@connId}"
+    logger.info "MiqVimInventory.storagePods_locked: loading Datastore Cluster cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1682,7 +1682,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.storagePods_locked: loaded Datastore Cluster cache for #{@connId}"
+    logger.info "MiqVimInventory.storagePods_locked: loaded Datastore Cluster cache for #{@connId}"
 
     @storagePods
   end # def storagePods_locked
@@ -1760,7 +1760,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "licenseManagers_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@licenseManagers) if @licenseManagers
 
-    $vim_log.info "MiqVimInventory.licenseManagers_locked: loading LicenseManager cache for #{@connId}"
+    logger.info "MiqVimInventory.licenseManagers_locked: loading LicenseManager cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1774,7 +1774,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.licenseManagers_locked: loaded LicenseManager cache for #{@connId}"
+    logger.info "MiqVimInventory.licenseManagers_locked: loaded LicenseManager cache for #{@connId}"
 
     @licenseManagers
   end # def licenseManagers_locked
@@ -1870,7 +1870,7 @@ class MiqVimInventory < MiqVimClientBase
     raise "extensionManagers_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@extensionManagers) if @extensionManagers
 
-    $vim_log.info "MiqVimInventory.extensionManagers_locked: loading ExtensionManager cache for #{@connId}"
+    logger.info "MiqVimInventory.extensionManagers_locked: loading ExtensionManager cache for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
@@ -1884,7 +1884,7 @@ class MiqVimInventory < MiqVimClientBase
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.extensionManagers_locked: loaded ExtensionManager cache for #{@connId}"
+    logger.info "MiqVimInventory.extensionManagers_locked: loaded ExtensionManager cache for #{@connId}"
 
     @extensionManagers
   end # def extensionManagers_locked
@@ -1976,22 +1976,22 @@ class MiqVimInventory < MiqVimClientBase
     raise "inventoryHash_locked: cache lock not held" unless @cacheLock.sync_locked?
     return(@inventoryHash) if @inventoryHash
 
-    $vim_log.info "MiqVimInventory.inventoryHash_locked: loading inventoryHash for #{@connId}"
+    logger.info "MiqVimInventory.inventoryHash_locked: loading inventoryHash for #{@connId}"
     begin
       @cacheLock.sync_lock(:EX) if (unlock = @cacheLock.sync_shared?)
 
-      $vim_log.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: calling retrieveProperties" if $vim_log
+      logger.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: calling retrieveProperties"
 
       @inventoryHash = {}
       retrievePropertiesIter(@propCol, @spec) do |oc|
         (@inventoryHash[oc.obj.vimType] ||= []) << oc.obj
       end
 
-      $vim_log.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: returned from retrieveProperties" if $vim_log
+      logger.info "MiqVimInventory(#{@server}, #{@username}).inventoryHash_locked: returned from retrieveProperties"
     ensure
       @cacheLock.sync_unlock if unlock
     end
-    $vim_log.info "MiqVimInventory.inventoryHash_locked: loaded inventoryHash for #{@connId}"
+    logger.info "MiqVimInventory.inventoryHash_locked: loaded inventoryHash for #{@connId}"
 
     @inventoryHash
   end
@@ -2008,9 +2008,9 @@ class MiqVimInventory < MiqVimClientBase
   # Generate a user event associated with the given managed object.
   #
   def logUserEvent(entity, msg)
-    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: calling logUserEvent" if $vim_log
+    logger.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: calling logUserEvent"
     super(@sic.eventManager, entity, msg)
-    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: returned from logUserEvent" if $vim_log
+    logger.info "MiqVimInventory(#{@server}, #{@username}).logUserEvent: returned from logUserEvent"
   end
 
   ##################################
@@ -2183,13 +2183,13 @@ class MiqVimInventory < MiqVimClientBase
 
   def getTaskMor(tmor)
     if tmor.respond_to?(:vimType)
-      $vim_log.debug "getTaskMor: returning #{tmor}, no search"
+      logger.debug "getTaskMor: returning #{tmor}, no search"
       return tmor
     else
-      $vim_log.debug "getTaskMor: searching for task #{tmor}"
+      logger.debug "getTaskMor: searching for task #{tmor}"
       getTasks.each do |tmo|
         if tmo.to_str == tmor
-          $vim_log.debug "getTaskMor: returning #{tmo} (#{tmo.vimType})"
+          logger.debug "getTaskMor: returning #{tmo} (#{tmo.vimType})"
           return tmo
         end
       end
@@ -2204,7 +2204,7 @@ class MiqVimInventory < MiqVimClientBase
   def waitForTask(tmor, className = nil)
     className ||= self.class.to_s
 
-    $vim_log.info "#{className}(#{@server}, #{@username})::waitForTask(#{tmor})" if $vim_log
+    logger.info "#{className}(#{@server}, #{@username})::waitForTask(#{tmor})"
     args = VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
       pfsa << VimHash.new("PropertyFilterSpec") do |pfs|
         pfs.propSet = VimArray.new("ArrayOfPropertySpec") do |psa|
@@ -2240,14 +2240,14 @@ class MiqVimInventory < MiqVimClientBase
     end
 
     raise VimFault.new(error) if state == TaskInfoState::Error
-    $vim_log.info "#{className}(#{@server}, #{@username})::waitForTask: result = #{result}" if $vim_log
+    logger.info "#{className}(#{@server}, #{@username})::waitForTask: result = #{result}"
     result
   end # def waitForTask
 
   def pollTask(tmor, className = nil)
     className ||= self.class.to_s
 
-    $vim_log.info "#{className}(#{@server}, #{@username})::pollTask(#{tmor})" if $vim_log
+    logger.info "#{className}(#{@server}, #{@username})::pollTask(#{tmor})"
     args = VimArray.new("ArrayOfPropertyFilterSpec") do |pfsa|
       pfsa << VimHash.new("PropertyFilterSpec") do |pfs|
         pfs.propSet = VimArray.new("ArrayOfPropertySpec") do |psa|
@@ -2323,9 +2323,9 @@ class MiqVimInventory < MiqVimClientBase
       end
     end
 
-    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: calling retrieveProperties(#{mo.vimType})" if $vim_log
+    logger.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: calling retrieveProperties(#{mo.vimType})"
     oca = retrievePropertiesCompat(@propCol, pfSpec)
-    $vim_log.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: return from retrieveProperties(#{mo.vimType})" if $vim_log
+    logger.info "MiqVimInventory(#{@server}, #{@username}).getMoProp_local: return from retrieveProperties(#{mo.vimType})"
 
     return nil if !oca || !oca[0] || !oca[0].propSet
 

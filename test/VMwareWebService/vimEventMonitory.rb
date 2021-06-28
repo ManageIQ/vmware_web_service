@@ -5,8 +5,8 @@ SERVER   = raise "please define SERVER"
 USERNAME = raise "please define USERNAME"
 PASSWORD = raise "please define PASSWORD"
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 vimEm = MiqVimEventMonitor.new(SERVER, USERNAME, PASSWORD)
 

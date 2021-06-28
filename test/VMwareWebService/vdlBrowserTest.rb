@@ -3,8 +3,8 @@ require 'manageiq-gems-pending'
 require 'VMwareWebService/MiqVim'
 require 'VMwareWebService/VixDiskLib/VixDiskLib'
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 $stderr.sync = true
 $stdout.sync = true

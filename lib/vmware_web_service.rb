@@ -5,3 +5,5 @@ autoload :VimArray,  'VMwareWebService/VimTypes'
 autoload :VimString, 'VMwareWebService/VimTypes'
 autoload :VimFault,  'VMwareWebService/VimTypes'
 autoload :VimClass,  'VMwareWebService/VimTypes'
+
+require "VMwareWebService/logging"

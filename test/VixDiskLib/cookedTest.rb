@@ -1,7 +1,7 @@
 require 'VMwareWebService/VixDiskLib/VixDiskLib'
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
 diskFiles = [
   "/vmfs/volumes/StarM2-LUN1/VMmini-101/VMmini-101.vmdk"

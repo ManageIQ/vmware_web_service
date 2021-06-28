@@ -1,4 +1,8 @@
+require 'VMwareWebService/logging'
+
 class MiqVimEventHistoryCollector
+  include VMwareWebService::Logging
+
   attr_reader :invObj
 
   def initialize(invObj, eventFilterSpec = nil, pgSize = 20)
@@ -14,7 +18,7 @@ class MiqVimEventHistoryCollector
 
   def release
     return unless @eventHistoryCollector
-    $vim_log.info "MiqVimEventHistoryCollector.release: destroying #{@eventHistoryCollector}"
+    logger.info "MiqVimEventHistoryCollector.release: destroying #{@eventHistoryCollector}"
     @invObj.destroyCollector(@eventHistoryCollector)
     @eventHistoryCollector = nil
   end

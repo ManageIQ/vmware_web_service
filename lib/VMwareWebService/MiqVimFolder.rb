@@ -1,4 +1,8 @@
+require 'VMwareWebService/logging'
+
 class MiqVimFolder
+  include VMwareWebService::Logging
+
   attr_reader :name, :invObj
 
   def initialize(invObj, fh)
@@ -36,10 +40,10 @@ class MiqVimFolder
     hmor = (host.kind_of?(Hash) ? host['MOR'] : host) if host
     pmor = (pool.kind_of?(Hash) ? pool['MOR'] : pool) if pool
 
-    $vim_log.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).registerVM: calling registerVM_Task" if $vim_log
+    logger.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).registerVM: calling registerVM_Task"
     taskMor = @invObj.registerVM_Task(@fMor, path, name, asTemplate.to_s, pmor, hmor)
-    $vim_log.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).registerVM: returned from registerVM_Task" if $vim_log
-    $vim_log.debug "MiqVimFolder::registerVM: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).registerVM: returned from registerVM_Task"
+    logger.debug "MiqVimFolder::registerVM: taskMor = #{taskMor}"
     waitForTask(taskMor)
   end
 
@@ -65,9 +69,9 @@ class MiqVimFolder
       cs.vmFolder       = ah[:vmFolder]       unless ah[:vmFolder].nil?
     end
 
-    $vim_log.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addStandaloneHost: calling addStandaloneHost_Task" if $vim_log
+    logger.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addStandaloneHost: calling addStandaloneHost_Task"
     taskMor = @invObj.addStandaloneHost_Task(@fMor, cspec, ah[:asConnected].to_s, ah[:license])
-    $vim_log.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addStandaloneHost: returned from addStandaloneHost_Task" if $vim_log
+    logger.info "MiqVimCluster(#{@invObj.server}, #{@invObj.username}).addStandaloneHost: returned from addStandaloneHost_Task"
     return taskMor unless ah[:wait]
     waitForTask(taskMor)
   end # def addStandaloneHost
@@ -77,10 +81,10 @@ class MiqVimFolder
     oMor = nil
     oMor = (vCenterObject.kind_of?(Hash) ? vCenterObject['MOR'] : vCenterObject) if vCenterObject
 
-    $vim_log.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).moveIntoFolder: calling moveIntoFolder_Task" if $vim_log
+    logger.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).moveIntoFolder: calling moveIntoFolder_Task"
     taskMor = @invObj.moveIntoFolder_Task(@fMor, oMor)
-    $vim_log.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).moveIntoFolder: returned from moveIntoFolder_Task" if $vim_log
-    $vim_log.debug "MiqVimFolder::moveIntoFolder: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).moveIntoFolder: returned from moveIntoFolder_Task"
+    logger.debug "MiqVimFolder::moveIntoFolder: taskMor = #{taskMor}"
     waitForTask(taskMor)
   end
 
@@ -96,10 +100,10 @@ class MiqVimFolder
     hMor = (host.kind_of?(Hash) ? host['MOR'] : host) if host
     pMor = (pool.kind_of?(Hash) ? pool['MOR'] : pool) if pool
 
-    $vim_log.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).createVM calling createVM_Task" if $vim_log
+    logger.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).createVM calling createVM_Task"
     taskMor = @invObj.createVM_Task(@fMor, configSpec, pMor, hMor)
-    $vim_log.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).createVM returned from createVM_Task" if $vim_log
-    $vim_log.debug "MiqVimFolder::createVM: taskMor = #{taskMor}" if $vim_log
+    logger.info "MiqVimFolder(#{@invObj.server}, #{@invObj.username}).createVM returned from createVM_Task"
+    logger.debug "MiqVimFolder::createVM: taskMor = #{taskMor}"
     waitForTask(taskMor)
   end
 

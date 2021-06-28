@@ -27,9 +27,9 @@ module MiqVimUpdate
 
     while truncated
       begin
-        $vim_log.info "#{log_prefix}: call to waitForUpdates...Starting" if $vim_log
+        logger.info "#{log_prefix}: call to waitForUpdates...Starting"
         updateSet = waitForUpdatesEx(@umPropCol, version, wait_options)
-        $vim_log.info "#{log_prefix}: call to waitForUpdates...Complete" if $vim_log
+        logger.info "#{log_prefix}: call to waitForUpdates...Complete"
 
         version   = updateSet.version
         truncated = updateSet.truncated
@@ -46,7 +46,7 @@ module MiqVimUpdate
         # Help out the Ruby Garbage Collector by resetting variables pointing to large objects back to nil
         updateSet = nil
       rescue HTTPClient::ReceiveTimeoutError => terr
-        $vim_log.info "#{log_prefix}: call to waitForUpdates...Timeout" if $vim_log
+        logger.info "#{log_prefix}: call to waitForUpdates...Timeout"
         raise terr if !isAlive?
         retry
       end
@@ -58,9 +58,9 @@ module MiqVimUpdate
   def monitorUpdatesSince(version)
     log_prefix = "MiqVimUpdate.monitorUpdatesSince (#{@connId})"
     begin
-      $vim_log.info "#{log_prefix}: call to waitForUpdates...Starting (version = #{version})" if $vim_log
+      logger.info "#{log_prefix}: call to waitForUpdates...Starting (version = #{version})"
       updateSet = waitForUpdatesEx(@umPropCol, version, :max_wait => @maxWait)
-      $vim_log.info "#{log_prefix}: call to waitForUpdates...Complete (version = #{version})" if $vim_log
+      logger.info "#{log_prefix}: call to waitForUpdates...Complete (version = #{version})"
       return version if updateSet.nil?
 
       version = updateSet.version
@@ -70,11 +70,11 @@ module MiqVimUpdate
       updateSet.filterSet.each do |fu|
         next if fu.filter != @filterSpecRef
         fu.objectSet.each do |objUpdate|
-          $vim_log.info "#{log_prefix}: applying update...Starting (version = #{version})" if $vim_log
+          logger.info "#{log_prefix}: applying update...Starting (version = #{version})"
           @cacheLock.synchronize(:EX) do
             updateObject(objUpdate)
           end
-          $vim_log.info "#{log_prefix}: applying update...Complete (version = #{version})" if $vim_log
+          logger.info "#{log_prefix}: applying update...Complete (version = #{version})"
           Thread.pass
         end
       end # updateSet.filterSet.each
@@ -82,9 +82,9 @@ module MiqVimUpdate
       updateSet = nil
       return version
     rescue HTTPClient::ReceiveTimeoutError => terr
-      $vim_log.info "#{log_prefix}: call to waitForUpdates...Timeout (version = #{version})" if $vim_log
+      logger.info "#{log_prefix}: call to waitForUpdates...Timeout (version = #{version})"
       retry if isAlive?
-      $vim_log.warn "#{log_prefix}: connection lost"
+      logger.warn "#{log_prefix}: connection lost"
       raise terr
     end
   end
@@ -97,7 +97,7 @@ module MiqVimUpdate
     @debugUpdates   = false if @debugUpdates.nil?
     @dumpToLog      = true  if @debugUpdates
 
-    $vim_log.debug "#{log_prefix}: debugUpdates = #{@debugUpdates}"
+    logger.debug "#{log_prefix}: debugUpdates = #{@debugUpdates}"
 
     begin
       @umPropCol     = @sic.propertyCollector
@@ -116,18 +116,18 @@ module MiqVimUpdate
       # Ignore signals, except TERM
     rescue => herr
       if herr.respond_to?(:reason) && herr.reason == 'The task was canceled by a user.'
-        $vim_log.info "#{log_prefix}: waitForUpdates canceled"
+        logger.info "#{log_prefix}: waitForUpdates canceled"
       else
-        $vim_log.error "******* #{herr.class}"
-        $vim_log.error herr.to_s
-        $vim_log.error herr.backtrace.join("\n") unless herr.kind_of?(HTTPClient::ReceiveTimeoutError) # already logged in monitorUpdatesInitial or monitorUpdatesSince
+        logger.error "******* #{herr.class}"
+        logger.error herr.to_s
+        logger.error herr.backtrace.join("\n") unless herr.kind_of?(HTTPClient::ReceiveTimeoutError) # already logged in monitorUpdatesInitial or monitorUpdatesSince
         raise herr
       end
     ensure
       if @filterSpecRef && isAlive?
-        $vim_log.info "#{log_prefix}: calling destroyPropertyFilter...Starting"
+        logger.info "#{log_prefix}: calling destroyPropertyFilter...Starting"
         destroyPropertyFilter(@filterSpecRef)
-        $vim_log.info "#{log_prefix}: calling destroyPropertyFilter...Complete"
+        logger.info "#{log_prefix}: calling destroyPropertyFilter...Complete"
       end
       @filterSpecRef = nil
       # @umPropCol     = nil
@@ -137,18 +137,18 @@ module MiqVimUpdate
   def stopUpdateMonitor
     log_prefix = "MiqVimUpdate.stopUpdateMonitor (#{@connId})"
 
-    $vim_log.info "#{log_prefix}: for address=<#{@server}>, username=<#{@username}>...Starting"
+    logger.info "#{log_prefix}: for address=<#{@server}>, username=<#{@username}>...Starting"
     @monitor = false
     if @umPropCol
       if isAlive?
-        $vim_log.info "#{log_prefix}: calling cancelWaitForUpdates...Starting"
+        logger.info "#{log_prefix}: calling cancelWaitForUpdates...Starting"
         cancelWaitForUpdates(@umPropCol)
-        $vim_log.info "#{log_prefix}: calling cancelWaitForUpdates...Complete"
+        logger.info "#{log_prefix}: calling cancelWaitForUpdates...Complete"
       end
       @umPropCol = nil
       @updateThread.run if @updateThread.status == "sleep"
     end
-    $vim_log.info "#{log_prefix}: for address=<#{@server}>, username=<#{@username}>...Complete"
+    logger.info "#{log_prefix}: for address=<#{@server}>, username=<#{@username}>...Complete"
   end
 
   def forceFail
@@ -159,7 +159,7 @@ module MiqVimUpdate
   def updateObject(objUpdate, initialUpdate = false)
     unless @inventoryHash # no cache to update
       return unless initialUpdate
-      $vim_log.info "MiqVimUpdate.updateObject: setting @inventoryHash to empty hash"
+      logger.info "MiqVimUpdate.updateObject: setting @inventoryHash to empty hash"
       @inventoryHash = {}
     end
 
@@ -171,12 +171,12 @@ module MiqVimUpdate
     when 'modify'
       updateProps(objUpdate, initialUpdate)
     else
-      $vim_log.warn "MiqVimUpdate.updateObject (#{@connId}): unrecognized operation: #{objUpdate.kind}"
+      logger.warn "MiqVimUpdate.updateObject (#{@connId}): unrecognized operation: #{objUpdate.kind}"
     end
   end
 
   def updateProps(objUpdate, initialUpdate = false)
-    $vim_log.debug "Update object (#{@connId}): #{objUpdate.obj.vimType}: #{objUpdate.obj}" if @debugUpdates
+    logger.debug "Update object (#{@connId}): #{objUpdate.obj.vimType}: #{objUpdate.obj}" if @debugUpdates
     return if !objUpdate.changeSet || objUpdate.changeSet.empty?
 
     #
@@ -191,7 +191,7 @@ module MiqVimUpdate
     hashName = "#{pm[:baseName]}ByMor"
     return unless (objHash = instance_variable_get(hashName)) # no cache to update
     unless (obj = objHash[objUpdate.obj])
-      $vim_log.warn "updateProps (#{@connId}): object #{objUpdate.obj} not found in #{hashName}"
+      logger.warn "updateProps (#{@connId}): object #{objUpdate.obj} not found in #{hashName}"
       return
     end
 
@@ -234,8 +234,8 @@ module MiqVimUpdate
       # Call the notify callback if enabled, defined and we are past the initial update
       #
       if @notifyMethod && !initialUpdate
-        $vim_log.debug "MiqVimUpdate.updateProps (#{@connId}): server = #{@server}, mor = (#{objUpdate.obj.vimType}, #{objUpdate.obj})"
-        $vim_log.debug "MiqVimUpdate.updateProps (#{@connId}): changedProps = [ #{changedProps.join(', ')} ]"
+        logger.debug "MiqVimUpdate.updateProps (#{@connId}): server = #{@server}, mor = (#{objUpdate.obj.vimType}, #{objUpdate.obj})"
+        logger.debug "MiqVimUpdate.updateProps (#{@connId}): changedProps = [ #{changedProps.join(', ')} ]"
         Thread.new do
           @notifyMethod.call(:server       => @server,
                              :username     => @username,
@@ -251,9 +251,9 @@ module MiqVimUpdate
       end
 
     rescue => err
-      $vim_log.warn "MiqVimUpdate::updateProps (#{@connId}): #{err}"
-      $vim_log.warn "Clearing cache for (#{@connId}): #{pm[:baseName]}"
-      $vim_log.debug err.backtrace.join("\n")
+      logger.warn "MiqVimUpdate::updateProps (#{@connId}): #{err}"
+      logger.warn "Clearing cache for (#{@connId}): #{pm[:baseName]}"
+      logger.debug err.backtrace.join("\n")
       dumpCache("#{pm[:baseName]}ByMor")
 
       instance_variable_set("#{pm[:baseName]}ByMor", nil)
@@ -266,9 +266,9 @@ module MiqVimUpdate
     objBaseType = objUpdate.obj.vimBaseType
 
     # always log additions to the inventory.
-    $vim_log.info "MiqVimUpdate.addObject (#{@connId}): #{objType}: #{objUpdate.obj}"
+    logger.info "MiqVimUpdate.addObject (#{@connId}): #{objType}: #{objUpdate.obj}"
     return unless (pm = @propMap[objBaseType.to_sym])  # not an object type we cache
-    $vim_log.info "MiqVimUpdate.addObject (#{@connId}): Adding object #{objType}: #{objUpdate.obj}"
+    logger.info "MiqVimUpdate.addObject (#{@connId}): Adding object #{objType}: #{objUpdate.obj}"
 
     #
     # First, add the object's MOR to the @inventoryHash entry for the object's type.
@@ -283,7 +283,7 @@ module MiqVimUpdate
       hashName = "#{pm[:baseName]}ByMor"
       unless instance_variable_get(hashName) # no cache to update
         return unless initialUpdate
-        $vim_log.info "MiqVimUpdate.addObject: setting #{hashName} and #{pm[:baseName]} to empty hash"
+        logger.info "MiqVimUpdate.addObject: setting #{hashName} and #{pm[:baseName]} to empty hash"
         instance_variable_set(hashName, {})
         instance_variable_set(pm[:baseName], {})
       end
@@ -298,7 +298,7 @@ module MiqVimUpdate
       # Call the notify callback if enabled, defined and we are past the initial update
       #
       if @notifyMethod && !initialUpdate
-        $vim_log.debug "MiqVimUpdate.addObject: server = #{@server}, mor = (#{objUpdate.obj.vimType}, #{objUpdate.obj})"
+        logger.debug "MiqVimUpdate.addObject: server = #{@server}, mor = (#{objUpdate.obj.vimType}, #{objUpdate.obj})"
         Thread.new do
           @notifyMethod.call(:server   => @server,
                              :username => @username,
@@ -310,9 +310,9 @@ module MiqVimUpdate
       end
 
     rescue => err
-      $vim_log.warn "MiqVimUpdate::addObject: #{err}"
-      $vim_log.warn "Clearing cache for: #{pm[:baseName]}"
-      $vim_log.debug err.backtrace.join("\n")
+      logger.warn "MiqVimUpdate::addObject: #{err}"
+      logger.warn "Clearing cache for: #{pm[:baseName]}"
+      logger.debug err.backtrace.join("\n")
       dumpCache("#{pm[:baseName]}ByMor")
 
       instance_variable_set("#{pm[:baseName]}ByMor", nil)
@@ -325,9 +325,9 @@ module MiqVimUpdate
     objBaseType = objUpdate.obj.vimBaseType
 
     # always log deletions from the inventory.
-    $vim_log.info "MiqVimUpdate.deleteObject (#{@connId}): #{objType}: #{objUpdate.obj}"
+    logger.info "MiqVimUpdate.deleteObject (#{@connId}): #{objType}: #{objUpdate.obj}"
     return unless (pm = @propMap[objBaseType.to_sym])      # not an object type we cache
-    $vim_log.info "MiqVimUpdate.deleteObject (#{@connId}): Deleting object: #{objType}: #{objUpdate.obj}"
+    logger.info "MiqVimUpdate.deleteObject (#{@connId}): Deleting object: #{objType}: #{objUpdate.obj}"
 
     ia = @inventoryHash[objType]
     ia.delete(objUpdate.obj)
@@ -341,7 +341,7 @@ module MiqVimUpdate
       # Call the notify callback if enabled, defined and we are past the initial update
       #
       if @notifyMethod && !initialUpdate
-        $vim_log.debug "MiqVimUpdate.deleteObject: server = #{@server}, mor = (#{objUpdate.obj.vimType}, #{objUpdate.obj})"
+        logger.debug "MiqVimUpdate.deleteObject: server = #{@server}, mor = (#{objUpdate.obj.vimType}, #{objUpdate.obj})"
         Thread.new do
           @notifyMethod.call(:server   => @server,
                              :username => @username,
@@ -353,9 +353,9 @@ module MiqVimUpdate
       end
 
     rescue => err
-      $vim_log.warn "MiqVimUpdate::deleteObject: #{err}"
-      $vim_log.warn "Clearing cache for: #{pm[:baseName]}"
-      $vim_log.debug err.backtrace.join("\n")
+      logger.warn "MiqVimUpdate::deleteObject: #{err}"
+      logger.warn "Clearing cache for: #{pm[:baseName]}"
+      logger.debug err.backtrace.join("\n")
       dumpCache("#{pm[:baseName]}ByMor")
 
       instance_variable_set("#{pm[:baseName]}ByMor", nil)
@@ -367,17 +367,17 @@ module MiqVimUpdate
     changedProps = [] if returnChangedProps
     changeSet.each do |propChange|
       if @debugUpdates
-        $vim_log.debug "\tpropChange name (path): #{propChange.name}"
-        $vim_log.debug "\tpropChange op: #{propChange.op}"
-        $vim_log.debug "\tpropChange val (type): #{propChange.val.class}"
+        logger.debug "\tpropChange name (path): #{propChange.name}"
+        logger.debug "\tpropChange op: #{propChange.op}"
+        logger.debug "\tpropChange val (type): #{propChange.val.class}"
 
-        $vim_log.debug "\t*** propChange val START:"
+        logger.debug "\t*** propChange val START:"
         oGi = @globalIndent
         @globalIndent = "\t\t"
         dumpObj(propChange.val)
         @globalIndent = oGi
-        $vim_log.debug "\t*** propChange val END"
-        $vim_log.debug "\t***"
+        logger.debug "\t*** propChange val END"
+        logger.debug "\t***"
       end
 
       #
@@ -424,9 +424,9 @@ module MiqVimUpdate
 
   def dumpCache(cache)
     return unless @debugUpdates
-    $vim_log.debug "**** Dumping #{cache} cache"
+    logger.debug "**** Dumping #{cache} cache"
     dumbObj(instance_variable_get(cache))
-    $vim_log.debug "**** #{cache} dump end"
+    logger.debug "**** #{cache} dump end"
   end
   private :dumpCache
 

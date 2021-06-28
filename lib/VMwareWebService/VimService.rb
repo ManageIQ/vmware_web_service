@@ -1,8 +1,11 @@
 require "handsoap"
 require 'active_support/core_ext/numeric/bytes'
+require 'VMwareWebService/logging'
 require 'VMwareWebService/VimTypes'
 
 class VimService < Handsoap::Service
+  include VMwareWebService::Logging
+
   attr_reader :sic, :about, :apiVersion, :isVirtualCenter, :v20, :v2, :v4, :v5, :v6, :serviceInstanceMor, :session_cookie
 
   Handsoap.http_driver = :HTTPClient
@@ -1291,14 +1294,14 @@ class VimService < Handsoap::Service
       if @xml_payload_len > @xml_payload_max
         @xml_payload_len = 0
 
-        $vim_log.debug("#{log_prefix} Running garbage collection")
+        logger.debug("#{log_prefix} Running garbage collection")
 
         # Force a GC, because Ruby's GC is triggered on number of objects without
         #   regard to size.  The object we just freed may not be released right away.
         gc_time = Benchmark.realtime { GC.start }
 
         gc_log_level = gc_time >= 5 ? :warn : :debug
-        $vim_log.send(gc_log_level, "#{log_prefix} Garbage collection took #{gc_time} seconds")
+        logger.send(gc_log_level, "#{log_prefix} Garbage collection took #{gc_time} seconds")
       end
     end
   end

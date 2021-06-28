@@ -3,10 +3,10 @@ require 'fs/MiqFS/MiqFS'
 require 'VMwareWebService/VixDiskLib/VixDiskLib'
 require 'ostruct'
 
-$vim_log = Logger.new(STDOUT)
-$vim_log.level = Logger::WARN
+VMwareWebService.logger = Logger.new(STDOUT)
+VMwareWebService.logger.level = Logger::WARN
 
-$log = $vim_log
+$log = VMwareWebService.logger
 
 VixDiskLib.init
 
