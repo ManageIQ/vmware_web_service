@@ -44,49 +44,28 @@ class VimService
     rbvmomi_to_vim_types(vim_to_rbvmomi_types(mor).AcquireMksTicket)
   end
 
-  def acquireTicket(mor, ticketType)
-    rbvmomi_to_vim_types(vim_to_rbvmomi_types(mor).AcquireTicket(:ticketType => ticketType))
+  def acquireTicket(mor, ticket_type)
+    rbvmomi_to_vim_types(vim_to_rbvmomi_types(mor).AcquireTicket(:ticketType => ticket_type))
   end
 
-  def addHost_Task(clustMor, spec, asConnected, resourcePool = nil, license = nil)
-    response = invoke("n1:AddHost_Task") do |message|
-      message.add "n1:_this", clustMor do |i|
-        i.set_attr "type", clustMor.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", spec.xsiType
-        marshalObj(i, spec)
-      end
-      message.add "n1:asConnected", asConnected
-      message.add "n1:resourcePool", resourcePool do |i|
-        i.set_attr "type", resourcePool.vimType
-      end unless resourcePool.nil?
-      message.add "n1:license", license unless license.nil?
-    end
-    (parse_response(response, 'AddHost_TaskResponse')['returnval'])
+  def addHost_Task(cluster_mor, spec, as_connected, resource_pool = nil, license = nil)
+    task_mor = vim_to_rbvmomi_types(cluster_mor).AddHost_Task(
+      :spec         => vim_to_rbvmomi_types(spec),
+      :asConnected  => as_connected,
+      :resourcePool => vim_to_rbvmomi_types(resource_pool),
+      :license      => license
+    )
+
+    rbvmomi_to_vim_types(task_mor)
   end
 
   def addInternetScsiSendTargets(hssMor, iScsiHbaDevice, targets)
-    response = invoke("n1:AddInternetScsiSendTargets") do |message|
-      message.add "n1:_this", hssMor do |i|
-        i.set_attr "type", hssMor.vimType
-      end
-      message.add "n1:iScsiHbaDevice", iScsiHbaDevice
-      if targets.kind_of?(Array)
-        targets.each do |t|
-          message.add "n1:targets" do |i|
-            i.set_attr "xsi:type", t.xsiType
-            marshalObj(i, t)
-          end
-        end
-      else
-        message.add "n1:targets" do |i|
-          i.set_attr "xsi:type", targets.xsiType
-          marshalObj(i, targets)
-        end
-      end
-    end
-    (parse_response(response, 'AddInternetScsiSendTargetsResponse'))
+    response = vim_to_rbvmomi_types(hssMor).AddInternetScsiSendTargets(
+      :iScsiHbaDevice => vim_to_rbvmomi_types(iScsiHbaDevice),
+      :targets        => vim_to_rbvmomi_types(targets)
+    )
+
+    rbvmomi_to_vim_types(response)
   end
 
   def addInternetScsiStaticTargets(hssMor, iScsiHbaDevice, targets)
@@ -151,13 +130,8 @@ class VimService
     (parse_response(response, 'CancelTaskResponse'))
   end
 
-  def cancelWaitForUpdates(propCol)
-    response = invoke("n1:CancelWaitForUpdates") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-    end
-    (parse_response(response, 'CancelWaitForUpdatesResponse'))
+  def cancelWaitForUpdates(prop_col)
+    rbvmomi_to_vim_types(vim_to_rbvmomi_types(prop_col).CancelWaitForUpdates)
   end
 
   def cloneVM_Task(vmMor, fmor, name, cspec)
@@ -229,18 +203,13 @@ class VimService
     (parse_response(response, 'CreateCustomizationSpecResponse')['returnval'])
   end
 
-  def createFilter(propCol, pfSpec, partialUpdates)
-    response = invoke("n1:CreateFilter") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-      message.add "n1:spec" do |i|
-        i.set_attr "xsi:type", pfSpec.xsiType
-        marshalObj(i, pfSpec)
-      end
-      message.add "n1:partialUpdates", partialUpdates
-    end
-    (parse_response(response, 'CreateFilterResponse')['returnval'])
+  def createFilter(property_collector, spec, partial_updates)
+    result = vim_to_rbvmomi_types(property_collector).CreateFilter(
+      :spec           => vim_to_rbvmomi_types(spec),
+      :partialUpdates => partial_updates
+    )
+
+    rbvmomi_to_vim_types(result)
   end
 
   def createFolder(pfMor, fname)
@@ -302,7 +271,7 @@ class VimService
   end
 
   def currentTime
-    serviceInstanceMor.CurrentTime
+    vim_to_rbvmomi_types(serviceInstanceMor).CurrentTime
   end
 
   def customizationSpecItemToXml(csmMor, item)
@@ -1156,37 +1125,14 @@ class VimService
     (parse_response(response, 'UpdateSoftwareInternetScsiEnabledResponse'))
   end
 
-  def waitForUpdates(propCol, version = nil)
-    response = invoke("n1:WaitForUpdates") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-      message.add "n1:version", version if version
-    end
-    (parse_response(response, 'WaitForUpdatesResponse')['returnval'])
+  def waitForUpdates(property_collector, version = nil)
+    rbvmomi_to_vim_types(vim_to_rbvmomi_types(property_collector).WaitForUpdates(:version => version))
   end
 
-  def waitForUpdatesEx(propCol, version = nil, options = {})
-    max_wait    = options[:max_wait]
-    max_objects = options[:max_objects]
-
-    options = VimHash.new("WaitOptions") do |opts|
-      opts.maxObjectUpdates = max_objects.to_s if max_objects
-      opts.maxWaitSeconds   = max_wait.to_s    if max_wait
-    end
-
-    response = invoke("n1:WaitForUpdatesEx") do |message|
-      message.add "n1:_this", propCol do |i|
-        i.set_attr "type", propCol.vimType
-      end
-
-      message.add "n1:version", version if version
-      message.add "n1:options" do |i|
-        i.set_attr "type", options.vimType
-        marshalObj(i, options)
-      end
-    end
-    (parse_response(response, 'WaitForUpdatesExResponse')['returnval'])
+  def waitForUpdatesEx(property_collector, version = nil, options = {})
+    options  = RbVmomi::VIM.WaitOptions(:maxObjectUpdates => options[:max_objects], :maxWaitSeconds => options[:max_wait])
+    response = vim_to_rbvmomi_types(property_collector).WaitForUpdatesEx(:version => version, :options => options)
+    rbvmomi_to_vim_types(response)
   end
 
   def xmlToCustomizationSpecItem(csmMor, specItemXml)
@@ -1203,8 +1149,6 @@ class VimService
 
   def rbvmomi_to_vim_types(obj)
     case obj
-    when String
-      obj
     when Array
       obj.map { |i| rbvmomi_to_vim_types(i) }
     when RbVmomi::BasicTypes::ManagedObject
@@ -1215,6 +1159,8 @@ class VimService
           vim.send("#{key}=", rbvmomi_to_vim_types(val))
         end
       end
+    when String, Symbol, Integer, Time, TrueClass, FalseClass, NillClass
+      obj
     else
       raise ArgumentError, "Invalid type #{obj.class}"
     end
@@ -1224,6 +1170,13 @@ class VimService
     case obj
     when Array
       obj.map { |i| vim_to_rbvmomi_types(i) }
+    when VimHash
+      klass = "RbVmomi::VIM::#{obj.xsiType}".constantize
+      klass.new.tap do |new_obj|
+        obj.each do |key, val|
+          new_obj.send("#{key}=", vim_to_rbvmomi_types(val))
+        end
+      end
     when VimString
       if obj.xsiType == "ManagedObjectReference"
         klass = "RbVmomi::VIM::#{obj.vimType}".constantize
@@ -1231,8 +1184,10 @@ class VimService
       else
         obj.to_s
       end
-    when String
+    when String, Symbol, Integer, Time, TrueClass, FalseClass, NillClass
       obj
+    else
+      raise ArgumentError, "Invalid type #{obj.class}"
     end
   end
 end
