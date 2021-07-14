@@ -23,28 +23,29 @@ class MiqVim < MiqVimInventory
   # @param server [String] DNS name or IP address of the vCenter Server
   # @param username [String] Username to connect to the vCenter Server
   # @param password [String] Password to connect to the vCenter Server
-  # @param cacheScope [Symbol] A pre-defined set of properties to cache (default: nil)
+  # @param port [Integer] Port to connect to the vCenter Server (default: 443)
+  # @param cache_scope [Symbol] A pre-defined set of properties to cache (default: nil)
   # @param monitor_updates [Bool] Should a thread be started to monitor updates (default: false)
-  # @param preLoad [Bool] Should the cache be built before returning the connection (default: false)
-  # @param debugUpdates [Bool] Should we print debug info for each update (default: false)
-  # @param notifyMethod [Method] A optional method to call for each update (default: nil)
-  # @param maxWait [Integer] How many seconds to wait before breaking out of WaitForUpdates (default: 60)
-  # @param maxObjects [Integer] How many objects to return from each WaitForUpdates page (default: 250)
-  def initialize(server, username, password, cacheScope = nil, monitor_updates = nil, preLoad = nil, debugUpdates = false, notifyMethod = nil, maxWait = 60, maxObjects = 250)
-    super(server, username, password, cacheScope)
+  # @param pre_load [Bool] Should the cache be built before returning the connection (default: false)
+  # @param debug_updates [Bool] Should we print debug info for each update (default: false)
+  # @param notify_method [Method] A optional method to call for each update (default: nil)
+  # @param max_wait [Integer] How many seconds to wait before breaking out of WaitForUpdates (default: 60)
+  # @param max_objects [Integer] How many objects to return from each WaitForUpdates page (default: 250)
+  def initialize(server:, username:, password:, port: 443, cache_scope: nil, monitor_updates: nil, pre_load: nil, debug_updates: false, notify_method: nil, max_wait: 60, max_objects: 250)
+    super(:server => server, :port => port, :username => username, :password => password, :cache_scope => cache_scope)
 
     monitor_updates = self.class.monitor_updates if monitor_updates.nil?
-    preLoad         = self.class.pre_load        if preLoad.nil?
+    pre_load        = self.class.pre_load        if pre_load.nil?
 
     @monitor_updates    = monitor_updates
     @updateMonitorReady = false
     @error              = nil
-    @notifyMethod       = notifyMethod
-    @debugUpdates       = debugUpdates
-    @maxWait            = maxWait
-    @maxObjects         = maxObjects
+    @notifyMethod       = notify_method
+    @debugUpdates       = debug_updates
+    @maxWait            = max_wait
+    @maxObjects         = max_objects
 
-    start_monitor_updates_thread(preLoad) if @monitor_updates
+    start_monitor_updates_thread(pre_load) if @monitor_updates
   end
 
   @@monitor_updates = false

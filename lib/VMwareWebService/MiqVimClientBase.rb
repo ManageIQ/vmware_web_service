@@ -8,10 +8,11 @@ require 'VMwareWebService/VimService'
 class MiqVimClientBase < VimService
   @@receiveTimeout = 120
 
-  attr_reader :server, :username, :password, :connId
+  attr_reader :server, :port, :username, :password, :connId
 
-  def initialize(server, username, password)
+  def initialize(server:, username:, password:, port: 443)
     @server   = server
+    @port     = port
     @username = username
     @password = password
     @connId   = "#{@server}_#{@username}"
@@ -34,7 +35,7 @@ class MiqVimClientBase < VimService
   end
 
   def sdk_uri
-    URI::HTTPS.build(:host => server, :path => "/sdk")
+    URI::HTTPS.build(:host => server, :port => port, :path => "/sdk")
   end
 
   def self.receiveTimeout=(val)
@@ -59,7 +60,7 @@ class MiqVimClientBase < VimService
   end
 
   def connect
-    logger.debug "#{self.class.name}.connect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}".debug?
+    logger.debug { "#{self.class.name}.connect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" }
     @connLock.synchronize(:EX) do
       return if @connected
       login(@sic.sessionManager, @username, @password)
@@ -68,7 +69,7 @@ class MiqVimClientBase < VimService
   end
 
   def disconnect
-    logger.debug "#{self.class.name}.disconnect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}".debug?
+    logger.debug { "#{self.class.name}.disconnect(#{@connId}): #{$PROGRAM_NAME} #{ARGV.join(' ')}" }
     @connLock.synchronize(:EX) do
       return unless @connected
       logout(@sic.sessionManager)
