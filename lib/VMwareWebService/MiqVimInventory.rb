@@ -17,8 +17,8 @@ class MiqVimInventory < MiqVimClientBase
   @@selectorHash = {}
   @@cacheScope   = :cache_scope_full
 
-  def initialize(server:, username:, password:, port: 443, cache_scope: nil)
-    super(:server => server, :port => port, :username => username, :password => password)
+  def initialize(server:, username:, password:, port: 443, ssl_options: {}, cache_scope: nil)
+    super(:server => server, :port => port, :ssl_options => ssl_options, :username => username, :password => password)
 
     cache_scope ||= @@cacheScope
 

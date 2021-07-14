@@ -4,8 +4,8 @@ require 'VMwareWebService/MiqVimInventory'
 class MiqVimEventMonitor < MiqVimInventory
   include VMwareWebService::Logging
 
-  def initialize(server:, username:, password:, port: 443, event_filter_spec: nil, page_size: 100, max_wait: 60)
-    super(:server => server, :port => port, :username => username, :password => password, :cache_scope => :cache_scope_event_monitor)
+  def initialize(server:, username:, password:, port: 443, ssl_options: {}, event_filter_spec: nil, page_size: 100, max_wait: 60)
+    super(:server => server, :port => port, :ssl_options => ssl_options, :username => username, :password => password, :cache_scope => :cache_scope_event_monitor)
 
     @eventFilterSpec = event_filter_spec || VimHash.new("EventFilterSpec")
     @pgSize          = page_size
