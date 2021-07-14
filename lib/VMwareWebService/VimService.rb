@@ -1171,7 +1171,7 @@ class VimService
     when Array
       obj.map { |i| vim_to_rbvmomi_types(i) }
     when VimHash
-      klass = "RbVmomi::VIM::#{obj.xsiType}".constantize
+      klass = RbVmomi::VIM.const_get(obj.xsiType)
       klass.new.tap do |new_obj|
         obj.each do |key, val|
           new_obj.send("#{key}=", vim_to_rbvmomi_types(val))
@@ -1179,7 +1179,7 @@ class VimService
       end
     when VimString
       if obj.xsiType == "ManagedObjectReference"
-        klass = "RbVmomi::VIM::#{obj.vimType}".constantize
+        klass = RbVmomi::VIM.const_get(obj.xsiType)
         klass.new(vim, obj.to_s)
       else
         obj.to_s
