@@ -10,7 +10,7 @@ class MiqVimClientBase < VimService
 
   attr_reader :server, :port, :username, :password, :connId
 
-  def initialize(server:, username:, password:, port: 443)
+  def initialize(server:, username:, password:, port: 443, ssl_options: {})
     @server   = server
     @port     = port
     @username = username
@@ -20,9 +20,9 @@ class MiqVimClientBase < VimService
     @receiveTimeout = @@receiveTimeout
 
     on_http_client_init do |http_client, _headers|
-      http_client.ssl_config.verify_mode    = OpenSSL::SSL::VERIFY_NONE
-      http_client.ssl_config.verify_callback  = method(:verify_callback).to_proc
-      http_client.receive_timeout       = @receiveTimeout
+      http_client.receive_timeout        = @receiveTimeout
+      http_client.ssl_config.verify_mode = ssl_options[:verify_ssl] || OpenSSL::SSL::VERIFY_NONE
+      http_client.ssl_config.cert_store.add_cert(OpenSSL::X509::Certificate.new(ssl_options[:ca_file])) if ssl_options[:ca_file]
     end
 
     on_log_header { |msg| logger.info msg }

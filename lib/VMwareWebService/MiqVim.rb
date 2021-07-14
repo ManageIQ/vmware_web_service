@@ -24,6 +24,7 @@ class MiqVim < MiqVimInventory
   # @param username [String] Username to connect to the vCenter Server
   # @param password [String] Password to connect to the vCenter Server
   # @param port [Integer] Port to connect to the vCenter Server (default: 443)
+  # @param ssl_options [Hash] SSL connection options, :verify_mode and :ca_file
   # @param cache_scope [Symbol] A pre-defined set of properties to cache (default: nil)
   # @param monitor_updates [Bool] Should a thread be started to monitor updates (default: false)
   # @param pre_load [Bool] Should the cache be built before returning the connection (default: false)
@@ -31,8 +32,8 @@ class MiqVim < MiqVimInventory
   # @param notify_method [Method] A optional method to call for each update (default: nil)
   # @param max_wait [Integer] How many seconds to wait before breaking out of WaitForUpdates (default: 60)
   # @param max_objects [Integer] How many objects to return from each WaitForUpdates page (default: 250)
-  def initialize(server:, username:, password:, port: 443, cache_scope: nil, monitor_updates: nil, pre_load: nil, debug_updates: false, notify_method: nil, max_wait: 60, max_objects: 250)
-    super(:server => server, :port => port, :username => username, :password => password, :cache_scope => cache_scope)
+  def initialize(server:, username:, password:, port: 443, ssl_options: {}, cache_scope: nil, monitor_updates: nil, pre_load: nil, debug_updates: false, notify_method: nil, max_wait: 60, max_objects: 250)
+    super(:server => server, :port => port, :ssl_options => ssl_options, :username => username, :password => password, :cache_scope => cache_scope)
 
     monitor_updates = self.class.monitor_updates if monitor_updates.nil?
     pre_load        = self.class.pre_load        if pre_load.nil?
