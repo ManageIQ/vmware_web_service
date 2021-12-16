@@ -1,7 +1,7 @@
 # vmware-web-service
 
 [![Gem Version](https://badge.fury.io/rb/vmware_web_service.svg)](http://badge.fury.io/rb/vmware_web_service)
-[![Build Status](https://travis-ci.org/ManageIQ/vmware_web_service.svg)](https://travis-ci.org/ManageIQ/vmware_web_service)
+[![CI](https://github.com/ManageIQ/manageiq-gems-pending/actions/workflows/ci.yaml/badge.svg)](https://github.com/ManageIQ/manageiq-gems-pending/actions/workflows/ci.yaml)
 [![Code Climate](https://codeclimate.com/github/ManageIQ/vmware_web_service.svg)](https://codeclimate.com/github/ManageIQ/vmware_web_service)
 [![Test Coverage](https://codeclimate.com/github/ManageIQ/vmware_web_service/badges/coverage.svg)](https://codeclimate.com/github/ManageIQ/vmware_web_service/coverage)
 [![Security](https://hakiri.io/github/ManageIQ/vmware_web_service/master.svg)](https://hakiri.io/github/ManageIQ/vmware_web_service/master)
