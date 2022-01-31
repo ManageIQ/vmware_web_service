@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
   spec.required_ruby_version = ">= 2.5.0"
   spec.files = Dir["{app,config,lib}/**/*"]
 
-  spec.add_dependency "activesupport",        ">= 5.2.4.3", "< 6.1"
+  spec.add_dependency "activesupport",        ">= 5.2.4.3", "< 7.0"
   spec.add_dependency "ffi-vix_disk_lib",     "~>1.1"
   spec.add_dependency "handsoap",             "~>0.2.5"
   spec.add_dependency "httpclient",           "~>2.8.0"
