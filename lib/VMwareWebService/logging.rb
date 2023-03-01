@@ -9,8 +9,16 @@ module VMwareWebService
   end
 
   module Logging
+    extend ActiveSupport::Concern
+
+    class_methods do
+      def logger
+        VMwareWebService.logger
+      end
+    end
+
     def logger
-      VMwareWebService.logger
+      self.class.logger
     end
   end
 end
