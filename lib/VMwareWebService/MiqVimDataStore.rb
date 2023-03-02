@@ -317,6 +317,6 @@ class MiqVimDataStore
   end
 
   def encode_path_url(path)
-    URI.encode(path, /[^#{URI::PATTERN::UNRESERVED}]/)
+    URI::DEFAULT_PARSER.escape(path, /[^#{URI::PATTERN::UNRESERVED}]/o)
   end
 end # module MiqVimDataStore
