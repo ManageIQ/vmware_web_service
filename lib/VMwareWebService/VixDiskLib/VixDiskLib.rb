@@ -100,7 +100,7 @@ class VixDiskLib
 
     my_env["LD_LIBRARY_PATH"] = (my_env["LD_LIBRARY_PATH"].to_s.split(':') << VIXDISKLIB_PATH).compact.join(":")
     raise VixDiskLibError, "VixDiskLib.connect() failed: No logger defined" unless logger
-    my_env["LOG_FILE"] = logger.logdev.filename.to_s if logger.logdev.kind_of?(Logger::LogDevice)
+    my_env["LOG_FILE"] = logger.logdev.filename.to_s if logger.try(:logdev).kind_of?(Logger::LogDevice)
 
     my_env
   end
