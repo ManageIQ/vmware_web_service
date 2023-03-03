@@ -1,3 +1,6 @@
+require "active_support"
+require "active_support/concern"
+
 module VMwareWebService
   class << self
     attr_writer :logger
