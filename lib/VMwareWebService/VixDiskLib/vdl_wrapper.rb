@@ -3,27 +3,26 @@ require 'sync'
 require 'ffi-vix_disk_lib/api_wrapper'
 require 'VMwareWebService/VimTypes'
 require 'VMwareWebService/VixDiskLib/VixDiskLib'
-require 'VMwareWebService/logging'
 require 'time'
 
 VixDiskLibApi = FFI::VixDiskLib::ApiWrapper
 class VdlWrapper
   extend FFI::VixDiskLib::ApiWrapper
   include DRb::DRbUndumped
-  include VMwareWebService::Logging
 
   @initialized       = false
   @server_disk_count = 0
   @vddk              = nil
+  @logger            = Logger.new($stdout)
 
   def self.server(server)
     return unless @vddk.nil?
     @vddk = server
   end
 
-  @info_log  = ->(s) { logger.info "VMware(VixDiskLib): #{s}" }
-  @warn_log  = ->(s) { logger.warn "VMware(VixDiskLib): #{s}" }
-  @error_log = ->(s) { logger.error "VMware(VixDiskLib): #{s}" }
+  @info_log  = ->(s) { @logger.info "VMware(VixDiskLib): #{s}" }
+  @warn_log  = ->(s) { @logger.warn "VMware(VixDiskLib): #{s}" }
+  @error_log = ->(s) { @logger.error "VMware(VixDiskLib): #{s}" }
 
   def self.init
     return if @initialized
@@ -33,10 +32,10 @@ class VdlWrapper
   end
 
   def self.dumpDisks(server_name)
-    logger.warn "*** Open VdlDisks for server #{server_name}"
+    @logger.warn "*** Open VdlDisks for server #{server_name}"
     @connection.dumpDisks unless @connection.nil? || @connection.serverName != server_name
     @vddk.running = true
-    logger.warn "*** Open VdlDisks end"
+    @logger.warn "*** Open VdlDisks end"
   end
 
   def self.inc_server_disk_count
@@ -52,7 +51,7 @@ class VdlWrapper
   end
 
   def self.connect(connect_parms)
-    logger.info "VdlWrapper.connect: #{connect_parms[:server_name]}"
+    @logger.info "VdlWrapper.connect: #{connect_parms[:server_name]}"
     raise VixDiskLibError, "VixDiskLib is not initialized" unless @initialized
     raise VixDiskLibError, "Already connected to #{@connection.serverName}" if @connection
     @connection = VdlConnection.new(connect_parms, @vddk)
@@ -60,7 +59,7 @@ class VdlWrapper
   end
 
   def self.__disconnect__(conn_obj)
-    logger.info "VdlWrapper.__disconnect__: #{conn_obj.serverName}"
+    @logger.info "VdlWrapper.__disconnect__: #{conn_obj.serverName}"
     raise VixDiskLibError, "VixDiskLib is not initialized" unless @initialized
     FFI::VixDiskLib::API.disconnect(conn_obj.vdl_connection)
     @connection = nil
@@ -75,7 +74,7 @@ class VdlWrapper
     # the DRb service (this process) to segfault during the exit sequence.
     #
     # super
-    logger.info "VixDiskLib has exited cleanly"
+    @logger.info "VixDiskLib has exited cleanly"
     @vddk.running = true
     @vddk.shutdown = true
     @initialized = nil
@@ -85,13 +84,15 @@ end # class VixDiskLib
 class VdlConnection
   include DRb::DRbUndumped
 
-  attr_reader :vdl_connection, :serverName, :vddk
+  attr_reader :logger, :vdl_connection, :serverName, :vddk
 
   MAX_DISK_WARN = 9
 
   def initialize(connect_parms, vddk)
     @serverName     = connect_parms[:server_name]
-    logger.info "VdlConnection.initialize: #{@serverName}"
+    @logger         = Logger.new($stdout)
+
+    @logger.info "VdlConnection.initialize: #{@serverName}"
     @vdl_connection  = VixDiskLibApi.connect(connect_parms)
     @disks           = []
     @disk_lock       = Sync.new
@@ -172,13 +173,13 @@ end # class VdlConnection
 
 class VdlDisk
   include DRb::DRbUndumped
-  include VMwareWebService::Logging
 
-  attr_reader :path, :flags, :handle, :sectorSize, :timeStamp, :info
+  attr_reader :logger, :path, :flags, :handle, :sectorSize, :timeStamp, :info
 
   MIN_SECTORS_TO_CACHE = 64
 
   def initialize(conn_obj, path, flags)
+    @logger = Logger.new($stdout)
     @time_stamp = Time.now
     logger.debug { "VdlDisk.new <#{object_id}>: opening #{path}" }
     @connection = conn_obj
