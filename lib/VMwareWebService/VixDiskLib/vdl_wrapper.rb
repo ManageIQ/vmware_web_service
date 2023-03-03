@@ -2,6 +2,7 @@ require 'drb/drb'
 require 'sync'
 require 'ffi-vix_disk_lib/api_wrapper'
 require 'VMwareWebService/VimTypes'
+require 'VMwareWebService/VixDiskLib/VixDiskLib'
 require 'VMwareWebService/logging'
 require 'time'
 
