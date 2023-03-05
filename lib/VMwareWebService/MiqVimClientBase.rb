@@ -19,19 +19,8 @@ class MiqVimClientBase < VimService
 
     @receiveTimeout = @@receiveTimeout
 
-    on_http_client_init do |http_client, _headers|
-      http_client.receive_timeout        = @receiveTimeout
-      http_client.ssl_config.verify_mode = ssl_options[:verify_ssl] || OpenSSL::SSL::VERIFY_NONE
-      http_client.ssl_config.cert_store.add_cert(OpenSSL::X509::Certificate.new(ssl_options[:ca_file])) if ssl_options[:ca_file]
-    end
-
-    on_log_header { |msg| logger.info msg }
-    on_log_body   { |msg| logger.debug msg } if $miq_wiredump
-
-    super(:uri => sdk_uri, :version => 1)
-
-    @connected  = false
-    @connLock = Sync.new
+    @connected = false
+    @connLock  = Sync.new
   end
 
   def sdk_uri

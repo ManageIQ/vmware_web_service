@@ -49,7 +49,6 @@ class MiqVimInventory < MiqVimClientBase
     @spec       = spec
     @updateSpec = updateSpec
 
-    @globalIndent         = ""
     @selectorHash         = @@selectorHash
     @selectorPropPathHash = {}
 
