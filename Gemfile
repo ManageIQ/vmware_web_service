@@ -11,9 +11,14 @@ gemspec
 gem "manageiq-gems-pending", ">0", :require => 'manageiq-gems-pending', :git => "https://github.com/ManageIQ/manageiq-gems-pending.git", :branch => "master"
 gem "handsoap", "=0.2.5.5", :require => false, :source => "https://rubygems.manageiq.org"
 
-case ENV['TEST_RAILS_VERSION']
-when "6.0"
-  gem "activesupport", "~>6.0.4"
-when "6.1"
-  gem "activesupport", "~>6.1.4"
-end
+minimum_version =
+  case ENV['TEST_RAILS_VERSION']
+  when "6.0"
+    "~>6.0.4"
+  when "7.0"
+    "~>7.0.8"
+  else
+    "~>6.1.4"
+  end
+
+gem "activesupport", minimum_version
