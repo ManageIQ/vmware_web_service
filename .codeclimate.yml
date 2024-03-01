@@ -12,7 +12,7 @@ plugins:
   rubocop:
     enabled: true
     config: ".rubocop_cc.yml"
-    channel: rubocop-0-82
+    channel: rubocop-1-56-3
   brakeman:
     enabled: false
   bundler-audit:
