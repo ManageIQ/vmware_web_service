@@ -1,5 +1,4 @@
 require "handsoap"
-require 'active_support/core_ext/numeric/bytes'
 require 'VMwareWebService/logging'
 require 'VMwareWebService/VimTypes'
 
@@ -19,7 +18,7 @@ class VimService < Handsoap::Service
     @session_cookie     = nil
 
     @xml_payload_len  = 0
-    @xml_payload_max  = 10.megabytes
+    @xml_payload_max  = 10_485_760  # 10 megabytes
     @xml_payload_lock = Mutex.new
 
     @sic = retrieveServiceContent

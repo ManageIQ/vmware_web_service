@@ -1,5 +1,4 @@
-require "active_support"
-require "active_support/concern"
+require "logger"
 
 module VMwareWebService
   class << self
@@ -12,9 +11,11 @@ module VMwareWebService
   end
 
   module Logging
-    extend ActiveSupport::Concern
+    def self.included(other)
+      other.extend(ClassMethods)
+    end
 
-    class_methods do
+    module ClassMethods
       def logger
         VMwareWebService.logger
       end
