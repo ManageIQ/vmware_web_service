@@ -19,6 +19,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency "handsoap",             "~>0.2.5"
   spec.add_dependency "httpclient",           "~>2.8.0"
   spec.add_dependency "more_core_extensions", ">= 3.2", "< 5"
+  spec.add_dependency "uri",                  "~> 1.0.0", ">= 1.0.1"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "manageiq-style"
